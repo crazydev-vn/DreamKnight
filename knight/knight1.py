@@ -61,7 +61,6 @@ class Player1(pygame.sprite.Sprite):
         self.attack_sound_2 = pygame.mixer.Sound("sounds/attack/Sword2.mp3")
         self.attack_sound_3 = pygame.mixer.Sound("sounds/attack/Sword3.mp3")
         self.attack_sound_4 = pygame.mixer.Sound("sounds/attack/Sword4.mp3")
-        #self.attack_sound_5 = pygame.mixer.Sound("sounds/attack/Sword5.mp3")
         
         # Danh sách âm thanh để dễ quản lý
         self.attack_sounds = [
@@ -69,7 +68,6 @@ class Player1(pygame.sprite.Sprite):
             self.attack_sound_2,
             self.attack_sound_3,
             self.attack_sound_4,
-            #self.attack_sound_5
         ]
         
         # Chỉ số âm thanh hiện tại (bắt đầu từ 0)

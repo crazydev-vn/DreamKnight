@@ -1,8 +1,6 @@
-
-
 # ==================== CẤU HÌNH GAME ====================
 SCREEN_WIDTH = 800  #Độ rộng cửa sổ game (pixel)
-SCREEN_HEIGHT = 600 #Độ cao cửa sổ game (pixel)
+SCREEN_HEIGHT = 520  #Độ cao cửa sổ game (pixel) #400
 VIEW_WIDTH = 600   # Độ cao cửa sổ game (pixel)
 VIEW_HEIGHT = 400  # Vùng nhìn của camera - HIỆN TẠI CHỈ 1 PIXEL! 
 MAP_WIDTH = 1920
@@ -20,7 +18,7 @@ RUN_SPEED = 6  # Tốc độ chạy nhanh hơn
 MAP_IMAGE_PATH = "assets/map/MAP002.png"  # Đường dẫn đến file ảnh map của bạn
 
 # Thư mục chứa ảnh animation nhân vật (đảm bảo tồn tại)
-PLAYER_ASSET_DIR = "assets/knight1_lv1_walk"
+PLAYER_ASSET_DIR = "assets/knight_lv1"
 
 # Tên ảnh theo mẫu: walk_<dir>_<idx>.png
 # dir in ["up","down","left","right"], idx from 0..5
