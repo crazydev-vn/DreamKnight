@@ -18,7 +18,7 @@ RUN_SPEED = 6  # Tốc độ chạy nhanh hơn
 MAP_IMAGE_PATH = "assets/map/MAP002.png"  # Đường dẫn đến file ảnh map của bạn
 
 # Thư mục chứa ảnh animation nhân vật (đảm bảo tồn tại)
-PLAYER_ASSET_DIR = "assets/knight_lv1"
+PLAYER_ASSET_DIR = "assets/knight_lv3"
 
 # Tên ảnh theo mẫu: walk_<dir>_<idx>.png
 # dir in ["up","down","left","right"], idx from 0..5

@@ -38,7 +38,7 @@ class Game:
             x=140,
             y=20,
             image_path=None,  # Có thể để None nếu dùng animation
-            animation_folder="do_assets/Dragon_Home002",
+            animation_folder="assets/dragon_home", 
             frame_duration=0.15,
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
@@ -47,7 +47,7 @@ class Game:
         """Khởi tạo và phát nhạc nền"""
         try:
             # Load nhạc nền
-            pygame.mixer.music.load("sounds/34. Whispering Vaults.mp3")
+            pygame.mixer.music.load("sounds/map/001_Greenpath.mp3")
             
             # Cài đặt volume nhạc (0.0 đến 1.0)
             pygame.mixer.music.set_volume(0.5)  # 50% volume

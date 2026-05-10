@@ -175,6 +175,7 @@ class Player1(pygame.sprite.Sprite):
         # Tạo hitbox tấn công để phát hiện va chạm
         self.create_attack_hitbox()
 
+    #Hit box
     def create_attack_hitbox(self):
         """Tạo hitbox cho tấn công dựa trên hướng"""
         attack_range = 50  # Phạm vi tấn công (pixel)

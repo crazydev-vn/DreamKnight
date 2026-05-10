@@ -6,7 +6,7 @@ class GameObject:
     def __init__(self, x, y, image_path, animation_folder=None, frame_duration=0.05, scale=1.0):
         self.x = x
         self.y = y
-        self.scale = scale  # Thêm scale factor
+        self.scale = scale  
         
         # Load ảnh tĩnh
         try:

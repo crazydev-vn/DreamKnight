@@ -28,48 +28,48 @@ class Animation:
 # Định nghĩa cấu trúc thư mục và file cho từng animation
 ANIMATION_CONFIGS = {
     "idle": {
-        "folder": "knight1_lv1_idle",
+        "folder": "knight_lv3_idle",
         "directions": {
-            "up": {"prefix": "knight1_lv1_idle_ebove", "frames": 4},
-            "down": {"prefix": "knight1_lv1_idle_under", "frames": 12},
-            "left": {"prefix": "knight1_lv1_idle_left", "frames": 12},
-            "right": {"prefix": "knight1_lv1_idle_right", "frames": 12}
+            "up": {"prefix": "knight_lv3_idle_ebove", "frames": 4},
+            "down": {"prefix": "knight_lv3_idle_under", "frames": 12},
+            "left": {"prefix": "knight_lv3_idle_left", "frames": 12},
+            "right": {"prefix": "knight_lv3_idle_right", "frames": 12}
         }
     },
     "walk": {
-        "folder": "knight1_lv1_walk",
+        "folder": "knight_lv3_walk",
         "directions": {
-            "up": {"prefix": "knight1_lv1_walk_ebove", "frames": 6},
-            "down": {"prefix": "knight1_lv1_walk_under", "frames": 6},
-            "left": {"prefix": "knight1_lv1_walk_left", "frames": 6},
-            "right": {"prefix": "knight1_lv1_walk_right", "frames": 6}
+            "up": {"prefix": "knight_lv3_walk_ebove", "frames": 6},
+            "down": {"prefix": "knight_lv3_walk_under", "frames": 6},
+            "left": {"prefix": "knight_lv3_walk_left", "frames": 6},
+            "right": {"prefix": "knight_lv3_walk_right", "frames": 6}
         }
     },
     "run": {
-        "folder": "knight1_lv1_run",
+        "folder": "knight_lv3_run",
         "directions": {
-            "up": {"prefix": "knight1_lv1_run_ebove", "frames": 8},
-            "down": {"prefix": "knight1_lv1_run_under", "frames": 8},
-            "left": {"prefix": "knight1_lv1_run_left", "frames": 8},
-            "right": {"prefix": "knight1_lv1_run_right", "frames": 8}
+            "up": {"prefix": "knight_lv3_run_ebove", "frames": 8},
+            "down": {"prefix": "knight_lv3_run_under", "frames": 8},
+            "left": {"prefix": "knight_lv3_run_left", "frames": 8},
+            "right": {"prefix": "knight_lv3_run_right", "frames": 8}
         }
     },
     "attack_idle": {
-        "folder": "knight1_lv1_idle_attack",
+        "folder": "knight_lv3_idle_attack",
         "directions": {
-            "up": {"prefix": "knight1_lv1_idle_attack_ebove", "frames": 8},
-            "down": {"prefix": "knight1_lv1_idle_attack_under", "frames": 8},
-            "left": {"prefix": "knight1_lv1_idle_attack_left", "frames": 8},
-            "right": {"prefix": "knight1_lv1_idle_attack_right", "frames": 8}
+            "up": {"prefix": "knight_lv3_idle_attack_ebove", "frames": 8},
+            "down": {"prefix": "knight_lv3_idle_attack_under", "frames": 8},
+            "left": {"prefix": "knight_lv3_idle_attack_left", "frames": 8},
+            "right": {"prefix": "knight_lv3_idle_attack_right", "frames": 8}
         }
     },
     "attack_run": {
-        "folder": "knight1_lv1_run_attack",
+        "folder": "knight_lv3_run_attack",
         "directions": {
-            "up": {"prefix": "knight1_lv1_run_attack_ebove", "frames": 8},
-            "down": {"prefix": "knight1_lv1_run_attack_under", "frames": 8},
-            "left": {"prefix": "knight1_lv1_run_attack_left", "frames": 8},
-            "right": {"prefix": "knight1_lv1_run_attack_right", "frames": 8}
+            "up": {"prefix": "knight_lv3_run_attack_ebove", "frames": 8},
+            "down": {"prefix": "knight_lv3_run_attack_under", "frames": 8},
+            "left": {"prefix": "knight_lv3_run_attack_left", "frames": 8},
+            "right": {"prefix": "knight_lv3_run_attack_right", "frames": 8}
         }
     }
 }
@@ -119,7 +119,7 @@ class AnimationManager:
         
         for i in range(1, frame_count + 1):
             filename = f"{prefix}{i}.png"
-            filepath = os.path.join("assets", "knight_lv1", folder, filename)
+            filepath = os.path.join("assets", "knight_lv3", folder, filename)
             scaled_img = self._load_and_scale_image(filepath)
             frames.append(scaled_img)
         
