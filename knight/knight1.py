@@ -1,5 +1,5 @@
 import pygame
-from config import PLAYER_SPEED, RUN_SPEED
+from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
 from knight.animation_knight import Animation, load_idle_frames, load_walk_frames, load_run_frames, load_attack_idle_frames, load_attack_run_frames
 
 # Lớp Player kế thừa từ pygame.sprite.Sprite để sử dụng hệ thống sprite của Pygame
@@ -106,6 +106,7 @@ class Player1(pygame.sprite.Sprite):
         self.dy = 0  # Vận tốc theo trục Y
         
         # HITBOX TẤN CÔNG
+        self.debug = DEBUG_MODE  # Lấy giá trị debug từ config
         self.attack_hitbox = None  # Hitbox để phát hiện va chạm khi tấn công
 
     def handle_input(self, events):
@@ -214,6 +215,8 @@ class Player1(pygame.sprite.Sprite):
                 attack_range,
                 hitbox_size
             )
+    
+    
 
     def update_attack(self):
         """Cập nhật trạng thái tấn công"""
@@ -328,6 +331,10 @@ class Player1(pygame.sprite.Sprite):
                 # ĐI BỘ - Walk animation
                 self.walk_animations[self.direction].update()
                 self.image = self.walk_animations[self.direction].current_frame
+    def update_debug_mode(self):
+        """Cập nhật trạng thái debug từ config"""
+        from config import DEBUG_MODE
+        self.debug = DEBUG_MODE
 
     def draw(self, screen, camera):
         """Vẽ player lên screen với camera offset"""
@@ -337,9 +344,27 @@ class Player1(pygame.sprite.Sprite):
         # Vẽ player
         screen.blit(self.image, (screen_x, screen_y))
 
+        #"""
+        # ===== DEBUG: CHỈ HIỂN THỊ HITBOX =====
+        if DEBUG_MODE:  # Dùng trực tiếp từ config
+            # Vẽ attack hitbox (màu đỏ)
+            if self.is_attacking and self.attack_hitbox:
+                hitbox_screen_x = self.attack_hitbox.x - camera.x
+                hitbox_screen_y = self.attack_hitbox.y - camera.y
+                pygame.draw.rect(screen, (255, 0, 0), 
+                            (hitbox_screen_x, hitbox_screen_y, 
+                                self.attack_hitbox.width, self.attack_hitbox.height), 2)
+            
+            # Vẽ player hitbox (màu xanh lá)
+            pygame.draw.rect(screen, (0, 255, 0), 
+                        (screen_x, screen_y, self.width, self.height), 2)
+            
+            #"""
+
     def get_rect(self):
         """Trả về hitbox của player"""
         return pygame.Rect(self.x, self.y, self.width, self.height)
+    
     
     def get_attack_hitbox(self):
         """Trả về hitbox tấn công (nếu đang tấn công)"""

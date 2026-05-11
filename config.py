@@ -23,9 +23,5 @@ PLAYER_ASSET_DIR = "assets/knight_lv3"
 # Tên ảnh theo mẫu: walk_<dir>_<idx>.png
 # dir in ["up","down","left","right"], idx from 0..5
 PLAYER_ANIM_PREFIX = "walk"   # kết hợp: f"{PLAYER_ASSET_DIR}/{PLAYER_ANIM_PREFIX}_{dir}_{i}.png"
-# ==================== MÀU SẮC ====================
-#WHITE = (255, 255, 255)
-#RED = (255, 0, 0)
-#GREEN = (0, 255, 0)
-#BLUE = (0, 120, 255)
-#BLACK = (0, 0, 0)
+
+DEBUG_MODE = True
