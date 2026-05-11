@@ -1,27 +1,40 @@
 # ==================== CẤU HÌNH GAME ====================
-SCREEN_WIDTH = 800  #Độ rộng cửa sổ game (pixel)
-SCREEN_HEIGHT = 520  #Độ cao cửa sổ game (pixel) #400
-VIEW_WIDTH = 600   # Độ cao cửa sổ game (pixel)
-VIEW_HEIGHT = 400  # Vùng nhìn của camera - HIỆN TẠI CHỈ 1 PIXEL! 
-MAP_WIDTH = 1920
-MAP_HEIGHT = 1080
 
-PLAYER_WIDTH = 40
-PLAYER_HEIGHT = 40
+# Kích thước cửa sổ hiển thị chính của game (tính bằng pixel)
+SCREEN_WIDTH = 800   # Độ rộng cửa sổ game
+SCREEN_HEIGHT = 520  # Độ cao cửa sổ game (đã điều chỉnh từ 400 lên 520)
 
+# Kích thước vùng nhìn của camera (vùng thế giới game được hiển thị trong game_surface)
+VIEW_WIDTH = 600   # Độ rộng vùng nhìn (camera viewport width)
+VIEW_HEIGHT = 400  # Độ cao vùng nhìn (camera viewport height)
+
+# Kích thước toàn bộ bản đồ game (thế giới game rộng hơn màn hình)
+MAP_WIDTH = 1920   # Chiều rộng map (pixel)
+MAP_HEIGHT = 1080  # Chiều cao map (pixel)
+
+# Kích thước khung giới hạn (hitbox) của nhân vật chính
+PLAYER_WIDTH = 40   # Chiều rộng nhân vật (dùng cho va chạm)
+PLAYER_HEIGHT = 40  # Chiều cao nhân vật
+
+# Giới hạn FPS (frames per second) - thiết lập rất cao (10000) có thể để test hoặc debug
 FPS = 10000
 
-PLAYER_SPEED = 3  # THÊM DÒNG NÀY
-RUN_SPEED = 6  # Tốc độ chạy nhanh hơn
+# Tốc độ di chuyển cơ bản của nhân vật (pixel/frame)
+PLAYER_SPEED = 3
+
+# Tốc độ khi chạy (bằng nửa PLAYER_SPEED? thực tế là 6 > 3 nên nhanh gấp đôi)
+RUN_SPEED = 6        # Tốc độ chạy (nhanh hơn đi bộ)
 
 # ==================== ĐƯỜNG DẪN ẢNH ====================
-MAP_IMAGE_PATH = "assets/map/MAP002.png"  # Đường dẫn đến file ảnh map của bạn
 
-# Thư mục chứa ảnh animation nhân vật (đảm bảo tồn tại)
+# Đường dẫn đến file ảnh bản đồ nền (map background)
+MAP_IMAGE_PATH = "assets/map/MAP002.png"
+
+# Thư mục chứa các frame animation của nhân vật chính (các ảnh walking)
 PLAYER_ASSET_DIR = "assets/knight_lv3"
 
-# Tên ảnh theo mẫu: walk_<dir>_<idx>.png
-# dir in ["up","down","left","right"], idx from 0..5
-PLAYER_ANIM_PREFIX = "walk"   # kết hợp: f"{PLAYER_ASSET_DIR}/{PLAYER_ANIM_PREFIX}_{dir}_{i}.png"
+# Tiền tố tên file animation: các file có dạng walk_up_0.png, walk_left_1.png, ...
+PLAYER_ANIM_PREFIX = "walk"   # khi đọc file, sẽ kết hợp: f"{PLAYER_ASSET_DIR}/{PLAYER_ANIM_PREFIX}_{dir}_{i}.png"
 
+# Chế độ debug: in ra thông tin, hiển thị hitbox, v.v.
 DEBUG_MODE = True

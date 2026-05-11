@@ -4,6 +4,11 @@ from knight.knight1 import Player1
 from camera import Camera
 
 from game_object import GameObject  # Import object đơn giản
+from plant_target1 import PlantTarget1   # import enemy
+
+#Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
+#Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
+#phát nhạc nền. Kết nối các thành phần: player, camera, map, game object.
 
 class Game:
     def __init__(self):
@@ -12,36 +17,65 @@ class Game:
         # Khởi tạo mixer cho âm thanh
         pygame.mixer.init()
         
-        # Tạo cửa sổ game
+        # Tạo cửa sổ game với kích thước lấy từ config
         self.screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
         pygame.display.set_caption("DREAM KNIGHT")
-        self.clock = pygame.time.Clock()
+        self.clock = pygame.time.Clock()    # Đồng hồ để điều khiển FPS
         
         # Load map
         self.map_image = pygame.image.load(MAP_IMAGE_PATH).convert()
         
-        # Tạo player
-        self.player = Player1(MAP_WIDTH // 2, MAP_HEIGHT // 2)
+        # Tạo player tại trung tâm bản đồ (Chỉnh ở đây để chọn vị trí chỉ định)
+        self.player = Player1(
+            140, 20
+        )
         
-        # Tạo camera
+        # Tạo camera với kích thước bản đồ (dùng để cắt vùng nhìn)
         self.camera = Camera(MAP_WIDTH, MAP_HEIGHT)
         
-        # Tạo game surface với kích thước ĐÃ ZOOM của camera
+        # Tạo surface trung gian có kích thước bằng vùng nhìn của camera (đã có zoom)
+        # Camera có thể zoom (view_width, view_height) – đây là kích thước vùng nhìn game
         self.game_surface = pygame.Surface((self.camera.view_width, self.camera.view_height))
         
         # Khởi tạo và phát nhạc nền
         self.setup_music()
         
-        self.running = True
+        self.running = True # Cờ chạy vòng lặp game
 
+        # với animation từ thư mục
         self.dragonHome001_object = GameObject(
-            x=140,
-            y=20,
-            image_path=None,  # Có thể để None nếu dùng animation
+            #Tọa độ x, y trong game
+            x= 200 ,  
+            y= 200,
+            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
             animation_folder="assets/dragon_home", 
-            frame_duration=0.15,
+            frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
+
+        # Tạo plant target
+        
+        self.plants = []
+        
+        # Danh sách tọa độ các plant
+        plant_positions = [
+            (700, 800),
+            (730, 700),
+            (760, 600),
+            (700, 600),
+            #(800, 1000),
+            #(100, 200),    # Thêm tọa độ tùy ý
+            #(1800, 600),   # Thêm tọa độ tùy ý
+        ]
+        
+        for x, y in plant_positions:
+            plant = PlantTarget1(x, y, scale_factor=2.0)
+            plant.set_player(self.player)
+            self.plants.append(plant)
+
+        
+        #self.plant.set_player(self.player)
+
         
     def setup_music(self): 
         """Khởi tạo và phát nhạc nền"""
@@ -62,6 +96,8 @@ class Game:
             print(f"Lỗi khi phát nhạc: {e}")
 
     def handle_events(self):
+        # Vai trò: xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc).
+        # Trả về danh sách events để player xử lý thêm (tấn công, di chuyển...).
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
@@ -109,27 +145,48 @@ class Game:
         self.camera.update(self.player)
 
         self.dragonHome001_object.update(1/60)
+
+        # ========== CẬP NHẬT TẤT CẢ PLANT ==========
+        for plant in self.plants:
+            plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+        
+        # Kiểm tra va chạm tấn công với tất cả plant
+        self.check_attack_collisions()
+
+    def check_attack_collisions(self):
+        """Kiểm tra va chạm tấn công giữa player và tất cả plant"""
+        attack_hitbox = self.player.get_attack_hitbox()
+        if not attack_hitbox:
+            return
+        
+        # Duyệt ngược để xóa an toàn
+        for i in range(len(self.plants) - 1, -1, -1):
+            plant = self.plants[i]
+            cx, cy, radius = plant.get_hitbox()
+            
+            # Tìm điểm gần nhất trên attack_hitbox đến tâm plant
+            closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
+            closest_y = max(attack_hitbox.top, min(cy, attack_hitbox.bottom))
+            dx = closest_x - cx
+            dy = closest_y - cy
+            
+            if dx*dx + dy*dy < radius * radius:
+                self.plants.pop(i)  # Xóa plant khi bị đánh trúng
+                print(f"Plant bị tiêu diệt! Còn {len(self.plants)} plant")
     
     def draw(self):
-        # Vẽ lên game_surface (vùng nhìn đã ZOOM)
-        self.game_surface.fill((0, 0, 0))  # Nền đen
-        
-        # Vẽ map với camera offset
-        map_x = -self.camera.x
-        map_y = -self.camera.y
-        self.game_surface.blit(self.map_image, (map_x, map_y))
-        
-        #self.my_object.draw(self.game_surface, self.camera)
-
+        self.game_surface.fill((0,0,0))
+        self.game_surface.blit(self.map_image, (-self.camera.x, -self.camera.y))
         self.dragonHome001_object.draw(self.game_surface, self.camera)
         
-        # Vẽ player với camera offset
+        # ========== VẼ TẤT CẢ PLANT ==========
+        for plant in self.plants:
+            plant.draw(self.game_surface, self.camera)
+        
         self.player.draw(self.game_surface, self.camera)
         
-        # Scale game_surface lên toàn bộ màn hình
         scaled_surface = pygame.transform.scale(self.game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
-        self.screen.blit(scaled_surface, (0, 0))
-        
+        self.screen.blit(scaled_surface, (0,0))
         pygame.display.flip()
     
     def run(self):
