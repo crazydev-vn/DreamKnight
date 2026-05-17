@@ -57,15 +57,18 @@ class Game:
         
         self.plants = []
         
-        # Danh sách tọa độ các plant
+        # Danh sách tọa độ các plant được thêm vào
         plant_positions = [
             (700, 800),
             (730, 700),
             (760, 600),
             (700, 600),
-            #(800, 1000),
-            #(100, 200),    # Thêm tọa độ tùy ý
-            #(1800, 600),   # Thêm tọa độ tùy ý
+            
+        
+
+            (800, 1000),
+            (100, 200),    # Thêm tọa độ tùy ý
+            (1800, 600),   # Thêm tọa độ tùy ý
         ]
         
         for x, y in plant_positions:
@@ -76,9 +79,8 @@ class Game:
         
         #self.plant.set_player(self.player)
 
-        
+    #Khởi tạo và phát nhạc nền
     def setup_music(self): 
-        """Khởi tạo và phát nhạc nền"""
         try:
             # Load nhạc nền
             pygame.mixer.music.load("sounds/map/001_Greenpath.mp3")
@@ -116,17 +118,17 @@ class Game:
         # TRẢ VỀ EVENTS ĐỂ PLAYER XỬ LÝ TẤN CÔNG
         return events
     
+    #Tắt/bật nhạc nền
     def toggle_music(self):
-        """Tắt/bật nhạc nền"""
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.pause()
             print("Đã tạm dừng nhạc")
         else:
             pygame.mixer.music.unpause()
             print("Đã tiếp tục nhạc")
-
+            
+    #Thay đổi volume nhạc nền
     def change_volume(self, delta):
-        """Thay đổi volume nhạc nền"""
         current_volume = pygame.mixer.music.get_volume()
         new_volume = current_volume + delta
         # Giới hạn volume trong khoảng 0.0 đến 1.0
@@ -153,8 +155,8 @@ class Game:
         # Kiểm tra va chạm tấn công với tất cả plant
         self.check_attack_collisions()
 
+    #Kiểm tra va chạm tấn công giữa player và tất cả plant
     def check_attack_collisions(self):
-        """Kiểm tra va chạm tấn công giữa player và tất cả plant"""
         attack_hitbox = self.player.get_attack_hitbox()
         if not attack_hitbox:
             return

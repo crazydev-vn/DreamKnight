@@ -4,7 +4,7 @@ import math
 from config import PLAYER_SPEED, RUN_SPEED
 from knight.animation_knight import Animation, AnimationManager
 
-# ==================== CẤU HÌNH CHO PLANT TARGET ====================
+#CẤU HÌNH CHO PLANT TARGET 
 PLANT_ANIMATION_CONFIGS = {
     "idle": {
         "folder": "plant1_idle",
@@ -44,9 +44,10 @@ PLANT_ANIMATION_CONFIGS = {
     }
 }
 
+
+# Lớp PlantTarget1 - kẻ địch thực vật 
 class PlantTarget1(pygame.sprite.Sprite):
-    """Lớp PlantTarget1 - kẻ địch thực vật có AI đơn giản"""
-    
+ 
     def __init__(self, x, y, scale_factor=2.0):
         super().__init__()
         
@@ -66,8 +67,8 @@ class PlantTarget1(pygame.sprite.Sprite):
         self._load_all_animations(scale_factor)
         
         # ---------- TRẠNG THÁI HIỆN TẠI ----------
-        self.direction = "down"              # SỬA: "under" -> "down"
-        self.state = "idle"                  # idle, walk, run, attack, return_home
+        self.direction = "down"              
+        self.state = "idle"                
         self.is_attacking = False
         
         # ---------- THÔNG SỐ DI CHUYỂN ----------
@@ -105,9 +106,8 @@ class PlantTarget1(pygame.sprite.Sprite):
         
         # Debug
         self.debug = True
-        
+    #Load tất cả các frame animation từ thư mục assets/plant_target/plant1
     def _load_all_animations(self, scale_factor):
-        """Load tất cả các frame animation từ thư mục assets/plant_target/plant1"""
         # SỬA: đường dẫn đúng
         base_path = os.path.join("assets", "plant_target", "plant1")
         
@@ -167,17 +167,18 @@ class PlantTarget1(pygame.sprite.Sprite):
             self.idle_anims["up"] = Animation(default_frames, 200)
             self.idle_anims["left"] = Animation(default_frames, 200)
             self.idle_anims["right"] = Animation(default_frames, 200)
-    
+
+    #Gán tham chiếu đến player
     def set_player(self, player):
-        """Gán tham chiếu đến player"""
+
         self.player = player
-        
+
+    #Cập nhật trạng thái, di chuyển - DÙNG HITBOX CỐ ĐỊNH TẠI NHÀ 
     def update(self, delta_time, map_width, map_height):
-        """Cập nhật trạng thái, AI và di chuyển - DÙNG HITBOX CỐ ĐỊNH TẠI NHÀ"""
         if self.player is None:
             return
         
-        # === QUAN TRỌNG: Tính khoảng cách từ PLAYER đến HOME (vị trí nhà cố định) ===
+        # QUAN TRỌNG: Tính khoảng cách từ PLAYER đến HOME (vị trí nhà cố định) ===
         px = self.player.x + self.player.width // 2
         py = self.player.y + self.player.height // 2
         
@@ -200,7 +201,7 @@ class PlantTarget1(pygame.sprite.Sprite):
             else:
                 self.direction = "up"
         
-        # === XỬ LÝ TRẠNG THÁI AI DỰA TRÊN HITBOX CỐ ĐỊNH ===
+        # XỬ LÝ TRẠNG THÁI DỰA TRÊN HITBOX CỐ ĐỊNH ===
         current_time = pygame.time.get_ticks()
         
         # Kiểm tra player có ở trong vùng chase_range CỐ ĐỊNH không
@@ -302,9 +303,9 @@ class PlantTarget1(pygame.sprite.Sprite):
         
         # CẬP NHẬT ANIMATION
         self._update_animation(delta_time)
-        
+
+    #Chọn và cập nhật animation
     def _update_animation(self, delta_time):
-        """Chọn và cập nhật animation"""
         # Chọn dictionary animation
         if self.state == "idle":
             anim_dict = self.idle_anims
@@ -335,8 +336,8 @@ class PlantTarget1(pygame.sprite.Sprite):
             self.height = self.image.get_height()
             self.body_radius = max(self.width, self.height) // 2
     
+    #Vẽ Plant và hitbox CỐ ĐỊNH tại nhà
     def draw(self, screen, camera):
-        """Vẽ Plant và hitbox CỐ ĐỊNH tại nhà"""
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
@@ -378,14 +379,14 @@ class PlantTarget1(pygame.sprite.Sprite):
             state_text = font.render(f"State: {self.state}", True, (255, 255, 0))
             screen.blit(state_text, (screen_x, screen_y - 45))
     
+    #Trả về hitbox thân (hình tròn)
     def get_hitbox(self):
-        """Trả về hitbox thân (hình tròn)"""
         return (self.x + self.width//2, self.y + self.height//2, self.body_radius)
     
+    #Trả về vùng phát hiện đuổi theo
     def get_chase_hitbox(self):
-        """Trả về vùng phát hiện đuổi theo"""
         return (self.x + self.width//2, self.y + self.height//2, self.chase_radius)
     
+    #Trả về vùng rời khỏi
     def get_leave_hitbox(self):
-        """Trả về vùng rời khỏi"""
         return (self.x + self.width//2, self.y + self.height//2, self.leave_radius)

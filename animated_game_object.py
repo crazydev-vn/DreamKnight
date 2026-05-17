@@ -4,6 +4,7 @@ import os
 # Lớp AnimatedObject - đại diện cho một vật thể trong game có thể hiển thị ảnh tĩnh
 # Chạy animation từ một thư mục chứa nhiều frame ảnh.
 # Hỗ trợ bật/tắt animation, cập nhật theo thời gian, vẽ theo camera.
+
 class AnimatedObject:
     """Lớp vật thể có animation"""
     def __init__(self, x, y, static_image_path, animation_folder, frame_duration=0.05):

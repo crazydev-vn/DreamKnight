@@ -5,7 +5,8 @@ import os
 #Hỗ trợ ảnh tĩnh hoặc có animation (chuỗi ảnh).
 #Hỗ trợ scale, cập nhật theo thời gian, vẽ theo camera.
 class GameObject:
-    """Lớp vật thể animation hoặc ảnh tĩnh"""
+
+    #Lớp vật thể animation hoặc ảnh tĩnh"
     def __init__(self, x, y, image_path, animation_folder=None, frame_duration=0.05, scale=1.0):
         self.x = x
         self.y = y
@@ -35,17 +36,18 @@ class GameObject:
         #Nếu có thư mục animation thì load nó
         if animation_folder:
             self.load_animation(animation_folder)
-    
+            
+    #Helper method để scale ảnh
     def _scale_image(self, image):
-        """Helper method để scale ảnh"""
+     
         if self.scale == 1.0:
             return image
         new_width = int(image.get_width() * self.scale)
         new_height = int(image.get_height() * self.scale)
         return pygame.transform.scale(image, (new_width, new_height))
     
+    #Load 24 ảnh animation từ folder
     def load_animation(self, folder_path):
-        """Load 24 ảnh animation từ folder"""
         try:
             # Lấy danh sách tất cả file ảnh trong thư mục, lọc theo đuôi .png, .jpg, .jpeg
             image_files = sorted([f for f in os.listdir(folder_path) 
@@ -73,9 +75,8 @@ class GameObject:
 
         except Exception as e:
             print(f"Lỗi khi load animation: {e}")
-    
+    #Cập nhật animation theo tgian thực
     def update(self, delta_time):
-        """Cập nhật animation theo tgian thực """
     
         if not self.is_animating or not self.animation_frames:
             return
@@ -88,40 +89,41 @@ class GameObject:
             self.timer = 0
             self.current_frame = (self.current_frame + 1) % len(self.animation_frames)
             self.current_image = self.animation_frames[self.current_frame]
-    
+    #Vẽ object lên surface
     def draw(self, surface, camera):
-        """Vẽ object lên surface"""
+
         if not self.current_image:
             return
             
         draw_x = self.x - camera.x
         draw_y = self.y - camera.y
         surface.blit(self.current_image, (draw_x, draw_y))
-    
+
+    #Bật animation
     def enable_animation(self):
-        """Bật animation"""
         if self.animation_frames:
             self.is_animating = True
-            
+
+   #Tắt animation (chỉ hiển thị ảnh tĩnh)         
     def disable_animation(self):
-        """Tắt animation (chỉ hiển thị ảnh tĩnh)"""
         self.is_animating = False
         self.current_image = self.static_image
-    
+
+    #Reset animation về frame đầu
     def reset_animation(self):
-        """Reset animation về frame đầu"""
         self.current_frame = 0
         self.timer = 0
         if self.animation_frames:
             self.current_image = self.animation_frames[0]
-    
+
+    #Thay đổi scale sau khi đã khởi tạo
     def set_scale(self, new_scale):
-        """Thay đổi scale sau khi đã khởi tạo"""
         self.scale = new_scale
         # Reload lại ảnh với scale mới
         if self.static_image:
             original = pygame.image.load(self.image_path).convert_alpha()
             self.static_image = self._scale_image(original)
         if self.animation_frames:
+            
             # Reload lại animation với scale mới
             self.load_animation(self.animation_folder)

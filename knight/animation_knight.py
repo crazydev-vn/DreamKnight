@@ -77,15 +77,14 @@ ANIMATION_CONFIGS = {
     }
 }
 
+#Quản lý tất cả animations của player
 class AnimationManager:
-    """Quản lý tất cả animations của player"""
-    
     def __init__(self, scale_factor=2.0):
         self.scale_factor = scale_factor
         self.animations_cache = {}  # Cache để tránh load lại ảnh nhiều lần
         
+    #Load và scale ảnh
     def _load_and_scale_image(self, filepath):
-        """Load và scale ảnh"""
         try:
             img = pygame.image.load(filepath).convert_alpha()
             original_size = img.get_size()
@@ -96,9 +95,8 @@ class AnimationManager:
             print(f"Error loading image {filepath}: {e}")
             # Trả về surface trắng nếu không load được
             return pygame.Surface((32, 32), pygame.SRCALPHA)
-    
+    #Load animation dựa trên type và direction
     def load_animation(self, animation_type, direction):
-        """Load animation dựa trên type và direction"""
         cache_key = f"{animation_type}_{direction}"
         
         # Kiểm tra cache trước
@@ -130,33 +128,33 @@ class AnimationManager:
         self.animations_cache[cache_key] = frames
         return frames
     
+    #Tạo đối tượng Animation từ type và direction
     def create_animation(self, animation_type, direction, frame_duration=90):
-        """Tạo đối tượng Animation từ type và direction"""
         frames = self.load_animation(animation_type, direction)
         return Animation(frames, frame_duration)
 
 # Các hàm cũ (giữ lại cho tương thích)
+#Load frames đứng yên
 def load_idle_frames(direction):
-    """Load frames đứng yên"""
     manager = AnimationManager()
     return manager.load_animation("idle", direction)
 
-def load_walk_frames(direction):
-    """Load frames đi bộ"""
+#Load frames đi bộ
+def load_walk_frames(direction): 
     manager = AnimationManager()
     return manager.load_animation("walk", direction)
 
+#Load frames chạy nhanh
 def load_run_frames(direction):
-    """Load frames chạy nhanh"""
     manager = AnimationManager()
     return manager.load_animation("run", direction)
 
+#Load frames tấn công khi ĐỨNG YÊN
 def load_attack_idle_frames(direction):
-    """Load frames tấn công khi ĐỨNG YÊN"""
     manager = AnimationManager()
     return manager.load_animation("attack_idle", direction)
 
+#Load frames tấn công khi ĐANG CHẠY
 def load_attack_run_frames(direction):
-    """Load frames tấn công khi ĐANG CHẠY"""
     manager = AnimationManager()
     return manager.load_animation("attack_run", direction)

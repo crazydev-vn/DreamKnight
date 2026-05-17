@@ -19,9 +19,10 @@ class Camera:
         # Đây là phần bản đồ được hiển thị lên màn hình người chơi
         self.view_width = VIEW_WIDTH    # VIEW_WIDTH từ config (thường 800-1200px)
         self.view_height = VIEW_HEIGHT  # VIEW_HEIGHT từ config (thường 600-800px)
-        
+    
+    #Cập nhật vị trí camera để theo dõi nhân vật
     def update(self, target):
-        """Cập nhật vị trí camera để theo dõi nhân vật"""
+        
         # Tính tâm của đối tượng mục tiêu (nhân vật) (pixel)
         target_center_x = target.x + target.width // 2      # Tâm X của nhân vật
         target_center_y = target.y + target.height // 2     # Tâm Y của nhân vật
@@ -34,9 +35,9 @@ class Camera:
         # Đảm bảo camera không hiển thị vùng ngoài bản đồ
         self.x = max(0, min(self.x, self.map_width - self.view_width))      # Giới hạn X: từ 0 đến (map_width - view_width)
         self.y = max(0, min(self.y, self.map_height - self.view_height))    # Giới hạn Y: từ 0 đến (map_height - view_height)
-        
+    
+    #Cập nhật kích thước tầm nhìn khi màn hình thay đổi   
     def update_view_size(self, width, height):
-        """Cập nhật kích thước tầm nhìn khi màn hình thay đổi"""
         # Phương thức này cho phép thay đổi kích thước viewport động
         # Hữu ích khi resize cửa sổ game hoặc thay đổi độ phân giải
         self.view_width = width     # Chiều rộng mới của viewport (px)
