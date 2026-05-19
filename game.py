@@ -47,8 +47,39 @@ class Game:
             image_path="assets/home/home_001.png",  # Dùng ảnh tĩnh
             animation_folder=None,
             frame_duration=None,
+            scale=2.0  
+        )
+
+        # với animation từ thư mục
+        self.home002_objcect = GameObject(
+            #Tọa độ x, y trong game
+            x= 1500 ,  y= 10,
+            image_path= "assets/home2/home2.png",  # Không có ảnh tĩnh, chỉ dùng animation
+            animation_folder=None, 
+            frame_duration=None,    # Mỗi frame hiển thị 0.15 giây
+            scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
+        )
+
+        self.chimney_home2_object = GameObject(
+            x = 1500,  y = 10,
+            image_path=None,
+            animation_folder= "assets/chimney",
+            frame_duration=0.15,    
             scale=2.0
         )
+
+
+        # với animation từ thư mục
+        self.dragonHome001_object = GameObject(
+            #Tọa độ x, y trong game
+            x= 200 ,  y= 100,
+            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
+            animation_folder="assets/dragon_home", 
+            frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
+            scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
+        )
+
+        
 
         self.tree_01_object = GameObject (
             x = 800 , y = 120,
@@ -63,26 +94,25 @@ class Game:
             image_path="assets/fruit_basket/fruit_basket_01.png",
             animation_folder= None,
             frame_duration = 2.0,
-            scale= 2.0,
+            scale= 1.9,
         )
         self.fruit_pasket_02 = GameObject(
             x = 1330, y  = 190,
             image_path="assets/fruit_basket/fruit_basket_02.png",
             animation_folder= None,
             frame_duration = 2.0,
-            scale= 2.0,
+            scale= 1.9,
         )
 
-        # với animation từ thư mục
-        self.dragonHome001_object = GameObject(
-            #Tọa độ x, y trong game
-            x= 200 ,  y= 100,
-            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
-            animation_folder="assets/dragon_home", 
-            frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
-            scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
+        self.fruit_pasket_03 = GameObject (
+            x = 1430, y =  200,
+            image_path="assets/fruit_basket/fruit_basket_03.png",
+            animation_folder= None,
+            frame_duration = 2.0,
+            scale= 1.9,
         )
 
+        
 
 
         # Tạo plant target
@@ -92,13 +122,13 @@ class Game:
         # Danh sách tọa độ các plant được thêm vào
         plant_positions = [
             (700, 800),
-            (730, 700),
-            (760, 600),
-            (700, 600),
+            #(730, 700),
+            #(760, 600),
+            #(700, 600),
     
-            (800, 1000),
-            (100, 200),    # Thêm tọa độ tùy ý
-            (1800, 600),   # Thêm tọa độ tùy ý
+            #(800, 1000),
+            #(100, 200),    # Thêm tọa độ tùy ý
+            #(1800, 600),   # Thêm tọa độ tùy ý
         ]
         
         for x, y in plant_positions:
@@ -177,11 +207,18 @@ class Game:
         self.camera.update(self.player)
 
         self.home001_object.update(1/60)
+        self.home002_objcect.update(1/60)
+        self.chimney_home2_object.update(1/60)
+
+        self.dragonHome001_object.update(1/60)
+
+
         self.tree_01_object.update(1/60)
         self.fruit_pasket_01.update(1/60)
         self.fruit_pasket_02.update(1/60)
+        self.fruit_pasket_03.update(1/60)
 
-        self.dragonHome001_object.update(1/60)
+        
         
 
 
@@ -217,12 +254,19 @@ class Game:
         self.game_surface.fill((0,0,0))
         self.game_surface.blit(self.map_image, (-self.camera.x, -self.camera.y))
         
+       
         self.home001_object.draw(self.game_surface, self.camera)
+        self.home002_objcect.draw(self.game_surface, self.camera)
+        self.chimney_home2_object.draw(self.game_surface, self.camera)
+
+        self.dragonHome001_object.draw(self.game_surface, self.camera)
+
         self.tree_01_object.draw(self.game_surface, self.camera)
         self.fruit_pasket_01.draw(self.game_surface, self.camera)
         self.fruit_pasket_02.draw(self.game_surface, self.camera)
+        self.fruit_pasket_03.draw(self.game_surface, self.camera)
 
-        self.dragonHome001_object.draw(self.game_surface, self.camera)
+       
         
         
         # ========== VẼ TẤT CẢ PLANT ==========
