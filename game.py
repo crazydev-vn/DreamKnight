@@ -42,16 +42,48 @@ class Game:
         
         self.running = True # Cờ chạy vòng lặp game
 
+        self.home001_object = GameObject(
+            x=900, y= 10, #100, 
+            image_path="assets/home/home_001.png",  # Dùng ảnh tĩnh
+            animation_folder=None,
+            frame_duration=None,
+            scale=2.0
+        )
+
+        self.tree_01_object = GameObject (
+            x = 800 , y = 120,
+            image_path = None,
+            animation_folder = "assets/tree_01",
+            frame_duration = 2.0,
+            scale=2.0,
+        )
+
+        self.fruit_pasket_01 = GameObject(
+            x = 1225, y  = 190,
+            image_path="assets/fruit_basket/fruit_basket_01.png",
+            animation_folder= None,
+            frame_duration = 2.0,
+            scale= 2.0,
+        )
+        self.fruit_pasket_02 = GameObject(
+            x = 1330, y  = 190,
+            image_path="assets/fruit_basket/fruit_basket_02.png",
+            animation_folder= None,
+            frame_duration = 2.0,
+            scale= 2.0,
+        )
+
         # với animation từ thư mục
         self.dragonHome001_object = GameObject(
             #Tọa độ x, y trong game
-            x= 200 ,  
-            y= 200,
+            x= 200 ,  y= 100,
             image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
             animation_folder="assets/dragon_home", 
             frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
+
+
 
         # Tạo plant target
         
@@ -63,9 +95,7 @@ class Game:
             (730, 700),
             (760, 600),
             (700, 600),
-            
-        
-
+    
             (800, 1000),
             (100, 200),    # Thêm tọa độ tùy ý
             (1800, 600),   # Thêm tọa độ tùy ý
@@ -83,7 +113,7 @@ class Game:
     def setup_music(self): 
         try:
             # Load nhạc nền
-            pygame.mixer.music.load("sounds/map/001_Greenpath.mp3")
+            pygame.mixer.music.load("03_sounds/map/H101-62 ASPID REVISED.mp3")
             
             # Cài đặt volume nhạc (0.0 đến 1.0)
             pygame.mixer.music.set_volume(0.5)  # 50% volume
@@ -146,7 +176,14 @@ class Game:
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
 
+        self.home001_object.update(1/60)
+        self.tree_01_object.update(1/60)
+        self.fruit_pasket_01.update(1/60)
+        self.fruit_pasket_02.update(1/60)
+
         self.dragonHome001_object.update(1/60)
+        
+
 
         # ========== CẬP NHẬT TẤT CẢ PLANT ==========
         for plant in self.plants:
@@ -179,7 +216,14 @@ class Game:
     def draw(self):
         self.game_surface.fill((0,0,0))
         self.game_surface.blit(self.map_image, (-self.camera.x, -self.camera.y))
+        
+        self.home001_object.draw(self.game_surface, self.camera)
+        self.tree_01_object.draw(self.game_surface, self.camera)
+        self.fruit_pasket_01.draw(self.game_surface, self.camera)
+        self.fruit_pasket_02.draw(self.game_surface, self.camera)
+
         self.dragonHome001_object.draw(self.game_surface, self.camera)
+        
         
         # ========== VẼ TẤT CẢ PLANT ==========
         for plant in self.plants:

@@ -2,6 +2,16 @@ import pygame
 from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
 from knight.animation_knight import Animation, load_idle_frames, load_walk_frames, load_run_frames, load_attack_idle_frames, load_attack_run_frames
 
+# Lớp Player1 kế thừa từ pygame.sprite.Sprite để sử dụng hệ thống sprite của Pygame
+
+# Lớp Player1 - Đại diện cho nhân vật chính (hiệp sĩ) trong game.
+# Quản lý:
+# - Các trạng thái: đứng yên (idle), đi bộ (walk), chạy (run), tấn công (attack).
+# - Animation riêng cho từng trạng thái và từng hướng (lên, xuống, trái, phải).
+# - Di chuyển mượt với vector chuẩn hóa, di chuyển = nhấn giữ shift trái
+# - Tấn công bằng chuột trái, tạo hitbox tấn công và phát âm thanh luân phiên.
+# - Giới hạn trong bản đồ, cập nhật camera, vẽ với debug hitbox.
+
 class Player1(pygame.sprite.Sprite):
     def __init__(self, x, y):
         super().__init__()
@@ -44,10 +54,10 @@ class Player1(pygame.sprite.Sprite):
 
         # KHỞI TẠO ÂM THANH TẤN CÔNG
         pygame.mixer.init()
-        self.attack_sound_1 = pygame.mixer.Sound("sounds/attack/Sword1.mp3")
-        self.attack_sound_2 = pygame.mixer.Sound("sounds/attack/Sword2.mp3")
-        self.attack_sound_3 = pygame.mixer.Sound("sounds/attack/Sword3.mp3")
-        self.attack_sound_4 = pygame.mixer.Sound("sounds/attack/Sword4.mp3")
+        self.attack_sound_1 = pygame.mixer.Sound("03_sounds/attack/Sword1.mp3")
+        self.attack_sound_2 = pygame.mixer.Sound("03_sounds/attack/Sword2.mp3")
+        self.attack_sound_3 = pygame.mixer.Sound("03_sounds/attack/Sword3.mp3")
+        self.attack_sound_4 = pygame.mixer.Sound("03_sounds/attack/Sword4.mp3")
         
         self.attack_sounds = [
             self.attack_sound_1,
@@ -65,6 +75,10 @@ class Player1(pygame.sprite.Sprite):
         self.attack_start_time = 0
         self.attack_duration = 300
         self.sound_played_for_this_attack = False  
+        
+        # THÊM BIẾN TOGGLE RUN (nhấn Shift 1 lần để chạy, nhấn lại để đi bộ)
+        self.run_mode = False  # Chế độ chạy nhanh (toggle)
+        self.shift_just_pressed = False  # Đánh dấu Shift vừa được nhấn trong frame này
         
         # THAY ĐỔI 1: Xóa các biến liên quan đến thời gian chạy tự động
         # (không cần walk_start_time và running_transition_time nữa)
@@ -84,9 +98,18 @@ class Player1(pygame.sprite.Sprite):
         self.debug = DEBUG_MODE
         self.attack_hitbox = None
 
-    # THAY ĐỔI 2: Sửa handle_input để kiểm tra phím Shift
+    # THAY ĐỔI 2: Sửa handle_input để kiểm tra phím Shift với chế độ toggle
     def handle_input(self, events):
         keys = pygame.key.get_pressed()
+        
+        # XỬ LÝ TOGGLE RUN (nhấn Shift 1 lần để chuyển đổi chế độ chạy/đi bộ)
+        # Kiểm tra nếu đang nhấn Shift
+        if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+            if not self.shift_just_pressed:  # Chỉ xử lý 1 lần khi mới nhấn
+                self.run_mode = not self.run_mode  # Đảo trạng thái chế độ chạy
+                self.shift_just_pressed = True
+        else:
+            self.shift_just_pressed = False  # Reset khi thả Shift
         
         if not self.is_attacking:
             dx_raw = (keys[pygame.K_d] - keys[pygame.K_a])
@@ -95,9 +118,9 @@ class Player1(pygame.sprite.Sprite):
             if dx_raw != 0 or dy_raw != 0:
                 length = max((dx_raw**2 + dy_raw**2) ** 0.5, 0.1)
                 
-                # THAY ĐỔI QUAN TRỌNG: Kiểm tra phím Shift trái để chạy
-                # Nếu nhấn Shift trái thì chạy nhanh, nếu không thì đi bộ
-                if keys[pygame.K_LSHIFT] or keys[pygame.K_RSHIFT]:
+                # THAY ĐỔI QUAN TRỌNG: Kiểm tra run_mode thay vì nhấn giữ Shift
+                # Nếu đang ở chế độ chạy thì chạy nhanh, nếu không thì đi bộ
+                if self.run_mode:
                     # Đang chạy - dùng tốc độ chạy
                     self.dx = (dx_raw / length) * RUN_SPEED
                     self.dy = (dy_raw / length) * RUN_SPEED
@@ -194,7 +217,7 @@ class Player1(pygame.sprite.Sprite):
 
     # THAY ĐỔI 3: Xóa hoặc đơn giản hóa update_running_state
     def update_running_state(self):
-        # Không cần hàm này nữa vì trạng thái chạy được điều khiển hoàn toàn bằng Shift
+        # Không cần hàm này nữa vì trạng thái chạy được điều khiển hoàn toàn bằng toggle Shift
         # Giữ lại hàm rỗng để không ảnh hưởng đến code gọi nó
         pass
 
@@ -251,7 +274,7 @@ class Player1(pygame.sprite.Sprite):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
-
+    """
         if DEBUG_MODE:
             if self.is_attacking and self.attack_hitbox:
                 hitbox_screen_x = self.attack_hitbox.x - camera.x
@@ -262,7 +285,7 @@ class Player1(pygame.sprite.Sprite):
             
             pygame.draw.rect(screen, (0, 255, 0), 
                         (screen_x, screen_y, self.width, self.height), 2)
-
+    """
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)
     
