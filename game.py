@@ -67,9 +67,15 @@ class Game:
             frame_duration=0.15,    
             scale=2.0
         )
+        
 
-
-        # với animation từ thư mục
+        self.home_base01_object = GameObject(
+            x = 200, y  = 101,
+            image_path="assets/home_base/home_base01.png",
+            animation_folder= None,
+            frame_duration = 2.0,
+            scale= 2.0,
+        )
         self.dragonHome001_object = GameObject(
             #Tọa độ x, y trong game
             x= 200 ,  y= 100,
@@ -78,6 +84,79 @@ class Game:
             frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
+
+
+        self.fences = []
+        
+        # Tạo nhiều hàng rào bằng vòng lặp
+        fence_positions = [
+            (152, 101),
+            (152, 133),
+            (152, 165),
+            (152, 197),
+            (152, 229),
+            (152, 261),
+            (152, 293),
+            (152, 325),
+            (152, 357),
+            (152, 389),
+            (152, 421),
+            (152, 453),
+            (152, 485),
+            (152, 517),
+            (152, 549),
+            (152, 581),
+            (152, 613),
+            (152, 645),
+
+
+            (801, 101),
+            (801, 133),
+            (801, 165),
+            (801, 197),
+            (801, 229),
+            (801, 261),
+            (801, 293),
+            (801, 325),
+            (801, 357),
+            (801, 389),
+            (801, 421),
+            (801, 453),
+            (801, 485),
+            (801, 517),
+            (801, 549),
+            (801, 581),
+            (801, 613),
+            (801, 645),
+            (801, 677),
+            (801, 709),
+            (801, 741),
+            (801, 773),
+            (801, 805),
+            (801, 837),
+            (801, 869),
+            (801, 901),
+            (801, 933),
+            (801, 965),
+            (801, 997),
+            (801, 1029),
+       
+         
+        ]
+        
+        for x, y in fence_positions:
+            fence = GameObject(
+                x=x, y=y,
+                image_path="assets/fence/fence2.png",
+                animation_folder=None,
+                frame_duration=2.0,
+                scale=2.0,
+            )
+            self.fences.append(fence)
+
+
+
+    
 
         
 
@@ -210,8 +289,11 @@ class Game:
         self.home002_objcect.update(1/60)
         self.chimney_home2_object.update(1/60)
 
+        self.home001_object.update(1/60)
         self.dragonHome001_object.update(1/60)
 
+        for fence in self.fences:
+            fence.update(1/60)
 
         self.tree_01_object.update(1/60)
         self.fruit_pasket_01.update(1/60)
@@ -256,10 +338,19 @@ class Game:
         
        
         self.home001_object.draw(self.game_surface, self.camera)
+        
+        
         self.home002_objcect.draw(self.game_surface, self.camera)
         self.chimney_home2_object.draw(self.game_surface, self.camera)
 
-        self.dragonHome001_object.draw(self.game_surface, self.camera)
+
+
+
+        self.home_base01_object.draw(self.game_surface, self.camera) #2
+        self.dragonHome001_object.draw(self.game_surface, self.camera) #3
+        
+        for fence in self.fences:
+            fence.draw(self.game_surface, self.camera)
 
         self.tree_01_object.draw(self.game_surface, self.camera)
         self.fruit_pasket_01.draw(self.game_surface, self.camera)
