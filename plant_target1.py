@@ -263,7 +263,7 @@ class PlantTarget1(pygame.sprite.Sprite):
                     else:
                         self.direction = "down" if dy_home > 0 else "up"
         
-        # === XỬ LÝ ĐUỔI THEO (khi đang walk hoặc run) ===
+        # XỬ LÝ ĐUỔI THEO (khi đang walk hoặc run)
         if self.state in ("walk", "run"):
             # Tính vector từ Plant đến Player
             target_x = self.player.x + self.player.width // 2
