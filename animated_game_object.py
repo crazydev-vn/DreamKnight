@@ -24,9 +24,9 @@ class AnimatedObject:
         self.timer = 0  # Bộ đếm thời gian để chuyển frame
         self.animation_enabled = True  # Cờ: True = đang chạy animation, False = dùng ảnh tĩnh
         self.current_image = self.static_image  # Ảnh đang được hiển thị (khởi tạo là ảnh tĩnh)
-        
+    
+    # Load tất cả ảnh animation từ folder
     def load_animation_frames(self, folder_path):
-        """Load tất cả ảnh animation từ folder"""
         try:
             # Lấy danh sách tên file ảnh trong thư mục, lọc theo đuôi mở rộng
             image_files = sorted([f for f in os.listdir(folder_path) 
@@ -43,9 +43,8 @@ class AnimatedObject:
             print(f"Đã load {len(self.animation_frames)} frame animation từ {folder_path}")
         except Exception as e:
             print(f"Lỗi khi load animation: {e}")
-    
+    # "Cập nhật animation
     def update(self, delta_time):
-        """Cập nhật animation""" 
         # Nếu animation bị tắt HOẶC không có frame nào -> hiển thị ảnh tĩnh
         if not self.animation_enabled or not self.animation_frames:
             self.current_image = self.static_image
@@ -62,6 +61,7 @@ class AnimatedObject:
             # Cập nhật ảnh hiện tại là frame mới
             self.current_image = self.animation_frames[self.current_frame]
     
+    # Vẽ object
     def draw(self, surface, camera):
         """Vẽ object"""
         # Tính tọa độ vẽ trên surface = tọa độ thế giới - tọa độ camera
