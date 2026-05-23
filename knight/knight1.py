@@ -275,7 +275,7 @@ class Player1(pygame.sprite.Sprite):
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
     #Vẽ hitbox nhân vật
-    #"""
+    """
         if DEBUG_MODE:
             if self.is_attacking and self.attack_hitbox:
                 hitbox_screen_x = self.attack_hitbox.x - camera.x
@@ -286,7 +286,7 @@ class Player1(pygame.sprite.Sprite):
             
             pygame.draw.rect(screen, (0, 255, 0), 
                         (screen_x, screen_y, self.width, self.height), 2)
-    #"""
+    """
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)
