@@ -96,8 +96,17 @@ class Player1(pygame.sprite.Sprite):
 
         self.x = x
         self.y = y
-        self.width = self.image.get_width()
+
+
+        self.width =  self.image.get_width()
         self.height = self.image.get_height()
+
+        self.hitbox_width = 30   # Chiều rộng hitbox mong muốn
+        self.hitbox_height = 50  # Chiều cao hitbox mong muốn
+
+        # Tùy chọn: Offset để dịch hitbox so với ảnh
+        self.hitbox_offset_x = 45  # Dịch ngang (dương = sang phải)
+        self.hitbox_offset_y = 40  # Dịch dọc (dương = xuống dưới)
 
         self.dx = 0
         self.dy = 0
@@ -180,39 +189,60 @@ class Player1(pygame.sprite.Sprite):
         self.create_attack_hitbox()
 
     def create_attack_hitbox(self):
-        attack_range = 50
-        hitbox_size = 40
+        # ===== CÁC THAM SỐ DỄ ĐIỀU CHỈNH =====
+        # Kích thước hitbox
+        hitbox_width = 60      # Độ rộng hitbox (cho hướng trái/phải)
+        hitbox_height = 60     # Chiều cao hitbox (cho hướng lên/xuống)
         
-        if self.direction == "up":
-            self.attack_hitbox = pygame.Rect(
-                self.x + self.width // 2 - hitbox_size // 2,
-                self.y - attack_range,
-                hitbox_size,
-                attack_range
-            )
-        elif self.direction == "down":
-            self.attack_hitbox = pygame.Rect(
-                self.x + self.width // 2 - hitbox_size // 2,
-                self.y + self.height,
-                hitbox_size,
-                attack_range
-            )
-        elif self.direction == "left":
-            self.attack_hitbox = pygame.Rect(
-                self.x - attack_range,
-                self.y + self.height // 2 - hitbox_size // 2,
-                attack_range,
-                hitbox_size
-            )
-        elif self.direction == "right":
-            self.attack_hitbox = pygame.Rect(
-                self.x + self.width,
-                self.y + self.height // 2 - hitbox_size // 2,
-                attack_range,
-                hitbox_size
-            )
+        # Điều chỉnh vị trí cho từng hướng (đơn vị: pixels)
+        # Giá trị dương = dịch sang phải/xuống dưới, âm = dịch sang trái/lên trên
+        offset_config = {
+            "up": {
+                "offset_x": 0,      # Dịch ngang (so với tâm)
+                "offset_y": -25,    # Dịch dọc (âm = lên trên, dương = xuống dưới)
+                "width": 80,        # Độ rộng hitbox khi đánh lên
+                "height": 20        # Chiều cao hitbox khi đánh lên
+            },
+            "down": {
+                "offset_x": 0,
+                "offset_y": 45,     # Dịch xuống dưới
+                "width": 80,
+                "height": 20
+            },
+            "left": {
+                "offset_x": -35,    # Dịch sang trái
+                "offset_y": 0,
+                "width": 20,
+                "height": 70
+            },
+            "right": {
+                "offset_x": 40,     # Dịch sang phải
+                "offset_y": 0,
+                "width": 20,
+                "height": 70
+            }
+        }
+        
+        # Lấy cấu hình cho hướng hiện tại
+        config = offset_config[self.direction]
+        
+        # Tính tâm của player
+        center_x = self.x + self.width // 2
+        center_y = self.y + self.height // 2
+        
+        # Tính vị trí hitbox dựa trên tâm player
+        hitbox_x = center_x + config["offset_x"] - config["width"] // 2
+        hitbox_y = center_y + config["offset_y"] - config["height"] // 2
+        
+        # Tạo hitbox
+        self.attack_hitbox = pygame.Rect(
+            hitbox_x,
+            hitbox_y,
+            config["width"],
+            config["height"]
+        )
     
-    #Cập nhật update_attack để hỗ trợ attack_walk
+    # Cập nhật update_attack để hỗ trợ attack_walk
     def update_attack(self):
         if self.is_attacking:
             current_time = pygame.time.get_ticks()
@@ -299,6 +329,26 @@ class Player1(pygame.sprite.Sprite):
         from config import DEBUG_MODE
         self.debug = DEBUG_MODE
 
+    """
+    def draw(self, screen, camera):
+        screen_x = self.x - camera.x
+        screen_y = self.y - camera.y
+        screen.blit(self.image, (screen_x, screen_y))
+        
+        
+        # Vẽ hitbox nhân vật và attack hitbox khi debug mode bật
+        if DEBUG_MODE:
+            if self.is_attacking and self.attack_hitbox:
+                hitbox_screen_x = self.attack_hitbox.x - camera.x
+                hitbox_screen_y = self.attack_hitbox.y - camera.y
+                pygame.draw.rect(screen, (255, 0, 0), 
+                            (hitbox_screen_x, hitbox_screen_y, 
+                                self.attack_hitbox.width, self.attack_hitbox.height), 2)
+            
+            pygame.draw.rect(screen, (0, 255, 0), 
+                        (screen_x, screen_y, self.width, self.height), 2)
+    """
+
     def draw(self, screen, camera):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
@@ -313,11 +363,23 @@ class Player1(pygame.sprite.Sprite):
                             (hitbox_screen_x, hitbox_screen_y, 
                                 self.attack_hitbox.width, self.attack_hitbox.height), 2)
             
+            # SỬA: Dùng hitbox_width, hitbox_height và hitbox_offset
             pygame.draw.rect(screen, (0, 255, 0), 
-                        (screen_x, screen_y, self.width, self.height), 2)
+                        (screen_x + self.hitbox_offset_x, 
+                        screen_y + self.hitbox_offset_y, 
+                        self.hitbox_width, 
+                        self.hitbox_height), 2)
+            
 
     def get_rect(self):
-        return pygame.Rect(self.x, self.y, self.width, self.height)
+        #return pygame.Rect(self.x, self.y, self.width, self.height)
+        # Trả về hitbox của nhân vật (dùng cho va chạm)
+        return pygame.Rect(
+            self.x + self.hitbox_offset_x, 
+            self.y + self.hitbox_offset_y, 
+            self.hitbox_width, 
+            self.hitbox_height
+        )
     
     def get_attack_hitbox(self):
         return self.attack_hitbox if self.is_attacking else None
