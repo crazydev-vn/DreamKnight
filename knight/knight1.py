@@ -1,6 +1,6 @@
 import pygame
 from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
-from knight.animation_knight import Animation, load_idle_frames, load_walk_frames, load_run_frames, load_attack_idle_frames, load_attack_run_frames
+from knight.animation_knight import Animation, load_idle_frames, load_walk_frames, load_run_frames, load_attack_idle_frames, load_attack_walk_frames, load_attack_run_frames
 
 # Lớp Player1 kế thừa từ pygame.sprite.Sprite để sử dụng hệ thống sprite của Pygame
 
@@ -45,6 +45,14 @@ class Player1(pygame.sprite.Sprite):
             "right": Animation(load_attack_idle_frames("right"), frame_duration=60),
         }
         
+        # THÊM MỚI: Animation tấn công khi đi bộ
+        self.attack_walk_animations = {
+            "up": Animation(load_attack_walk_frames("up"), frame_duration=60),
+            "down": Animation(load_attack_walk_frames("down"), frame_duration=60), 
+            "left": Animation(load_attack_walk_frames("left"), frame_duration=60),
+            "right": Animation(load_attack_walk_frames("right"), frame_duration=60),
+        }
+        
         self.attack_run_animations = {
             "up": Animation(load_attack_run_frames("up"), frame_duration=50),
             "down": Animation(load_attack_run_frames("down"), frame_duration=50), 
@@ -80,9 +88,8 @@ class Player1(pygame.sprite.Sprite):
         self.run_mode = False  # Chế độ chạy nhanh (toggle)
         self.shift_just_pressed = False  # Đánh dấu Shift vừa được nhấn trong frame này
         
-        # THAY ĐỔI 1: Xóa các biến liên quan đến thời gian chạy tự động
-        # (không cần walk_start_time và running_transition_time nữa)
-
+        #  Xóa các biến liên quan đến thời gian chạy tự động
+        
         # HÌNH ẢNH VÀ VỊ TRÍ
         self.image = self.idle_animations[self.direction].current_frame
         self.rect = self.image.get_rect(center=(x, y))
@@ -118,7 +125,7 @@ class Player1(pygame.sprite.Sprite):
             if dx_raw != 0 or dy_raw != 0:
                 length = max((dx_raw**2 + dy_raw**2) ** 0.5, 0.1)
                 
-                # THAY ĐỔI QUAN TRỌNG: Kiểm tra run_mode thay vì nhấn giữ Shift
+                # Kiểm tra run_mode nhấn Shift
                 # Nếu đang ở chế độ chạy thì chạy nhanh, nếu không thì đi bộ
                 if self.run_mode:
                     # Đang chạy - dùng tốc độ chạy
@@ -153,14 +160,21 @@ class Player1(pygame.sprite.Sprite):
         if self.current_attack_sound_index >= len(self.attack_sounds):
             self.current_attack_sound_index = 0
 
+    # Cập nhật start_attack để hỗ trợ attack_walk
     def start_attack(self):
         self.is_attacking = True
         self.attack_start_time = pygame.time.get_ticks()
         self.sound_played_for_this_attack = False
         
+        # Chọn animation dựa trên trạng thái di chuyển
         if self.is_running:
+            # Đang chạy - dùng animation attack_run
             self.attack_run_animations[self.direction].reset()
+        elif self.dx != 0 or self.dy != 0:
+            # Đang di chuyển (đi bộ) - dùng animation attack_walk
+            self.attack_walk_animations[self.direction].reset()
         else:
+            # Đang đứng yên - dùng animation attack_idle
             self.attack_idle_animations[self.direction].reset()
         
         self.create_attack_hitbox()
@@ -198,6 +212,7 @@ class Player1(pygame.sprite.Sprite):
                 hitbox_size
             )
     
+    #Cập nhật update_attack để hỗ trợ attack_walk
     def update_attack(self):
         if self.is_attacking:
             current_time = pygame.time.get_ticks()
@@ -206,16 +221,21 @@ class Player1(pygame.sprite.Sprite):
                 self.play_next_attack_sound()
                 self.sound_played_for_this_attack = True
             
+            # Cập nhật animation phù hợp với trạng thái
             if self.is_running:
                 self.attack_run_animations[self.direction].update()
+            elif self.dx != 0 or self.dy != 0:
+                # Đang đi bộ - cập nhật animation attack_walk
+                self.attack_walk_animations[self.direction].update()
             else:
+                # Đang đứng yên - cập nhật animation attack_idle
                 self.attack_idle_animations[self.direction].update()
             
             if current_time - self.attack_start_time >= self.attack_duration:
                 self.is_attacking = False
                 self.attack_hitbox = None
 
-    # THAY ĐỔI 3: Xóa hoặc đơn giản hóa update_running_state
+    # Xóa hgiản hóa update_running_state
     def update_running_state(self):
         # Không cần hàm này nữa vì trạng thái chạy được điều khiển hoàn toàn bằng toggle Shift
         # Giữ lại hàm rỗng để không ảnh hưởng đến code gọi nó
@@ -244,21 +264,30 @@ class Player1(pygame.sprite.Sprite):
         if self.is_attacking:
             self.create_attack_hitbox()
 
+    # Cập nhật phương thức update để hỗ trợ attack_walk
     def update(self, map_width, map_height, events):
         self.handle_input(events)
         self.update_running_state()  # Hàm này giờ không làm gì cả
         self.update_attack()
         self.move(self.dx, self.dy, map_width, map_height)
 
+        # Chọn animation hiển thị phù hợp
         if self.is_attacking:
             if self.is_running:
+                # Đang tấn công và chạy
                 self.image = self.attack_run_animations[self.direction].current_frame
+            elif self.dx != 0 or self.dy != 0:
+                # Đang tấn công và đi bộ
+                self.image = self.attack_walk_animations[self.direction].current_frame
             else:
+                # Đang tấn công và đứng yên
                 self.image = self.attack_idle_animations[self.direction].current_frame
         elif self.dx == 0 and self.dy == 0:
+            # Đứng yên không tấn công
             self.idle_animations[self.direction].update()
             self.image = self.idle_animations[self.direction].current_frame
         else:
+            # Đang di chuyển không tấn công
             if self.is_running:
                 self.run_animations[self.direction].update()
                 self.image = self.run_animations[self.direction].current_frame
@@ -274,8 +303,8 @@ class Player1(pygame.sprite.Sprite):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
-    #Vẽ hitbox nhân vật
-    """
+        
+        # Vẽ hitbox nhân vật và attack hitbox khi debug mode bật
         if DEBUG_MODE:
             if self.is_attacking and self.attack_hitbox:
                 hitbox_screen_x = self.attack_hitbox.x - camera.x
@@ -286,7 +315,6 @@ class Player1(pygame.sprite.Sprite):
             
             pygame.draw.rect(screen, (0, 255, 0), 
                         (screen_x, screen_y, self.width, self.height), 2)
-    """
 
     def get_rect(self):
         return pygame.Rect(self.x, self.y, self.width, self.height)

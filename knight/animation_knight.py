@@ -66,6 +66,15 @@ ANIMATION_CONFIGS = {
             "right": {"prefix": "knight_lv3_idle_attack_right", "frames": 8}
         }
     },
+    "attack_walk": {  # THÊM MỚI: Tấn công khi đi bộ
+        "folder": "knight_lv3_walk_attack",  # Tên thư mục chứa ảnh attack khi đi bộ
+        "directions": {
+            "up": {"prefix": "knight_lv3_walk_attack_ebove", "frames": 8},
+            "down": {"prefix": "knight_lv3_walk_attack_under", "frames": 8},
+            "left": {"prefix": "knight_lv3_walk_attack_left", "frames": 8},
+            "right": {"prefix": "knight_lv3_walk_attack_right", "frames": 8}
+        }
+    },
     "attack_run": {
         "folder": "knight_lv3_run_attack",
         "directions": {
@@ -95,6 +104,7 @@ class AnimationManager:
             print(f"Error loading image {filepath}: {e}")
             # Trả về surface trắng nếu không load được
             return pygame.Surface((32, 32), pygame.SRCALPHA)
+    
     #Load animation dựa trên type và direction
     def load_animation(self, animation_type, direction):
         cache_key = f"{animation_type}_{direction}"
@@ -153,6 +163,11 @@ def load_run_frames(direction):
 def load_attack_idle_frames(direction):
     manager = AnimationManager()
     return manager.load_animation("attack_idle", direction)
+
+# THÊM MỚI: Load frames tấn công khi ĐI BỘ
+def load_attack_walk_frames(direction):
+    manager = AnimationManager()
+    return manager.load_animation("attack_walk", direction)
 
 #Load frames tấn công khi ĐANG CHẠY
 def load_attack_run_frames(direction):
