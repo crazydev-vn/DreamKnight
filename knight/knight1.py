@@ -18,10 +18,10 @@ class Player1(pygame.sprite.Sprite):
 
         # KHỞI TẠO CÁC BỘ ANIMATION
         self.idle_animations = {
-            "up": Animation(load_idle_frames("up"), frame_duration=200),
+            "up": Animation(load_idle_frames("up"), frame_duration=500),
             "down": Animation(load_idle_frames("down"), frame_duration=200), 
             "left": Animation(load_idle_frames("left"), frame_duration=200),
-            "right": Animation(load_idle_frames("right"), frame_duration=200),
+            "right": Animation(load_idle_frames("right"), frame_duration=500),
         }
         
         self.walk_animations = {
@@ -353,7 +353,7 @@ class Player1(pygame.sprite.Sprite):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
-        
+        """
         # Vẽ hitbox nhân vật và attack hitbox khi debug mode bật
         if DEBUG_MODE:
             if self.is_attacking and self.attack_hitbox:
@@ -369,7 +369,7 @@ class Player1(pygame.sprite.Sprite):
                         screen_y + self.hitbox_offset_y, 
                         self.hitbox_width, 
                         self.hitbox_height), 2)
-            
+        """  
 
     def get_rect(self):
         #return pygame.Rect(self.x, self.y, self.width, self.height)

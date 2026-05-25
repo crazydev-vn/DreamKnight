@@ -51,7 +51,7 @@ class PlantTarget1(pygame.sprite.Sprite):
     def __init__(self, x, y, scale_factor=2.0):
         super().__init__()
         
-        # ---------- VỊ TRÍ VÀ HITBOX CƠ BẢN ----------
+        # VỊ TRÍ VÀ HITBOX CƠ BẢN 
         self.x = float(x)
         self.y = float(y)
         self.home_x = float(x)    # lưu vị trí nhà để quay về
@@ -66,32 +66,34 @@ class PlantTarget1(pygame.sprite.Sprite):
         # Load tất cả animation
         self._load_all_animations(scale_factor)
         
-        # ---------- TRẠNG THÁI HIỆN TẠI ----------
+        #TRẠNG THÁI HIỆN TẠI 
         self.direction = "down"              
         self.state = "idle"                
         self.is_attacking = False
         
-        # ---------- THÔNG SỐ DI CHUYỂN ----------
+        #THÔNG SỐ DI CHUYỂN 
         self.speed = 0.0
         self.dx = 0.0
         self.dy = 0.0
         
-        # ---------- AI PARAMETERS ----------
-        self.home_chase_radius = 200         # vùng phát hiện cố định (hitbox 2) - TĂNG LÊN 200
-        self.home_leave_radius = 400         # vùng rời cố định (hitbox 3) - GẤP ĐÔI chase
+        # PARAMETERS
+        self.home_chase_radius = 200         # vùng phát hiện cố định (hitbox 2)
+        self.home_leave_radius = 400         # vùng rời cố định (hitbox 3)
         self.walk_duration = 1000            # thời gian đi bộ trước khi chạy (ms)
+        self.attack_range = 50               # khoảng cách để kích hoạt animation tấn công
+        self.attack_duration = 500           # thời gian thực hiện animation tấn công (ms)
 
         self.walk_start_time = 0
         self.is_running = False
+        self.attack_start_time = 0            # thời điểm bắt đầu tấn công
         
         # Lưu player reference
         self.player = None
         
-        # ---------- HITBOX ----------
+        # HITBOX
         self.body_radius = 20
         
-        # ---------- HÌNH ẢNH VÀ RECT ----------
-        # SỬA: Kiểm tra an toàn khi lấy frame
+        # HÌNH ẢNH VÀ RECT 
         if "down" in self.idle_anims:
             self.image = self.idle_anims["down"].current_frame
         else:
@@ -106,9 +108,9 @@ class PlantTarget1(pygame.sprite.Sprite):
         
         # Debug
         self.debug = True
+        
     #Load tất cả các frame animation từ thư mục assets/plant_target/plant1
     def _load_all_animations(self, scale_factor):
-        # SỬA: đường dẫn đúng
         base_path = os.path.join("assets", "plant_target", "plant1")
         
         # Kiểm tra thư mục tồn tại
@@ -170,26 +172,49 @@ class PlantTarget1(pygame.sprite.Sprite):
 
     #Gán tham chiếu đến player
     def set_player(self, player):
-
         self.player = player
 
-    #Cập nhật trạng thái, di chuyển - DÙNG HITBOX CỐ ĐỊNH TẠI NHÀ 
+    #Cập nhật trạng thái, di chuyển
     def update(self, delta_time, map_width, map_height):
         if self.player is None:
             return
         
-        # QUAN TRỌNG: Tính khoảng cách từ PLAYER đến HOME (vị trí nhà cố định) ===
+        current_time = pygame.time.get_ticks()
+        
+        # XỬ LÝ TRẠNG THÁI TẤN CÔNG
+        if self.state == "attack":
+            # Kiểm tra nếu đã hết thời gian tấn công
+            if current_time - self.attack_start_time >= self.attack_duration:
+                self.state = "idle" if self.is_running == False else "run"
+                self.is_attacking = False
+                # Reset animation tấn công
+                if self.direction in self.attack_anims:
+                    self.attack_anims[self.direction].reset()
+                print("Kết thúc animation tấn công")
+            else:
+                # Đang trong animation tấn công, không di chuyển
+                self.dx = 0
+                self.dy = 0
+                self._update_animation(delta_time)
+                return
+        
+        # QUAN TRỌNG: Tính khoảng cách từ PLAYER đến HOME (vị trí nhà cố định)
         px = self.player.x + self.player.width // 2
         py = self.player.y + self.player.height // 2
         
         home_center_x = self.home_x + self.width // 2
         home_center_y = self.home_y + self.height // 2
         
-        # Khoảng cách từ player đến nhà (dùng để kiểm tra hitbox cố định)
+        # Khoảng cách từ player đến nhà
         dist_player_to_home = math.hypot(px - home_center_x, py - home_center_y)
         
-        # Cập nhật hướng nhìn về phía player (nếu đang đuổi)
-        if self.state in ("walk", "run", "attack") and self.player:
+        # Tính khoảng cách từ plant đến player
+        plant_center_x = self.x + self.width // 2
+        plant_center_y = self.y + self.height // 2
+        dist_to_player = math.hypot(plant_center_x - px, plant_center_y - py)
+        
+        # Cập nhật hướng nhìn về phía player
+        if self.player:
             angle = math.atan2(py - (self.y + self.height // 2), 
                               px - (self.x + self.width // 2))
             if abs(angle) < math.pi/4:
@@ -201,9 +226,23 @@ class PlantTarget1(pygame.sprite.Sprite):
             else:
                 self.direction = "up"
         
-        # XỬ LÝ TRẠNG THÁI DỰA TRÊN HITBOX CỐ ĐỊNH ===
-        current_time = pygame.time.get_ticks()
+        # KIỂM TRA KÍCH HOẠT TẤN CÔNG
+        # Nếu player trong tầm tấn công và không đang tấn công
+        if dist_to_player <= self.attack_range and self.state != "attack" and self.state != "return_home":
+            self.state = "attack"
+            self.is_attacking = True
+            self.attack_start_time = current_time
+            self.dx = 0
+            self.dy = 0
+            
+            # Reset animation tấn công để chạy từ đầu
+            if self.direction in self.attack_anims:
+                self.attack_anims[self.direction].reset()
+            
+            print(f"Plant phát hiện player trong tầm {self.attack_range}px - Bắt đầu tấn công!")
+            return
         
+        # XỬ LÝ TRẠNG THÁI DỰA TRÊN HITBOX CỐ ĐỊNH
         # Kiểm tra player có ở trong vùng chase_range CỐ ĐỊNH không
         if dist_player_to_home <= self.home_chase_radius:
             # Player đang ở trong vùng đuổi theo (cố định tại nhà)
@@ -226,12 +265,12 @@ class PlantTarget1(pygame.sprite.Sprite):
                 
         elif dist_player_to_home > self.home_leave_radius:
             # Player ra khỏi vùng leave_range CỐ ĐỊNH -> quay về nhà
-            if self.state != "return_home" and self.state != "idle":
+            if self.state != "return_home" and self.state != "idle" and self.state != "attack":
                 self.state = "return_home"
                 self.is_running = False
                 print(f"Player ra khỏi vùng {self.home_leave_radius}px - QUAY VỀ NHÀ")
         
-        # === XỬ LÝ TRẠNG THÁI "return_home" (quay về vị trí nhà) ===
+        # XỬ LÝ TRẠNG THÁI "return_home" (quay về vị trí nhà)
         if self.state == "return_home":
             # Tính vector từ vị trí hiện tại về HOME
             dx_home = home_center_x - (self.x + self.width // 2)
@@ -253,7 +292,7 @@ class PlantTarget1(pygame.sprite.Sprite):
                 # Di chuyển về nhà với tốc độ walk
                 if dist_to_home > 0:
                     length = max(abs(dx_home), abs(dy_home), 0.1)
-                    speed = PLAYER_SPEED * 0.6  # Tốc độ về nhà (chậm hơn)
+                    speed = PLAYER_SPEED * 0.6  # Tốc độ về nhà
                     self.dx = (dx_home / length) * speed
                     self.dy = (dy_home / length) * speed
                     
@@ -272,7 +311,11 @@ class PlantTarget1(pygame.sprite.Sprite):
             dy_target = target_y - (self.y + self.height // 2)
             distance = math.hypot(dx_target, dy_target)
             
-            if distance > 5:  # Chỉ di chuyển nếu còn xa
+            # Nếu đến gần player, dừng lại để tấn công (sẽ được xử lý ở đầu frame tiếp theo)
+            if distance <= self.attack_range:
+                self.dx = 0
+                self.dy = 0
+            elif distance > 5:  # Chỉ di chuyển nếu còn xa
                 length = max(distance, 0.1)
                 if self.state == "run":
                     speed = RUN_SPEED * 0.7  # Plant chạy chậm hơn player
@@ -318,7 +361,7 @@ class PlantTarget1(pygame.sprite.Sprite):
         else:
             anim_dict = self.walk_anims if self.state == "return_home" else self.idle_anims
         
-        # Lấy animation theo hướng (SỬA: fallback an toàn)
+        # Lấy animation theo hướng
         anim = anim_dict.get(self.direction)
         if not anim and "down" in anim_dict:
             anim = anim_dict["down"]
@@ -336,19 +379,22 @@ class PlantTarget1(pygame.sprite.Sprite):
             self.height = self.image.get_height()
             self.body_radius = max(self.width, self.height) // 2
     
-    #Vẽ Plant và hitbox CỐ ĐỊNH tại nhà
+    #Vẽ Plant và hitbox
     def draw(self, screen, camera):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
         
         if self.debug:
-            # === HITBOX DI ĐỘNG (thân plant) - màu xanh lá ===
+            # HITBOX DI ĐỘNG (thân plant) - màu xanh lá
             center_x = self.x + self.width // 2 - camera.x
             center_y = self.y + self.height // 2 - camera.y
             pygame.draw.circle(screen, (0, 255, 0), (center_x, center_y), self.body_radius, 2)
             
-            # === HITBOX CỐ ĐỊNH TẠI VỊ TRÍ NHÀ ===
+            # Vùng tấn công (màu cam)
+            pygame.draw.circle(screen, (255, 165, 0), (center_x, center_y), self.attack_range, 2)
+            
+            # HITBOX CỐ ĐỊNH TẠI VỊ TRÍ NHÀ
             home_center_x = self.home_x + self.width // 2 - camera.x
             home_center_y = self.home_y + self.height // 2 - camera.y
             
@@ -367,7 +413,7 @@ class PlantTarget1(pygame.sprite.Sprite):
                             (center_x, center_y), 
                             (home_center_x, home_center_y), 1)
             
-            # === HIỂN THỊ THÔNG TIN DEBUG ===
+            # HIỂN THỊ THÔNG TIN DEBUG
             font = pygame.font.Font(None, 20)
             dist_to_home = math.hypot(
                 (self.home_x + self.width//2) - (self.x + self.width//2),
@@ -382,11 +428,3 @@ class PlantTarget1(pygame.sprite.Sprite):
     #Trả về hitbox thân (hình tròn)
     def get_hitbox(self):
         return (self.x + self.width//2, self.y + self.height//2, self.body_radius)
-    
-    #Trả về vùng phát hiện đuổi theo
-    def get_chase_hitbox(self):
-        return (self.x + self.width//2, self.y + self.height//2, self.chase_radius)
-    
-    #Trả về vùng rời khỏi
-    def get_leave_hitbox(self):
-        return (self.x + self.width//2, self.y + self.height//2, self.leave_radius)

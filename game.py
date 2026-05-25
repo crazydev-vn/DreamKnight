@@ -47,7 +47,7 @@ class Game:
             image_path="assets/home/home_001.png",  # Dùng ảnh tĩnh
             animation_folder=None,
             frame_duration=None,
-            scale=2.0  
+            scale=2.0,
         )
 
         # với animation từ thư mục
