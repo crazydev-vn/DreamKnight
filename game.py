@@ -112,12 +112,8 @@ class Game:
             (801, 101), (801, 133), (801, 165), (801, 197), (801, 229), (801, 261),
             (801, 293), (801, 325), (801, 357), (801, 389), (801, 421), (801, 453),
             (801, 485), (801, 517), (801, 549), (801, 581), (801, 613), (801, 645),
-      
-       
-         
         ]
-        
-        
+            
         for x, y in fence_positions:
             fence = GameObject(
                 x=x, y=y,
@@ -168,7 +164,6 @@ class Game:
         # Danh sách tọa độ các plant được thêm vào
         plant_positions = [
             (700, 800),
-            #(730, 700),
             #(760, 600),
             #(700, 600),
     
@@ -180,27 +175,25 @@ class Game:
             plant = PlantTarget1(x, y, scale_factor=2.0)
             plant.set_player(self.player)
             self.plants.append(plant)
-
         #self.plant.set_player(self.player)
+           
            
         self.slimes2 = []
         # Danh sách tọa độ các slime 2 được thêm vào
         slime2_positions = [
-            (700, 800),
-            #(730, 700),
-            #(760, 600),
-            #(700, 600),
-    
-            #(800, 1000),
-            #(100, 200),    # Thêm tọa độ tùy ý
-            #(1800, 600),   # Thêm tọa độ tùy ý
+            (730, 700),
+            (700, 600),
+            (800, 1000),
+            (100, 200),    # Thêm tọa độ tùy ý
+            (1800, 600),   # Thêm tọa độ tùy ý
         ]
         for x, y in slime2_positions:
             slime2 = Slime2(x, y, scale_factor=2.0)
             slime2.set_player(self.player)
             self.slimes2.append(slime2)
-            
         
+        # ===== THÊM MỚI: Gán danh sách slime2 cho player để gây damage =====
+        self.player.set_enemies(self.slimes2)
 
     #Khởi tạo và phát nhạc nền
     def setup_music(self): 
@@ -291,28 +284,29 @@ class Game:
         self.fruit_pasket_03.update(1/60)
 
         
-        
-
-
         # CẬP NHẬT TẤT CẢ PLANT
         for plant in self.plants:
             plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-        self.check_attack_collisions()
 
-        # CẬP NHẬT TẤT CẢ PLANT
+        # CẬP NHẬT TẤT CẢ SLIME2
         for slime2 in self.slimes2:
             slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
         
-        # Kiểm tra va chạm tấn công với tất cả plant
-        self.check_attack_collisions()
+        # ===== SỬA: Xử lý va chạm riêng biệt =====
+        # Plant: xóa ngay khi trúng đòn (giữ nguyên cơ chế cũ)
+        self.check_plant_collisions()
+        
+        # Slime2: không xóa ở đây nữa, player sẽ gây damage qua deal_damage_to_enemies()
+        # Chỉ cần cập nhật lại danh sách slime2 (xóa những con đã chết)
+        self.remove_dead_slimes()
 
-    #Kiểm tra va chạm tấn công giữa player và tất cả plant
-    def check_attack_collisions(self):
+    # ===== HÀM MỚI: Xử lý va chạm cho PLANT (giữ nguyên cơ chế cũ) =====
+    def check_plant_collisions(self):
         attack_hitbox = self.player.get_attack_hitbox()
         if not attack_hitbox:
             return
         
-        # Duyệt ngược để xóa an toàn
+        # Duyệt ngược để xóa an toàn cho PLANT
         for i in range(len(self.plants) - 1, -1, -1):
             plant = self.plants[i]
             cx, cy, radius = plant.get_hitbox()
@@ -327,20 +321,15 @@ class Game:
                 self.plants.pop(i)  # Xóa plant khi bị đánh trúng
                 print(f"Plant bị tiêu diệt! Còn {len(self.plants)} plant")
 
-        # Duyệt ngược để xóa an toàn
-        for i in range(len(self.slimes2) - 1, -1, -1):
-            slime2 = self.slimes2[i]
-            cx, cy, radius = slime2.get_hitbox()
-            
-            # Tìm điểm gần nhất trên attack_hitbox đến tâm plant
-            closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
-            closest_y = max(attack_hitbox.top, min(cy, attack_hitbox.bottom))
-            dx = closest_x - cx
-            dy = closest_y - cy
-            
-            if dx*dx + dy*dy < radius * radius:
-                self.slimes2.pop(i)  # Xóa plant khi bị đánh trúng
-                print(f"Slime2 bị tiêu diệt! Còn {len(self.slimes2)} slime2")
+    # ===== HÀM MỚI: Xóa slime đã chết =====
+    def remove_dead_slimes(self):
+        """Xóa các slime2 đã chết khỏi danh sách"""
+        before_count = len(self.slimes2)
+        self.slimes2 = [slime for slime in self.slimes2 if not slime.is_dead]
+        if before_count != len(self.slimes2):
+            print(f"Đã xóa {before_count - len(self.slimes2)} slime2 chết")
+            # Cập nhật lại danh sách enemy cho player
+            self.player.set_enemies(self.slimes2)
     
     def draw(self):
         self.game_surface.fill((0,0,0))
@@ -373,8 +362,10 @@ class Game:
         for plant in self.plants:
             plant.draw(self.game_surface, self.camera)
 
+        # VẼ TẤT CẢ SLIME2 (chỉ vẽ nếu chưa chết)
         for slime2 in self.slimes2:
-            slime2.draw(self.game_surface, self.camera)
+            if not slime2.is_dead:
+                slime2.draw(self.game_surface, self.camera)
 
         self.player.draw(self.game_surface, self.camera)
         

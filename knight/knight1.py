@@ -10,6 +10,7 @@ from knight.animation_knight import Animation, load_idle_frames, load_walk_frame
 # - Animation riêng cho từng trạng thái và từng hướng (lên, xuống, trái, phải).
 # - Di chuyển mượt với vector chuẩn hóa, di chuyển = nhấn giữ shift trái
 # - Tấn công bằng chuột trái, tạo hitbox tấn công và phát âm thanh luân phiên.
+# - Gây sát thương lên kẻ địch khi tấn công
 # - Giới hạn trong bản đồ, cập nhật camera, vẽ với debug hitbox.
 
 class Player1(pygame.sprite.Sprite):
@@ -114,6 +115,13 @@ class Player1(pygame.sprite.Sprite):
         self.debug = DEBUG_MODE
         self.attack_hitbox = None
 
+        # ===== THÊM MỚI: HỆ THỐNG SÁT THƯƠNG =====
+        self.damage = 15                    # Sát thương mỗi đòn đánh
+        self.has_dealt_damage = False       # Đã gây sát thương trong đòn tấn công này chưa
+        self.damage_cooldown = 200          # Thời gian delay giữa các lần gây sát thương (ms)
+        self.last_damage_time = 0           # Thời điểm gây sát thương lần cuối
+        self.enemies = None                 # Danh sách kẻ địch (sẽ được gán từ game chính)
+
     # THAY ĐỔI 2: Sửa handle_input để kiểm tra phím Shift với chế độ toggle
     def handle_input(self, events):
         keys = pygame.key.get_pressed()
@@ -174,6 +182,7 @@ class Player1(pygame.sprite.Sprite):
         self.is_attacking = True
         self.attack_start_time = pygame.time.get_ticks()
         self.sound_played_for_this_attack = False
+        self.has_dealt_damage = False  # Reset trạng thái gây sát thương
         
         # Chọn animation dựa trên trạng thái di chuyển
         if self.is_running:
@@ -242,6 +251,50 @@ class Player1(pygame.sprite.Sprite):
             config["height"]
         )
     
+    # ===== HÀM MỚI: Gây sát thương lên kẻ địch =====
+    def deal_damage_to_enemies(self):
+        """Gây sát thương lên tất cả kẻ địch trong vùng attack_hitbox"""
+        if not self.is_attacking or self.attack_hitbox is None:
+            return
+        
+        current_time = pygame.time.get_ticks()
+        
+        # Kiểm tra cooldown
+        if current_time - self.last_damage_time < self.damage_cooldown:
+            return
+        
+        # Kiểm tra nếu đã có danh sách enemy
+        if self.enemies is None:
+            return
+        
+        # Duyệt từng enemy và kiểm tra va chạm
+        for enemy in self.enemies:
+            # Bỏ qua nếu enemy đã chết
+            if hasattr(enemy, 'is_dead') and enemy.is_dead:
+                continue
+            
+            # Lấy rect của enemy
+            if hasattr(enemy, 'get_rect'):
+                enemy_rect = enemy.get_rect()
+            elif hasattr(enemy, 'rect'):
+                enemy_rect = enemy.rect
+            else:
+                continue
+            
+            # Nếu attack_hitbox chạm vào enemy
+            if self.attack_hitbox.colliderect(enemy_rect):
+                # Gây sát thương nếu enemy có phương thức take_damage
+                if hasattr(enemy, 'take_damage'):
+                    enemy.take_damage(self.damage)
+                    self.last_damage_time = current_time
+                    print(f"⚔️ Player gây {self.damage} sát thương lên {enemy.__class__.__name__}!")
+                    break  # Chỉ gây damage cho 1 enemy mỗi lần (tránh đánh nhiều cùng lúc)
+    
+    # ===== HÀM MỚI: Gán danh sách enemy từ game chính =====
+    def set_enemies(self, enemies):
+        """Gán danh sách kẻ địch để player có thể tấn công"""
+        self.enemies = enemies
+    
     # Cập nhật update_attack để hỗ trợ attack_walk
     def update_attack(self):
         if self.is_attacking:
@@ -255,15 +308,20 @@ class Player1(pygame.sprite.Sprite):
             if self.is_running:
                 self.attack_run_animations[self.direction].update()
             elif self.dx != 0 or self.dy != 0:
-                # Đang đi bộ - cập nhật animation attack_walk
                 self.attack_walk_animations[self.direction].update()
             else:
-                # Đang đứng yên - cập nhật animation attack_idle
                 self.attack_idle_animations[self.direction].update()
+            
+            # THÊM MỚI: Kiểm tra thời điểm gây sát thương (giữa chừng animation)
+            attack_progress = current_time - self.attack_start_time
+            if not self.has_dealt_damage and attack_progress > 100:  # Gây sát thương sau 100ms
+                self.has_dealt_damage = True
+                self.deal_damage_to_enemies()  # Gọi hàm gây sát thương
             
             if current_time - self.attack_start_time >= self.attack_duration:
                 self.is_attacking = False
                 self.attack_hitbox = None
+                self.has_dealt_damage = False  # Reset cho lần tấn công sau
 
     # Xóa hgiản hóa update_running_state
     def update_running_state(self):
@@ -329,31 +387,12 @@ class Player1(pygame.sprite.Sprite):
         from config import DEBUG_MODE
         self.debug = DEBUG_MODE
 
-    """
     def draw(self, screen, camera):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
-        
-        
-        # Vẽ hitbox nhân vật và attack hitbox khi debug mode bật
-        if DEBUG_MODE:
-            if self.is_attacking and self.attack_hitbox:
-                hitbox_screen_x = self.attack_hitbox.x - camera.x
-                hitbox_screen_y = self.attack_hitbox.y - camera.y
-                pygame.draw.rect(screen, (255, 0, 0), 
-                            (hitbox_screen_x, hitbox_screen_y, 
-                                self.attack_hitbox.width, self.attack_hitbox.height), 2)
-            
-            pygame.draw.rect(screen, (0, 255, 0), 
-                        (screen_x, screen_y, self.width, self.height), 2)
-    """
 
-    def draw(self, screen, camera):
-        screen_x = self.x - camera.x
-        screen_y = self.y - camera.y
-        screen.blit(self.image, (screen_x, screen_y))
-        """
+        
         # Vẽ hitbox nhân vật và attack hitbox khi debug mode bật
         if DEBUG_MODE:
             if self.is_attacking and self.attack_hitbox:
@@ -369,10 +408,9 @@ class Player1(pygame.sprite.Sprite):
                         screen_y + self.hitbox_offset_y, 
                         self.hitbox_width, 
                         self.hitbox_height), 2)
-        """  
+
 
     def get_rect(self):
-        #return pygame.Rect(self.x, self.y, self.width, self.height)
         # Trả về hitbox của nhân vật (dùng cho va chạm)
         return pygame.Rect(
             self.x + self.hitbox_offset_x, 

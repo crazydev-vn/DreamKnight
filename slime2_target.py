@@ -41,6 +41,24 @@ SLIME2_ANIMATION_CONFIGS = {
             "left":  {"prefix": "slime2_attack_left", "frames": 11},
             "right": {"prefix": "slime2_attack_right", "frames": 11}
         }
+    },
+    "hit": {
+        "folder": "slime2_hurt",  # Cần tạo thư mục slime2_hit với các frame
+        "directions": {
+            "up":    {"prefix": "slime2_hurt_ebove", "frames": 4},
+            "down":  {"prefix": "slime2_hurt_under", "frames": 4},
+            "left":  {"prefix": "slime2_hurt_left", "frames": 4},
+            "right": {"prefix": "slime2_hurt_right", "frames": 4}
+        }
+    },
+    "death": {
+        "folder": "slime2_die",  # Cần tạo thư mục slime2_death với các frame
+        "directions": {
+            "up":    {"prefix": "slime2_die_ebove", "frames": 6},
+            "down":  {"prefix": "slime2_die_under", "frames": 6},
+            "left":  {"prefix": "slime2_die_left", "frames": 6},
+            "right": {"prefix": "slime2_die_right", "frames": 6}
+        }
     }
 }
 
@@ -61,6 +79,8 @@ class Slime2(pygame.sprite.Sprite):
         self.walk_anims = {}
         self.run_anims = {}
         self.attack_anims = {}
+        self.hit_anims = {}
+        self.death_anims = {}
         
         # Load tất cả animation
         self._load_all_animations(scale_factor)
@@ -85,6 +105,18 @@ class Slime2(pygame.sprite.Sprite):
         self.walk_start_time = 0
         self.is_running = False
         self.attack_start_time = 0            # thời điểm bắt đầu tấn công
+        
+        # THÔNG SỐ CHO BỊ THƯƠNG VÀ CHẾT
+        self.health = 30000000                     # máu của slime
+        self.max_health = 30000000
+        self.hit_start_time = 0
+        self.hit_duration = 300               # thời gian animation bị thương (ms)
+        self.death_start_time = 0
+        self.death_duration = 500             # thời gian animation chết (ms)
+        self.is_dead = False                  # trạng thái đã chết
+        self.is_invincible = False            # trạng thái bất tử (sau khi bị đánh)
+        self.invincible_duration = 500        # thời gian bất tử (ms)
+        self.invincible_start_time = 0
         
         # Lưu player reference
         self.player = None
@@ -154,9 +186,31 @@ class Slime2(pygame.sprite.Sprite):
             return anims
         
         self.idle_anims = load_anim_type("idle", frame_duration=200)
-        self.walk_anims = load_anim_type("walk", frame_duration=100)  # Chậm hơn plant một chút
+        self.walk_anims = load_anim_type("walk", frame_duration=100)
         self.run_anims = load_anim_type("run", frame_duration=90)
         self.attack_anims = load_anim_type("attack", frame_duration=70)
+        self.hit_anims = load_anim_type("hit", frame_duration=75)
+        self.death_anims = load_anim_type("death", frame_duration=85)
+        
+        # Nếu không load được animation hit, tạo animation mặc định
+        if not self.hit_anims:
+            print("Tạo animation hit mặc định cho slime2")
+            default_frames = [pygame.Surface((64, 64), pygame.SRCALPHA)]
+            default_frames[0].fill((255, 0, 0))  # màu đỏ cho bị thương
+            self.hit_anims["down"] = Animation(default_frames, 75)
+            self.hit_anims["up"] = Animation(default_frames, 75)
+            self.hit_anims["left"] = Animation(default_frames, 75)
+            self.hit_anims["right"] = Animation(default_frames, 75)
+        
+        # Nếu không load được animation death, tạo animation mặc định
+        if not self.death_anims:
+            print("Tạo animation death mặc định cho slime2")
+            default_frames = [pygame.Surface((64, 64), pygame.SRCALPHA)]
+            default_frames[0].fill((64, 0, 64))  # màu tím đậm cho chết
+            self.death_anims["down"] = Animation(default_frames, 85)
+            self.death_anims["up"] = Animation(default_frames, 85)
+            self.death_anims["left"] = Animation(default_frames, 85)
+            self.death_anims["right"] = Animation(default_frames, 85)
         
         # Nếu không load được animation nào, tạo animation mặc định
         if not self.idle_anims:
@@ -172,12 +226,102 @@ class Slime2(pygame.sprite.Sprite):
     def set_player(self, player):
         self.player = player
 
+    # Phương thức nhận sát thương
+    def take_damage(self, damage):
+        if self.is_dead:
+            return False
+        
+        if self.is_invincible:
+            return False
+        
+        # Trừ máu
+        self.health -= damage
+        print(f"Slime2 nhận {damage} sát thương! Máu còn: {self.health}/{self.max_health}")
+        
+        if self.health <= 0:
+            # Slime chết
+            self.health = 0
+            self.die()
+            return True
+        else:
+            # Slime bị thương
+            self.state = "hit"
+            self.hit_start_time = pygame.time.get_ticks()
+            
+            # Bật trạng thái bất tử
+            self.is_invincible = True
+            self.invincible_start_time = pygame.time.get_ticks()
+            
+            # Dừng di chuyển khi bị đánh
+            self.dx = 0
+            self.dy = 0
+            
+            # Reset animation hit
+            if self.direction in self.hit_anims:
+                self.hit_anims[self.direction].reset()
+            
+            return True
+    
+    # Phương thức xử lý khi chết
+    def die(self):
+        if not self.is_dead:
+            self.is_dead = True
+            self.state = "death"
+            self.death_start_time = pygame.time.get_ticks()
+            
+            # Dừng mọi di chuyển
+            self.dx = 0
+            self.dy = 0
+            
+            # Reset animation death
+            if self.direction in self.death_anims:
+                self.death_anims[self.direction].reset()
+            
+            print("Slime2 đã chết!")
+
+    # Cập nhật trạng thái bất tử
+    def _update_invincible(self, current_time):
+        if self.is_invincible:
+            if current_time - self.invincible_start_time >= self.invincible_duration:
+                self.is_invincible = False
+                print("Slime2 hết trạng thái bất tử")
+
     # Cập nhật trạng thái, di chuyển
     def update(self, delta_time, map_width, map_height):
         if self.player is None:
             return
         
         current_time = pygame.time.get_ticks()
+        
+        # Cập nhật trạng thái bất tử
+        self._update_invincible(current_time)
+        
+        # XỬ LÝ TRẠNG THÁI CHẾT
+        if self.state == "death":
+            # Kiểm tra nếu animation death đã kết thúc
+            if current_time - self.death_start_time >= self.death_duration:
+                # Slime đã chết hoàn toàn, có thể xóa khỏi game
+                self.kill()
+                print("Slime2 đã biến mất khỏi game!")
+                return
+            else:
+                # Cập nhật animation chết
+                self._update_animation(delta_time)
+                return
+        
+        # XỬ LÝ TRẠNG THÁI BỊ THƯƠNG
+        if self.state == "hit":
+            # Kiểm tra nếu đã hết thời gian animation hit
+            if current_time - self.hit_start_time >= self.hit_duration:
+                # Quay lại trạng thái trước đó (idle hoặc walk)
+                self.state = "idle" if not self.is_running else "walk"
+                print("Slime2 hết trạng thái bị thương")
+            else:
+                # Đang trong animation bị thương, không di chuyển
+                self.dx = 0
+                self.dy = 0
+                self._update_animation(delta_time)
+                return
         
         # XỬ LÝ TRẠNG THÁI TẤN CÔNG
         if self.state == "attack":
@@ -356,6 +500,10 @@ class Slime2(pygame.sprite.Sprite):
             anim_dict = self.run_anims
         elif self.state == "attack":
             anim_dict = self.attack_anims
+        elif self.state == "hit":
+            anim_dict = self.hit_anims
+        elif self.state == "death":
+            anim_dict = self.death_anims
         else:
             anim_dict = self.walk_anims if self.state == "return_home" else self.idle_anims
         
@@ -369,6 +517,17 @@ class Slime2(pygame.sprite.Sprite):
         if anim:
             anim.update()
             self.image = anim.current_frame
+            
+            # Tạo hiệu ứng nhấp nháy khi bất tử (bị thương)
+            if self.is_invincible and not self.is_dead:
+                # Nhấp nháy bằng cách thay đổi độ alpha
+                alpha = 128 + int(127 * math.sin(pygame.time.get_ticks() * 0.015))
+                if alpha < 128:
+                    alpha = 128
+                self.image.set_alpha(alpha)
+            else:
+                self.image.set_alpha(255)
+            
             # Cập nhật rect giữ nguyên tâm
             old_center = self.rect.center
             self.rect = self.image.get_rect()
@@ -379,6 +538,9 @@ class Slime2(pygame.sprite.Sprite):
     
     # Vẽ Slime2 và hitbox
     def draw(self, screen, camera):
+        if self.is_dead:
+            return
+        
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
@@ -387,6 +549,20 @@ class Slime2(pygame.sprite.Sprite):
             # HITBOX DI ĐỘNG (thân slime) - màu tím
             center_x = self.x + self.width // 2 - camera.x
             center_y = self.y + self.height // 2 - camera.y
+            
+            # Hiển thị thanh máu
+            bar_width = 40
+            bar_height = 6
+            bar_x = screen_x + (self.width - bar_width) // 2
+            bar_y = screen_y - 15
+            
+            # Màu nền thanh máu (đỏ)
+            pygame.draw.rect(screen, (255, 0, 0), (bar_x, bar_y, bar_width, bar_height))
+            # Màu máu hiện tại (xanh lá)
+            health_percent = self.health / self.max_health
+            current_bar_width = int(bar_width * health_percent)
+            pygame.draw.rect(screen, (0, 255, 0), (bar_x, bar_y, current_bar_width, bar_height))
+            
             pygame.draw.circle(screen, (128, 0, 128), (center_x, center_y), self.body_radius, 2)
             
             # Vùng tấn công (màu cam)
@@ -422,6 +598,10 @@ class Slime2(pygame.sprite.Sprite):
             
             state_text = font.render(f"State: {self.state}", True, (255, 255, 0))
             screen.blit(state_text, (screen_x, screen_y - 45))
+            
+            # Hiển thị máu
+            health_text = font.render(f"HP: {self.health}/{self.max_health}", True, (255, 255, 255))
+            screen.blit(health_text, (screen_x, screen_y - 65))
     
     # Trả về hitbox thân (hình tròn)
     def get_hitbox(self):
