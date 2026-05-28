@@ -4,50 +4,49 @@ import math
 from config import PLAYER_SPEED, RUN_SPEED
 from knight.animation_knight import Animation, AnimationManager
 
-#CẤU HÌNH CHO PLANT TARGET 
-PLANT_ANIMATION_CONFIGS = {
+# CẤU HÌNH CHO SLIME2 TARGET
+SLIME2_ANIMATION_CONFIGS = {
     "idle": {
-        "folder": "plant1_idle",
+        "folder": "slime2_idle",
         "directions": {
-            "up":    {"prefix": "plant1_idle_ebove", "frames": 4},
-            "down":  {"prefix": "plant1_idle_under", "frames": 4},
-            "left":  {"prefix": "plant1_idle_left", "frames": 4},
-            "right": {"prefix": "plant1_idle_right", "frames": 4}
+            "up":    {"prefix": "slime2_idle_ebove", "frames": 6},
+            "down":  {"prefix": "slime2_idle_under", "frames": 6},
+            "left":  {"prefix": "slime2_idle_left", "frames": 6},
+            "right": {"prefix": "slime2_idle_right", "frames": 6}
         }
     },
     "walk": {
-        "folder": "plant1_walk",
+        "folder": "slime2_walk",
         "directions": {
-            "up":    {"prefix": "plant1_walk_ebove", "frames": 6},
-            "down":  {"prefix": "plant1_walk_under", "frames": 6},
-            "left":  {"prefix": "plant1_walk_left", "frames": 6},
-            "right": {"prefix": "plant1_walk_right", "frames": 6}
+            "up":    {"prefix": "slime2_walk_ebove", "frames": 8},
+            "down":  {"prefix": "slime2_walk_under", "frames": 8},
+            "left":  {"prefix": "slime2_walk_left", "frames": 8},
+            "right": {"prefix": "slime2_walk_right", "frames": 8}
         }
     },
     "run": {
-        "folder": "plant1_run",
+        "folder": "slime2_run",
         "directions": {
-            "up":    {"prefix": "plant1_run_ebove", "frames": 8},
-            "down":  {"prefix": "plant1_run_under", "frames": 8},
-            "left":  {"prefix": "plant1_run_left", "frames": 8},
-            "right": {"prefix": "plant1_run_right", "frames": 8}
+            "up":    {"prefix": "slime2_run_ebove", "frames": 8},
+            "down":  {"prefix": "slime2_run_under", "frames": 8},
+            "left":  {"prefix": "slime2_run_left", "frames": 8},
+            "right": {"prefix": "slime2_run_right", "frames": 8}
         }
     },
     "attack": {
-        "folder": "plant1_attack",
+        "folder": "slime2_attack",
         "directions": {
-            "up":    {"prefix": "plant1_attack_ebove", "frames": 7},
-            "down":  {"prefix": "plant1_attack_under", "frames": 7},
-            "left":  {"prefix": "plant1_attack_left", "frames": 7},
-            "right": {"prefix": "plant1_attack_right", "frames": 7}
+            "up":    {"prefix": "slime2_attack_ebove", "frames": 11},
+            "down":  {"prefix": "slime2_attack_under", "frames": 11},
+            "left":  {"prefix": "slime2_attack_left", "frames": 11},
+            "right": {"prefix": "slime2_attack_right", "frames": 11}
         }
     }
 }
 
-
-# Lớp PlantTarget1 - kẻ địch thực vật 
-class PlantTarget1(pygame.sprite.Sprite):
- 
+# Lớp Slime2 - kẻ địch slime
+class Slime2(pygame.sprite.Sprite):
+    
     def __init__(self, x, y, scale_factor=2.0):
         super().__init__()
         
@@ -66,22 +65,22 @@ class PlantTarget1(pygame.sprite.Sprite):
         # Load tất cả animation
         self._load_all_animations(scale_factor)
         
-        #TRẠNG THÁI HIỆN TẠI 
+        # TRẠNG THÁI HIỆN TẠI 
         self.direction = "down"              
         self.state = "idle"                
         self.is_attacking = False
         
-        #THÔNG SỐ DI CHUYỂN 
+        # THÔNG SỐ DI CHUYỂN 
         self.speed = 0.0
         self.dx = 0.0
         self.dy = 0.0
         
-        # PARAMETERS
-        self.home_chase_radius = 200         # vùng phát hiện cố định (hitbox 2)
-        self.home_leave_radius = 400         # vùng rời cố định (hitbox 3)
-        self.walk_duration = 1000            # thời gian đi bộ trước khi chạy (ms)
-        self.attack_range = 50               # khoảng cách để kích hoạt animation tấn công
-        self.attack_duration = 500           # thời gian thực hiện animation tấn công (ms)
+        # PARAMETERS (có thể điều chỉnh cho slime)
+        self.home_chase_radius = 250         # vùng phát hiện cố định (rộng hơn plant một chút)
+        self.home_leave_radius = 450         # vùng rời cố định
+        self.walk_duration = 1200            # thời gian đi bộ trước khi chạy (ms) - lâu hơn plant
+        self.attack_range = 45               # khoảng cách để kích hoạt animation tấn công (gần hơn plant)
+        self.attack_duration = 600           # thời gian thực hiện animation tấn công (ms) - lâu hơn plant
 
         self.walk_start_time = 0
         self.is_running = False
@@ -99,7 +98,7 @@ class PlantTarget1(pygame.sprite.Sprite):
         else:
             # Fallback: tạo surface trắng nếu không có animation
             self.image = pygame.Surface((64, 64), pygame.SRCALPHA)
-            self.image.fill((0, 255, 0))  # màu xanh tạm thời
+            self.image.fill((128, 0, 128))  # màu tím cho slime
             
         self.rect = self.image.get_rect(center=(self.x, self.y))
         self.width = self.image.get_width()
@@ -109,9 +108,9 @@ class PlantTarget1(pygame.sprite.Sprite):
         # Debug
         self.debug = True
         
-    #Load tất cả các frame animation từ thư mục assets/plant_target/plant1
+    # Load tất cả các frame animation từ thư mục assets/slime_target/slime2
     def _load_all_animations(self, scale_factor):
-        base_path = os.path.join("assets", "plant_target", "plant1")
+        base_path = os.path.join("assets", "resource_slime1_2_3", "slime_2")
         
         # Kiểm tra thư mục tồn tại
         if not os.path.exists(base_path):
@@ -120,7 +119,7 @@ class PlantTarget1(pygame.sprite.Sprite):
             
         def load_anim_type(anim_type, frame_duration=90):
             anims = {}
-            config = PLANT_ANIMATION_CONFIGS.get(anim_type)
+            config = SLIME2_ANIMATION_CONFIGS.get(anim_type)
             if not config:
                 return anims
             folder = config["folder"]
@@ -140,15 +139,14 @@ class PlantTarget1(pygame.sprite.Sprite):
                                 img = pygame.transform.scale(img, new_size)
                             frames.append(img)
                         else:
-                            #print(f"Không tìm thấy file: {filepath}")
                             # Tạo frame giả
                             surf = pygame.Surface((64, 64), pygame.SRCALPHA)
-                            surf.fill((0, 255, 0))
+                            surf.fill((128, 0, 128))  # Màu tím cho slime
                             frames.append(surf)
                     except Exception as e:
-                        #print(f"Lỗi load ảnh {filepath}: {e}")
+                        # Tạo frame giả
                         surf = pygame.Surface((64, 64), pygame.SRCALPHA)
-                        surf.fill((0, 255, 0))
+                        surf.fill((128, 0, 128))
                         frames.append(surf)
                 if frames:
                     anims[direction] = Animation(frames, frame_duration)
@@ -156,25 +154,25 @@ class PlantTarget1(pygame.sprite.Sprite):
             return anims
         
         self.idle_anims = load_anim_type("idle", frame_duration=200)
-        self.walk_anims = load_anim_type("walk", frame_duration=90)
-        self.run_anims = load_anim_type("run", frame_duration=80)
-        self.attack_anims = load_anim_type("attack", frame_duration=60)
+        self.walk_anims = load_anim_type("walk", frame_duration=100)  # Chậm hơn plant một chút
+        self.run_anims = load_anim_type("run", frame_duration=90)
+        self.attack_anims = load_anim_type("attack", frame_duration=70)
         
         # Nếu không load được animation nào, tạo animation mặc định
         if not self.idle_anims:
-            print("Tạo animation mặc định cho plant")
+            print("Tạo animation mặc định cho slime2")
             default_frames = [pygame.Surface((64, 64), pygame.SRCALPHA)]
-            default_frames[0].fill((0, 255, 0))
+            default_frames[0].fill((128, 0, 128))
             self.idle_anims["down"] = Animation(default_frames, 200)
             self.idle_anims["up"] = Animation(default_frames, 200)
             self.idle_anims["left"] = Animation(default_frames, 200)
             self.idle_anims["right"] = Animation(default_frames, 200)
 
-    #Gán tham chiếu đến player
+    # Gán tham chiếu đến player
     def set_player(self, player):
         self.player = player
 
-    #Cập nhật trạng thái, di chuyển
+    # Cập nhật trạng thái, di chuyển
     def update(self, delta_time, map_width, map_height):
         if self.player is None:
             return
@@ -190,7 +188,7 @@ class PlantTarget1(pygame.sprite.Sprite):
                 # Reset animation tấn công
                 if self.direction in self.attack_anims:
                     self.attack_anims[self.direction].reset()
-                print("Kết thúc animation tấn công")
+                print("Kết thúc animation tấn công của Slime2")
             else:
                 # Đang trong animation tấn công, không di chuyển
                 self.dx = 0
@@ -208,10 +206,10 @@ class PlantTarget1(pygame.sprite.Sprite):
         # Khoảng cách từ player đến nhà
         dist_player_to_home = math.hypot(px - home_center_x, py - home_center_y)
         
-        # Tính khoảng cách từ plant đến player
-        plant_center_x = self.x + self.width // 2
-        plant_center_y = self.y + self.height // 2
-        dist_to_player = math.hypot(plant_center_x - px, plant_center_y - py)
+        # Tính khoảng cách từ slime đến player
+        slime_center_x = self.x + self.width // 2
+        slime_center_y = self.y + self.height // 2
+        dist_to_player = math.hypot(slime_center_x - px, slime_center_y - py)
         
         # Cập nhật hướng nhìn về phía player
         if self.player:
@@ -239,7 +237,7 @@ class PlantTarget1(pygame.sprite.Sprite):
             if self.direction in self.attack_anims:
                 self.attack_anims[self.direction].reset()
             
-            print(f"Plant phát hiện player trong tầm {self.attack_range}px - Bắt đầu tấn công!")
+            print(f"Slime2 phát hiện player trong tầm {self.attack_range}px - Bắt đầu tấn công!")
             return
         
         # XỬ LÝ TRẠNG THÁI DỰA TRÊN HITBOX CỐ ĐỊNH
@@ -250,25 +248,25 @@ class PlantTarget1(pygame.sprite.Sprite):
                 self.state = "walk"
                 self.walk_start_time = current_time
                 self.is_running = False
-                print(f"Phát hiện player trong vùng {self.home_chase_radius}px - Bắt đầu đuổi")
+                print(f"Slime2 phát hiện player trong vùng {self.home_chase_radius}px - Bắt đầu đuổi")
             elif self.state == "walk":
                 if current_time - self.walk_start_time >= self.walk_duration:
                     self.state = "run"
                     self.is_running = True
-                    print("Chuyển sang chạy!")
+                    print("Slime2 chuyển sang chạy!")
             elif self.state == "return_home":
                 # Đang quay về nhưng player lại vào vùng -> đuổi tiếp
                 self.state = "walk"
                 self.walk_start_time = current_time
                 self.is_running = False
-                print("Player quay lại vùng - Tiếp tục đuổi")
+                print("Player quay lại vùng - Slime2 tiếp tục đuổi")
                 
         elif dist_player_to_home > self.home_leave_radius:
             # Player ra khỏi vùng leave_range CỐ ĐỊNH -> quay về nhà
             if self.state != "return_home" and self.state != "idle" and self.state != "attack":
                 self.state = "return_home"
                 self.is_running = False
-                print(f"Player ra khỏi vùng {self.home_leave_radius}px - QUAY VỀ NHÀ")
+                print(f"Player ra khỏi vùng {self.home_leave_radius}px - Slime2 QUAY VỀ NHÀ")
         
         # XỬ LÝ TRẠNG THÁI "return_home" (quay về vị trí nhà)
         if self.state == "return_home":
@@ -287,12 +285,12 @@ class PlantTarget1(pygame.sprite.Sprite):
                 self.y = self.home_y
                 self.rect.x = self.x
                 self.rect.y = self.y
-                print("Đã về đến NHÀ!")
+                print("Slime2 đã về đến NHÀ!")
             else:
                 # Di chuyển về nhà với tốc độ walk
                 if dist_to_home > 0:
                     length = max(abs(dx_home), abs(dy_home), 0.1)
-                    speed = PLAYER_SPEED * 0.6  # Tốc độ về nhà
+                    speed = PLAYER_SPEED * 0.5  # Tốc độ về nhà (chậm hơn plant)
                     self.dx = (dx_home / length) * speed
                     self.dy = (dy_home / length) * speed
                     
@@ -304,7 +302,7 @@ class PlantTarget1(pygame.sprite.Sprite):
         
         # XỬ LÝ ĐUỔI THEO (khi đang walk hoặc run)
         if self.state in ("walk", "run"):
-            # Tính vector từ Plant đến Player
+            # Tính vector từ Slime đến Player
             target_x = self.player.x + self.player.width // 2
             target_y = self.player.y + self.player.height // 2
             dx_target = target_x - (self.x + self.width // 2)
@@ -318,9 +316,9 @@ class PlantTarget1(pygame.sprite.Sprite):
             elif distance > 5:  # Chỉ di chuyển nếu còn xa
                 length = max(distance, 0.1)
                 if self.state == "run":
-                    speed = RUN_SPEED * 0.7  # Plant chạy chậm hơn player
+                    speed = RUN_SPEED * 0.6  # Slime2 chạy chậm hơn plant
                 else:
-                    speed = PLAYER_SPEED * 0.5  # Plant đi chậm hơn player
+                    speed = PLAYER_SPEED * 0.4  # Slime2 đi chậm hơn plant
                 self.dx = (dx_target / length) * speed
                 self.dy = (dy_target / length) * speed
             else:
@@ -347,7 +345,7 @@ class PlantTarget1(pygame.sprite.Sprite):
         # CẬP NHẬT ANIMATION
         self._update_animation(delta_time)
 
-    #Chọn và cập nhật animation
+    # Chọn và cập nhật animation
     def _update_animation(self, delta_time):
         # Chọn dictionary animation
         if self.state == "idle":
@@ -379,17 +377,17 @@ class PlantTarget1(pygame.sprite.Sprite):
             self.height = self.image.get_height()
             self.body_radius = max(self.width, self.height) // 2
     
-    #Vẽ Plant và hitbox
+    # Vẽ Slime2 và hitbox
     def draw(self, screen, camera):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
         screen.blit(self.image, (screen_x, screen_y))
         
         if self.debug:
-            # HITBOX DI ĐỘNG (thân plant) - màu xanh lá
+            # HITBOX DI ĐỘNG (thân slime) - màu tím
             center_x = self.x + self.width // 2 - camera.x
             center_y = self.y + self.height // 2 - camera.y
-            pygame.draw.circle(screen, (0, 255, 0), (center_x, center_y), self.body_radius, 2)
+            pygame.draw.circle(screen, (128, 0, 128), (center_x, center_y), self.body_radius, 2)
             
             # Vùng tấn công (màu cam)
             pygame.draw.circle(screen, (255, 165, 0), (center_x, center_y), self.attack_range, 2)
@@ -408,7 +406,7 @@ class PlantTarget1(pygame.sprite.Sprite):
             pygame.draw.rect(screen, (255, 255, 255), 
                             (home_center_x - 5, home_center_y - 5, 10, 10), 2)
             
-            # Vẽ đường từ plant đến nhà
+            # Vẽ đường từ slime đến nhà
             pygame.draw.line(screen, (200, 200, 200), 
                             (center_x, center_y), 
                             (home_center_x, home_center_y), 1)
@@ -425,6 +423,6 @@ class PlantTarget1(pygame.sprite.Sprite):
             state_text = font.render(f"State: {self.state}", True, (255, 255, 0))
             screen.blit(state_text, (screen_x, screen_y - 45))
     
-    #Trả về hitbox thân (hình tròn)
+    # Trả về hitbox thân (hình tròn)
     def get_hitbox(self):
         return (self.x + self.width//2, self.y + self.height//2, self.body_radius)

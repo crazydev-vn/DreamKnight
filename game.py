@@ -5,6 +5,7 @@ from camera import Camera
 
 from game_object import GameObject  
 from plant_target1 import PlantTarget1   
+from slime2_target import Slime2
 
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -90,6 +91,8 @@ class Game:
             frame_duration = 2.0,
             scale= 2.0,
         )
+
+        """
         self.dragonHome001_object = GameObject(
             #Tọa độ x, y trong game
             x= 200 ,  y= 100,
@@ -98,10 +101,7 @@ class Game:
             frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
-
-
-        self.fences = []
-        
+        #self.fences = []
         # Tạo nhiều hàng rào bằng vòng lặp
         fence_positions = [
             (152, 101), (152, 133), (152, 165), (152, 197), (152, 229), (152, 261),
@@ -117,6 +117,7 @@ class Game:
          
         ]
         
+        
         for x, y in fence_positions:
             fence = GameObject(
                 x=x, y=y,
@@ -126,6 +127,7 @@ class Game:
                 scale=2.0,
             )
             self.fences.append(fence)  
+        """
 
         self.tree_01_object = GameObject (
             x = 830 , y = 120,
@@ -174,14 +176,31 @@ class Game:
             #(100, 200),    # Thêm tọa độ tùy ý
             #(1800, 600),   # Thêm tọa độ tùy ý
         ]
-        
         for x, y in plant_positions:
             plant = PlantTarget1(x, y, scale_factor=2.0)
             plant.set_player(self.player)
             self.plants.append(plant)
 
-        
         #self.plant.set_player(self.player)
+           
+        self.slimes2 = []
+        # Danh sách tọa độ các slime 2 được thêm vào
+        slime2_positions = [
+            (700, 800),
+            #(730, 700),
+            #(760, 600),
+            #(700, 600),
+    
+            #(800, 1000),
+            #(100, 200),    # Thêm tọa độ tùy ý
+            #(1800, 600),   # Thêm tọa độ tùy ý
+        ]
+        for x, y in slime2_positions:
+            slime2 = Slime2(x, y, scale_factor=2.0)
+            slime2.set_player(self.player)
+            self.slimes2.append(slime2)
+            
+        
 
     #Khởi tạo và phát nhạc nền
     def setup_music(self): 
@@ -261,10 +280,10 @@ class Game:
 
 
         self.home001_object.update(1/60)
-        self.dragonHome001_object.update(1/60)
+        #self.dragonHome001_object.update(1/60)
 
-        for fence in self.fences:
-            fence.update(1/60)
+        #for fence in self.fences:
+        #    fence.update(1/60)
 
         self.tree_01_object.update(1/60)
         self.fruit_pasket_01.update(1/60)
@@ -278,6 +297,11 @@ class Game:
         # CẬP NHẬT TẤT CẢ PLANT
         for plant in self.plants:
             plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+        self.check_attack_collisions()
+
+        # CẬP NHẬT TẤT CẢ PLANT
+        for slime2 in self.slimes2:
+            slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
         
         # Kiểm tra va chạm tấn công với tất cả plant
         self.check_attack_collisions()
@@ -302,6 +326,21 @@ class Game:
             if dx*dx + dy*dy < radius * radius:
                 self.plants.pop(i)  # Xóa plant khi bị đánh trúng
                 print(f"Plant bị tiêu diệt! Còn {len(self.plants)} plant")
+
+        # Duyệt ngược để xóa an toàn
+        for i in range(len(self.slimes2) - 1, -1, -1):
+            slime2 = self.slimes2[i]
+            cx, cy, radius = slime2.get_hitbox()
+            
+            # Tìm điểm gần nhất trên attack_hitbox đến tâm plant
+            closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
+            closest_y = max(attack_hitbox.top, min(cy, attack_hitbox.bottom))
+            dx = closest_x - cx
+            dy = closest_y - cy
+            
+            if dx*dx + dy*dy < radius * radius:
+                self.slimes2.pop(i)  # Xóa plant khi bị đánh trúng
+                print(f"Slime2 bị tiêu diệt! Còn {len(self.slimes2)} slime2")
     
     def draw(self):
         self.game_surface.fill((0,0,0))
@@ -317,11 +356,10 @@ class Game:
         self.home003_object.draw(self.game_surface, self.camera)
         self.flag1_object.draw(self.game_surface, self.camera)
 
-        self.home_base01_object.draw(self.game_surface, self.camera) #2
-        self.dragonHome001_object.draw(self.game_surface, self.camera) #3
-        
-        for fence in self.fences:
-            fence.draw(self.game_surface, self.camera)
+        #self.home_base01_object.draw(self.game_surface, self.camera) #2
+        #self.dragonHome001_object.draw(self.game_surface, self.camera) #3
+        #for fence in self.fences:
+        #    fence.draw(self.game_surface, self.camera)
 
         self.tree_01_object.draw(self.game_surface, self.camera)
         self.fruit_pasket_01.draw(self.game_surface, self.camera)
@@ -334,7 +372,10 @@ class Game:
         # VẼ TẤT CẢ PLANT 
         for plant in self.plants:
             plant.draw(self.game_surface, self.camera)
-        
+
+        for slime2 in self.slimes2:
+            slime2.draw(self.game_surface, self.camera)
+
         self.player.draw(self.game_surface, self.camera)
         
         scaled_surface = pygame.transform.scale(self.game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
