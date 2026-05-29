@@ -9,8 +9,8 @@ PLANT_ANIMATION_CONFIGS = {
     "idle": {
         "folder": "plant1_idle",
         "directions": {
-            "up":    {"prefix": "plant1_idle_ebove", "frames": 4},
-            "down":  {"prefix": "plant1_idle_under", "frames": 4},
+            "up":    {"prefix": "plant1_idle_up", "frames": 4},
+            "down":  {"prefix": "plant1_idle_down", "frames": 4},
             "left":  {"prefix": "plant1_idle_left", "frames": 4},
             "right": {"prefix": "plant1_idle_right", "frames": 4}
         }
@@ -18,8 +18,8 @@ PLANT_ANIMATION_CONFIGS = {
     "walk": {
         "folder": "plant1_walk",
         "directions": {
-            "up":    {"prefix": "plant1_walk_ebove", "frames": 6},
-            "down":  {"prefix": "plant1_walk_under", "frames": 6},
+            "up":    {"prefix": "plant1_walk_up", "frames": 6},
+            "down":  {"prefix": "plant1_walk_down", "frames": 6},
             "left":  {"prefix": "plant1_walk_left", "frames": 6},
             "right": {"prefix": "plant1_walk_right", "frames": 6}
         }
@@ -27,8 +27,8 @@ PLANT_ANIMATION_CONFIGS = {
     "run": {
         "folder": "plant1_run",
         "directions": {
-            "up":    {"prefix": "plant1_run_ebove", "frames": 8},
-            "down":  {"prefix": "plant1_run_under", "frames": 8},
+            "up":    {"prefix": "plant1_run_up", "frames": 8},
+            "down":  {"prefix": "plant1_run_down", "frames": 8},
             "left":  {"prefix": "plant1_run_left", "frames": 8},
             "right": {"prefix": "plant1_run_right", "frames": 8}
         }
@@ -36,8 +36,8 @@ PLANT_ANIMATION_CONFIGS = {
     "attack": {
         "folder": "plant1_attack",
         "directions": {
-            "up":    {"prefix": "plant1_attack_ebove", "frames": 7},
-            "down":  {"prefix": "plant1_attack_under", "frames": 7},
+            "up":    {"prefix": "plant1_attack_up", "frames": 7},
+            "down":  {"prefix": "plant1_attack_down", "frames": 7},
             "left":  {"prefix": "plant1_attack_left", "frames": 7},
             "right": {"prefix": "plant1_attack_right", "frames": 7}
         }
