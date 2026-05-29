@@ -9,8 +9,8 @@ SLIME2_ANIMATION_CONFIGS = {
     "idle": {
         "folder": "slime2_idle",
         "directions": {
-            "up":    {"prefix": "slime2_idle_ebove", "frames": 6},
-            "down":  {"prefix": "slime2_idle_under", "frames": 6},
+            "up":    {"prefix": "slime2_idle_up", "frames": 6},
+            "down":  {"prefix": "slime2_idle_down", "frames": 6},
             "left":  {"prefix": "slime2_idle_left", "frames": 6},
             "right": {"prefix": "slime2_idle_right", "frames": 6}
         }
@@ -18,8 +18,8 @@ SLIME2_ANIMATION_CONFIGS = {
     "walk": {
         "folder": "slime2_walk",
         "directions": {
-            "up":    {"prefix": "slime2_walk_ebove", "frames": 8},
-            "down":  {"prefix": "slime2_walk_under", "frames": 8},
+            "up":    {"prefix": "slime2_walk_up", "frames": 8},
+            "down":  {"prefix": "slime2_walk_down", "frames": 8},
             "left":  {"prefix": "slime2_walk_left", "frames": 8},
             "right": {"prefix": "slime2_walk_right", "frames": 8}
         }
@@ -27,8 +27,8 @@ SLIME2_ANIMATION_CONFIGS = {
     "run": {
         "folder": "slime2_run",
         "directions": {
-            "up":    {"prefix": "slime2_run_ebove", "frames": 8},
-            "down":  {"prefix": "slime2_run_under", "frames": 8},
+            "up":    {"prefix": "slime2_run_up", "frames": 8},
+            "down":  {"prefix": "slime2_run_down", "frames": 8},
             "left":  {"prefix": "slime2_run_left", "frames": 8},
             "right": {"prefix": "slime2_run_right", "frames": 8}
         }
@@ -36,8 +36,8 @@ SLIME2_ANIMATION_CONFIGS = {
     "attack": {
         "folder": "slime2_attack",
         "directions": {
-            "up":    {"prefix": "slime2_attack_ebove", "frames": 11},
-            "down":  {"prefix": "slime2_attack_under", "frames": 11},
+            "up":    {"prefix": "slime2_attack_up", "frames": 11},
+            "down":  {"prefix": "slime2_attack_down", "frames": 11},
             "left":  {"prefix": "slime2_attack_left", "frames": 11},
             "right": {"prefix": "slime2_attack_right", "frames": 11}
         }
@@ -45,8 +45,8 @@ SLIME2_ANIMATION_CONFIGS = {
     "hit": {
         "folder": "slime2_hurt",  # Cần tạo thư mục slime2_hit với các frame
         "directions": {
-            "up":    {"prefix": "slime2_hurt_ebove", "frames": 4},
-            "down":  {"prefix": "slime2_hurt_under", "frames": 4},
+            "up":    {"prefix": "slime2_hurt_up", "frames": 4},
+            "down":  {"prefix": "slime2_hurt_down", "frames": 4},
             "left":  {"prefix": "slime2_hurt_left", "frames": 4},
             "right": {"prefix": "slime2_hurt_right", "frames": 4}
         }
@@ -54,8 +54,8 @@ SLIME2_ANIMATION_CONFIGS = {
     "death": {
         "folder": "slime2_die",  # Cần tạo thư mục slime2_death với các frame
         "directions": {
-            "up":    {"prefix": "slime2_die_ebove", "frames": 6},
-            "down":  {"prefix": "slime2_die_under", "frames": 6},
+            "up":    {"prefix": "slime2_die_up", "frames": 6},
+            "down":  {"prefix": "slime2_die_down", "frames": 6},
             "left":  {"prefix": "slime2_die_left", "frames": 6},
             "right": {"prefix": "slime2_die_right", "frames": 6}
         }
