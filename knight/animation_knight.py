@@ -33,8 +33,8 @@ ANIMATION_CONFIGS = {
     "idle": {
         "folder": "knight_lv3_idle",
         "directions": {
-            "up": {"prefix": "knight_lv3_idle_ebove", "frames": 4},
-            "down": {"prefix": "knight_lv3_idle_under", "frames": 12},
+            "up": {"prefix": "knight_lv3_idle_up", "frames": 4},
+            "down": {"prefix": "knight_lv3_idle_down", "frames": 12},
             "left": {"prefix": "knight_lv3_idle_left", "frames": 12},
             "right": {"prefix": "knight_lv3_idle_right", "frames": 12}
         }
@@ -42,8 +42,8 @@ ANIMATION_CONFIGS = {
     "walk": {
         "folder": "knight_lv3_walk",
         "directions": {
-            "up": {"prefix": "knight_lv3_walk_ebove", "frames": 6},
-            "down": {"prefix": "knight_lv3_walk_under", "frames": 6},
+            "up": {"prefix": "knight_lv3_walk_up", "frames": 6},
+            "down": {"prefix": "knight_lv3_walk_down", "frames": 6},
             "left": {"prefix": "knight_lv3_walk_left", "frames": 6},
             "right": {"prefix": "knight_lv3_walk_right", "frames": 6}
         }
@@ -51,8 +51,8 @@ ANIMATION_CONFIGS = {
     "run": {
         "folder": "knight_lv3_run",
         "directions": {
-            "up": {"prefix": "knight_lv3_run_ebove", "frames": 8},
-            "down": {"prefix": "knight_lv3_run_under", "frames": 8},
+            "up": {"prefix": "knight_lv3_run_up", "frames": 8},
+            "down": {"prefix": "knight_lv3_run_down", "frames": 8},
             "left": {"prefix": "knight_lv3_run_left", "frames": 8},
             "right": {"prefix": "knight_lv3_run_right", "frames": 8}
         }
@@ -60,8 +60,8 @@ ANIMATION_CONFIGS = {
     "attack_idle": {
         "folder": "knight_lv3_idle_attack",
         "directions": {
-            "up": {"prefix": "knight_lv3_idle_attack_ebove", "frames": 8},
-            "down": {"prefix": "knight_lv3_idle_attack_under", "frames": 8},
+            "up": {"prefix": "knight_lv3_idle_attack_up", "frames": 8},
+            "down": {"prefix": "knight_lv3_idle_attack_down", "frames": 8},
             "left": {"prefix": "knight_lv3_idle_attack_left", "frames": 8},
             "right": {"prefix": "knight_lv3_idle_attack_right", "frames": 8}
         }
@@ -69,8 +69,8 @@ ANIMATION_CONFIGS = {
     "attack_walk": {  # THÊM MỚI: Tấn công khi đi bộ
         "folder": "knight_lv3_walk_attack",  # Tên thư mục chứa ảnh attack khi đi bộ
         "directions": {
-            "up": {"prefix": "knight_lv3_walk_attack_ebove", "frames": 8},
-            "down": {"prefix": "knight_lv3_walk_attack_under", "frames": 8},
+            "up": {"prefix": "knight_lv3_walk_attack_up", "frames": 8},
+            "down": {"prefix": "knight_lv3_walk_attack_down", "frames": 8},
             "left": {"prefix": "knight_lv3_walk_attack_left", "frames": 8},
             "right": {"prefix": "knight_lv3_walk_attack_right", "frames": 8}
         }
@@ -78,8 +78,8 @@ ANIMATION_CONFIGS = {
     "attack_run": {
         "folder": "knight_lv3_run_attack",
         "directions": {
-            "up": {"prefix": "knight_lv3_run_attack_ebove", "frames": 8},
-            "down": {"prefix": "knight_lv3_run_attack_under", "frames": 8},
+            "up": {"prefix": "knight_lv3_run_attack_up", "frames": 8},
+            "down": {"prefix": "knight_lv3_run_attack_down", "frames": 8},
             "left": {"prefix": "knight_lv3_run_attack_left", "frames": 8},
             "right": {"prefix": "knight_lv3_run_attack_right", "frames": 8}
         }
