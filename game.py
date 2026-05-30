@@ -6,11 +6,11 @@ from camera import Camera
 from game_object import GameObject  
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
-
+#================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
 #phát nhạc nền. Kết nối các thành phần: player, camera, map, game object.
-
+#================================================================================================
 class Game:
     def __init__(self):
         pygame.init()

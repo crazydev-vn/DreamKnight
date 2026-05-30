@@ -3,6 +3,9 @@ import os
 import math
 from config import PLAYER_SPEED, RUN_SPEED
 from knight.animation_knight import Animation, AnimationManager
+#================================================================================================
+
+#================================================================================================
 
 #CẤU HÌNH CHO PLANT TARGET 
 PLANT_ANIMATION_CONFIGS = {

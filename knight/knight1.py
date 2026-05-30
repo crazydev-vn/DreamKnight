@@ -2,8 +2,9 @@ import pygame
 from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
 from knight.animation_knight import Animation, load_idle_frames, load_walk_frames, load_run_frames, load_attack_idle_frames, load_attack_walk_frames, load_attack_run_frames
 
-# Lớp Player1 kế thừa từ pygame.sprite.Sprite để sử dụng hệ thống sprite của Pygame
 
+#================================================================================================
+# Lớp Player1 kế thừa từ pygame.sprite.Sprite để sử dụng hệ thống sprite của Pygame
 # Lớp Player1 - Đại diện cho nhân vật chính (hiệp sĩ) trong game.
 # Quản lý:
 # - Các trạng thái: đứng yên (idle), đi bộ (walk), chạy (run), tấn công (attack).
@@ -12,6 +13,7 @@ from knight.animation_knight import Animation, load_idle_frames, load_walk_frame
 # - Tấn công bằng chuột trái, tạo hitbox tấn công và phát âm thanh luân phiên.
 # - Gây sát thương lên kẻ địch khi tấn công
 # - Giới hạn trong bản đồ, cập nhật camera, vẽ với debug hitbox.
+#================================================================================================
 
 class Player1(pygame.sprite.Sprite):
     def __init__(self, x, y):

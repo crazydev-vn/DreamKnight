@@ -3,8 +3,10 @@ import os
 import math
 from config import PLAYER_SPEED, RUN_SPEED
 from knight.animation_knight import Animation, AnimationManager
-
+#================================================================================================
 # CẤU HÌNH CHO SLIME2 TARGET
+
+#================================================================================================
 SLIME2_ANIMATION_CONFIGS = {
     "idle": {
         "folder": "slime2_idle",

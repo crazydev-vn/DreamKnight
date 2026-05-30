@@ -2,10 +2,13 @@ import pygame
 import os
 from config import PLAYER_SPEED, RUN_SPEED
 
+#================================================================================================
 # Lớp Animation quản lý chuỗi các frame
 # Lớp Animation: quản lý một chuỗi các frame ảnh để tạo hiệu ứng chuyển động.
 # Tự động cập nhật frame theo thời gian dựa trên frame_duration (ms)
 # Hỗ trợ reset về frame đầu tiên.
+#================================================================================================
+
 class Animation:
     def __init__(self, frames, frame_duration=90):
         self.frames = frames    # Danh sách các frame ảnh

@@ -1,9 +1,11 @@
 import pygame
 import os
 
+#================================================================================================
 #GameObject dùng để biểu diễn một đối tượng trong game,
 #Hỗ trợ ảnh tĩnh hoặc có animation (chuỗi ảnh).
 #Hỗ trợ scale, cập nhật theo thời gian, vẽ theo camera.
+#================================================================================================
 
 class GameObject:
     #Lớp vật thể animation hoặc ảnh tĩnh
