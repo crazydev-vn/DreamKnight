@@ -84,6 +84,7 @@ class Game:
             scale = 2.0,
         )
 
+        #NỀN 
         self.home_base01_object = GameObject(
             x = 200, y  = 101,
             image_path="assets/home_base/home_base01.png",
@@ -91,8 +92,6 @@ class Game:
             frame_duration = 2.0,
             scale= 2.0,
         )
-
-        """
         self.dragonHome001_object = GameObject(
             #Tọa độ x, y trong game
             x= 200 ,  y= 100,
@@ -101,7 +100,10 @@ class Game:
             frame_duration=0.15,    # Mỗi frame hiển thị 0.15 giây
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
-        #self.fences = []
+
+        
+
+        self.fences = []
         # Tạo nhiều hàng rào bằng vòng lặp
         fence_positions = [
             (152, 101), (152, 133), (152, 165), (152, 197), (152, 229), (152, 261),
@@ -123,7 +125,7 @@ class Game:
                 scale=2.0,
             )
             self.fences.append(fence)  
-        """
+        
 
         self.tree_01_object = GameObject (
             x = 830 , y = 120,
@@ -132,7 +134,7 @@ class Game:
             frame_duration = 2.0,
             scale=2.0,
         )
-
+        
         self.fruit_pasket_01 = GameObject(
             x = 1225, y  = 190,
             image_path="assets/fruit_basket/fruit_basket_01.png",
@@ -140,6 +142,9 @@ class Game:
             frame_duration = 2.0,
             scale= 2.0,
         )
+        
+
+
         self.fruit_pasket_02 = GameObject(
             x = 1330, y  = 190,
             image_path="assets/fruit_basket/fruit_basket_02.png",
@@ -156,6 +161,14 @@ class Game:
             scale= 2.0,
         )
 
+        self.sampleNPC_object = GameObject (
+            x = 1100, y = 300,
+            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
+            animation_folder="assets/sample", 
+            frame_duration=0.1,    # Mỗi frame hiển thị 0.15 giây
+            scale= 1.0,  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
+        )
+
 
         # Tạo plant target
         
@@ -163,7 +176,7 @@ class Game:
         
         # Danh sách tọa độ các plant được thêm vào
         plant_positions = [
-            (700, 800),
+            #(700, 800),
             #(760, 600),
             #(700, 600),
     
@@ -181,11 +194,11 @@ class Game:
         self.slimes2 = []
         # Danh sách tọa độ các slime 2 được thêm vào
         slime2_positions = [
-            (730, 700),
-            (700, 600),
-            (800, 1000),
-            (100, 200),    # Thêm tọa độ tùy ý
-            (1800, 600),   # Thêm tọa độ tùy ý
+            #(730, 700),
+            #(700, 600),
+            #(800, 1000),
+            #(100, 200),    # Thêm tọa độ tùy ý
+            #(1800, 600),   # Thêm tọa độ tùy ý
         ]
         for x, y in slime2_positions:
             slime2 = Slime2(x, y, scale_factor=2.0)
@@ -273,12 +286,16 @@ class Game:
 
 
         self.home001_object.update(1/60)
-        #self.dragonHome001_object.update(1/60)
 
-        #for fence in self.fences:
-        #    fence.update(1/60)
+
+        self.dragonHome001_object.update(1/60)
+        self.sampleNPC_object.update(1/60)
+
+        for fence in self.fences:
+            fence.update(1/60)
 
         self.tree_01_object.update(1/60)
+
         self.fruit_pasket_01.update(1/60)
         self.fruit_pasket_02.update(1/60)
         self.fruit_pasket_03.update(1/60)
@@ -317,6 +334,7 @@ class Game:
             dx = closest_x - cx
             dy = closest_y - cy
             
+
             if dx*dx + dy*dy < radius * radius:
                 self.plants.pop(i)  # Xóa plant khi bị đánh trúng
                 print(f"Plant bị tiêu diệt! Còn {len(self.plants)} plant")
@@ -345,10 +363,15 @@ class Game:
         self.home003_object.draw(self.game_surface, self.camera)
         self.flag1_object.draw(self.game_surface, self.camera)
 
-        #self.home_base01_object.draw(self.game_surface, self.camera) #2
-        #self.dragonHome001_object.draw(self.game_surface, self.camera) #3
-        #for fence in self.fences:
-        #    fence.draw(self.game_surface, self.camera)
+        self.home_base01_object.draw(self.game_surface, self.camera) #2
+        self.dragonHome001_object.draw(self.game_surface, self.camera) #3
+        
+        #NPC Sample
+        self.sampleNPC_object.draw(self.game_surface, self.camera)
+
+        #Hàng rào dragon home
+        for fence in self.fences:
+            fence.draw(self.game_surface, self.camera)
 
         self.tree_01_object.draw(self.game_surface, self.camera)
         self.fruit_pasket_01.draw(self.game_surface, self.camera)

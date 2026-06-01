@@ -89,7 +89,7 @@ ANIMATION_CONFIGS = {
     },
 
     "dash": {
-        "folder": "knight_lv3_dash",  
+        "folder": "knight_lv3_dash01",  
         "directions": {
             "up": {"prefix": "knight_lv3_dash_up", "frames": 5},
             "down": {"prefix": "knight_lv3_dash_down", "frames": 5},

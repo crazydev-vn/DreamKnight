@@ -1,12 +1,12 @@
 # ==================== CẤU HÌNH GAME ====================
 
 # Kích thước cửa sổ hiển thị chính của game (tính bằng pixel)
-SCREEN_WIDTH = 800   # Độ rộng cửa sổ game
-SCREEN_HEIGHT = 520  # Độ cao cửa sổ game (đã điều chỉnh từ 400 lên 520)
+SCREEN_WIDTH = 1720 #1920  # Độ rộng cửa sổ game 800
+SCREEN_HEIGHT = 940 #1040  # Độ cao cửa sổ game 520
 
 # Kích thước vùng nhìn của camera (vùng thế giới game được hiển thị trong game_surface)
-VIEW_WIDTH = 600   # Độ rộng vùng nhìn (camera viewport width)
-VIEW_HEIGHT = 400  # Độ cao vùng nhìn (camera viewport height)
+VIEW_WIDTH = 800   # Độ rộng vùng nhìn (camera viewport width) 600
+VIEW_HEIGHT = 450  # Độ cao vùng nhìn (camera viewport height)  400
 
 # Kích thước toàn bộ bản đồ game (thế giới game rộng hơn màn hình)
 MAP_WIDTH = 1920   # Chiều rộng map (pixel)
