@@ -86,6 +86,16 @@ ANIMATION_CONFIGS = {
             "left": {"prefix": "knight_lv3_run_attack_left", "frames": 8},
             "right": {"prefix": "knight_lv3_run_attack_right", "frames": 8}
         }
+    },
+
+    "dash": {
+        "folder": "knight_lv3_dash",  
+        "directions": {
+            "up": {"prefix": "knight_lv3_dash_up", "frames": 5},
+            "down": {"prefix": "knight_lv3_dash_down", "frames": 5},
+            "left": {"prefix": "knight_lv3_dash_left", "frames": 5},
+            "right": {"prefix": "knight_lv3_dash_right", "frames": 5}
+        }
     }
 }
 
@@ -176,3 +186,8 @@ def load_attack_walk_frames(direction):
 def load_attack_run_frames(direction):
     manager = AnimationManager()
     return manager.load_animation("attack_run", direction)
+
+# Thêm hàm load dash frames
+def load_dash_frames(direction):
+    manager = AnimationManager()
+    return manager.load_animation("dash", direction)
