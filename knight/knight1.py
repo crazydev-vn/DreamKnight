@@ -68,7 +68,7 @@ class Player1(pygame.sprite.Sprite):
             "right": Animation(load_attack_run_frames("right"), frame_duration=50),
         }
         
-        # ===== THÊM MỚI: DASH ANIMATION =====
+        #DASH ANIMATION
         # Dash: kỹ năng lướt nhanh với animation riêng
         self.dash_animations = {
             "up": Animation(load_dash_frames("up"), frame_duration=40),
@@ -93,9 +93,9 @@ class Player1(pygame.sprite.Sprite):
         
         self.current_attack_sound_index = 0
 
-        # ===== THÊM MỚI: ÂM THANH DASH =====
+        #ÂM THANH DASH =====
         # Âm thanh khi thực hiện dash
-        self.dash_sound = pygame.mixer.Sound("03_sounds/dash/dash02.mp3")  # Đảm bảo file tồn tại
+        self.dash_sound = pygame.mixer.Sound("03_sounds/dash/dash03.mp3")  # Đảm bảo file tồn tại
         # Có thể thay bằng sound khác hoặc comment nếu chưa có file
 
         # BIẾN TRẠNG THÁI CỦA PLAYER
@@ -110,16 +110,16 @@ class Player1(pygame.sprite.Sprite):
         self.run_mode = False  # Chế độ chạy nhanh (toggle)
         self.shift_just_pressed = False  # Đánh dấu Shift vừa được nhấn trong frame này
         
-        # ===== THÊM MỚI: DASH VARIABLES =====
+        # DASH VARIABLES 
         self.is_dashing = False         # Đang trong trạng thái dash
         self.dash_start_time = 0        # Thời điểm bắt đầu dash
-        self.dash_duration = 150        # Thời gian dash (ms) - lướt trong 150ms
-        self.dash_distance = 150        # Khoảng cách dash (pixels) - lướt 150px
+        self.dash_duration = 150        # Thời gian dash x(ms) - lướt trong x(ms)
+        self.dash_distance = 100        # Khoảng cách dash (pixels) - lướt x(px)
         self.dash_start_x = 0           # Vị trí X bắt đầu dash
         self.dash_start_y = 0           # Vị trí Y bắt đầu dash
         self.dash_target_x = 0          # Vị trí X đích đến
         self.dash_target_y = 0          # Vị trí Y đích đến
-        self.dash_cooldown = 800        # Thời gian hồi chiêu dash (ms) - 0.8 giây
+        self.dash_cooldown = 500        # Thời gian hồi chiêu dash x00 -> 0.x(ms)
         self.last_dash_time = 0         # Thời điểm dash gần nhất
         self.dash_direction = "down"    # Hướng dash
         
@@ -239,30 +239,30 @@ class Player1(pygame.sprite.Sprite):
     #Bắt đầu dash theo hướng hiện tại - lướt nhanh về phía trước
     def start_dash(self):
         self.is_dashing = True
-        self.is_attacking = False  # Hủy attack nếu đang có
+        self.is_attacking = False
         self.dash_start_time = pygame.time.get_ticks()
         self.last_dash_time = self.dash_start_time
         self.dash_direction = self.direction
         
-        # Phát âm thanh dash (nếu có file)
-        try:
-             self.dash_sound.play()
-        except:
-             pass  # Bỏ qua nếu chưa có file âm thanh
+        # ===== QUAN TRỌNG: Cập nhật image NGAY =====
+        self.dash_animations[self.direction].reset()
+        self.image = self.dash_animations[self.direction].current_frame
         
-        # Lưu vị trí bắt đầu
+        # Phát âm thanh
+        try:
+            self.dash_sound.play()
+        except:
+            pass
+        
+        # Lưu vị trí
         self.dash_start_x = self.x
         self.dash_start_y = self.y
         
-        # Tính vị trí đích dựa trên hướng
+        # Tính vị trí đích
         dash_vec = self.get_dash_vector()
         self.dash_target_x = self.x + dash_vec[0] * self.dash_distance
         self.dash_target_y = self.y + dash_vec[1] * self.dash_distance
         
-        # Reset animation dash về frame đầu
-        self.dash_animations[self.direction].reset()
-        
-        # Tạo hiệu ứng dash (trail, particles, etc.)
         self.create_dash_effect()
 
         
@@ -505,38 +505,35 @@ class Player1(pygame.sprite.Sprite):
 
     # Cập nhật phương thức update để hỗ trợ dash và attack_walk
     def update(self, map_width, map_height, events):
-        # Cập nhật dash TRƯỚC (dash ưu tiên cao nhất)
+        # ===== QUAN TRỌNG: Xử lý input TRƯỚC để bắt dash ngay =====
+        self.handle_input(events)
+        
+        # Sau đó mới cập nhật dash
         self.update_dash(map_width, map_height)
         
-        # Nếu đang dash, không xử lý các state khác
+        # Nếu đang dash, chỉ cập nhật animation và thoát
         if self.is_dashing:
-            # Vẫn cập nhật image cho dash
+            self.dash_animations[self.dash_direction].update()
             self.image = self.dash_animations[self.dash_direction].current_frame
-            return
+            return  # Thoát ngay, không xử lý gì thêm
         
-        # Xử lý các state bình thường khi không dash
-        self.handle_input(events)
-        self.update_running_state()  # Hàm này giờ không làm gì cả
+        # Phần còn lại cho state bình thường (giữ nguyên)
+        self.update_running_state()
         self.update_attack()
         self.move(self.dx, self.dy, map_width, map_height)
-
-        # Chọn animation hiển thị phù hợp
+        
+        # Chọn animation bình thường
         if self.is_attacking:
             if self.is_running:
-                # Đang tấn công và chạy
                 self.image = self.attack_run_animations[self.direction].current_frame
             elif self.dx != 0 or self.dy != 0:
-                # Đang tấn công và đi bộ
                 self.image = self.attack_walk_animations[self.direction].current_frame
             else:
-                # Đang tấn công và đứng yên
                 self.image = self.attack_idle_animations[self.direction].current_frame
         elif self.dx == 0 and self.dy == 0:
-            # Đứng yên không tấn công
             self.idle_animations[self.direction].update()
             self.image = self.idle_animations[self.direction].current_frame
         else:
-            # Đang di chuyển không tấn công
             if self.is_running:
                 self.run_animations[self.direction].update()
                 self.image = self.run_animations[self.direction].current_frame
@@ -557,10 +554,10 @@ class Player1(pygame.sprite.Sprite):
             # ===== THÊM OFFSET ĐỂ CANH CHỈNH ANIMATION BỊ LỆCH =====
             # Điều chỉnh các giá trị này để sprite dash khớp với vị trí nhân vật
             dash_sprite_offset = {
-                "left": {"offset_x": 5, "offset_y": 30},   # Left: dịch XUỐNG 15px (vì đang lệch lên)
-                "right": {"offset_x": -70, "offset_y": 30},  # Right: dịch XUỐNG 15px (vì đang lệch lên)
-                "up": {"offset_x": 30, "offset_y": 0},     # Up: dịch SANG PHẢI 15px (vì đang lệch trái)
-                "down": {"offset_x": 30, "offset_y": -50}    # Down: dịch SANG PHẢI 15px (vì đang lệch trái)
+                "left": {"offset_x": 5, "offset_y": 30},   # Left: dịch XUỐNG 30px
+                "right": {"offset_x": -70, "offset_y": 30}, # Right: dịch XUỐNG 30px
+                "up": {"offset_x": 30, "offset_y": 0},     # Up: dịch SANG PHẢI 30px
+                "down": {"offset_x": 30, "offset_y": -50}   # Down: dịch SANG PHẢI 30px
             }
             
             offset = dash_sprite_offset.get(self.dash_direction, {"offset_x": 0, "offset_y": 0})
@@ -598,50 +595,51 @@ class Player1(pygame.sprite.Sprite):
                 current_hitbox_y = start_hitbox_y + (target_hitbox_y - start_hitbox_y) * progress
                 
                 # Vẽ hitbox xanh (hitbox thường tại vị trí hiện tại của player)
-                #green_hitbox_x = self.x + self.hitbox_offset_x - camera.x
-                #green_hitbox_y = self.y + self.hitbox_offset_y - camera.y
-                #pygame.draw.rect(screen, (0, 255, 0), 
-                #            (green_hitbox_x, green_hitbox_y, 
-                #                self.hitbox_width, self.hitbox_height), 2)
+                green_hitbox_x = self.x + self.hitbox_offset_x - camera.x
+                green_hitbox_y = self.y + self.hitbox_offset_y - camera.y
+                pygame.draw.rect(screen, (0, 255, 0), 
+                            (green_hitbox_x, green_hitbox_y, 
+                                self.hitbox_width, self.hitbox_height), 2)
                 
-                #Vẽ hitbox vàng (hitbox dash nội suy)
-                #pygame.draw.rect(screen, (255, 255, 0), 
-                #            (current_hitbox_x - camera.x, 
-                #                current_hitbox_y - camera.y, 
-                #                self.hitbox_width, 
-                #                self.hitbox_height), 2)
+                # Vẽ hitbox vàng (hitbox dash nội suy)
+                pygame.draw.rect(screen, (255, 255, 0), 
+                            (current_hitbox_x - camera.x, 
+                                current_hitbox_y - camera.y, 
+                                self.hitbox_width, 
+                                self.hitbox_height), 2)
                 
-
-                #Vẽ đường kẻ từ start đến target (debug)
-                #start_screen_x = start_hitbox_x - camera.x
-                #start_screen_y = start_hitbox_y - camera.y
-                #target_screen_x = target_hitbox_x - camera.x
-                #target_screen_y = target_hitbox_y - camera.y
-                #pygame.draw.line(screen, (255, 0, 255), 
-                #            (start_screen_x, start_screen_y), 
-                #            (target_screen_x, target_screen_y), 1)
+                # Vẽ đường kẻ từ start đến target (debug)
+                start_screen_x = start_hitbox_x - camera.x
+                start_screen_y = start_hitbox_y - camera.y
+                target_screen_x = target_hitbox_x - camera.x
+                target_screen_y = target_hitbox_y - camera.y
+                pygame.draw.line(screen, (255, 0, 255), 
+                            (start_screen_x, start_screen_y), 
+                            (target_screen_x, target_screen_y), 1)
         else:
-            # Vẽ sprite nhân vật
+            # ===== KHÔNG DASH: Vẽ sprite nhân vật =====
             screen_x = self.x - camera.x
             screen_y = self.y - camera.y
             screen.blit(self.image, (screen_x, screen_y))
-
-            """
-            #hitbox nhân vật
+            
+            # ===== VẼ HITBOX NHÂN VẬT (DEBUG) =====
             if DEBUG_MODE:
+                # Vẽ attack hitbox nếu đang tấn công
                 if self.is_attacking and self.attack_hitbox:
                     hitbox_screen_x = self.attack_hitbox.x - camera.x
                     hitbox_screen_y = self.attack_hitbox.y - camera.y
                     pygame.draw.rect(screen, (255, 0, 0), 
                                 (hitbox_screen_x, hitbox_screen_y, 
                                     self.attack_hitbox.width, self.attack_hitbox.height), 2)
+                
+                # Vẽ hitbox thường của nhân vật
                 pygame.draw.rect(screen, (0, 255, 0), 
                             (screen_x + self.hitbox_offset_x, 
                             screen_y + self.hitbox_offset_y, 
                             self.hitbox_width, 
                             self.hitbox_height), 2)
 
-            """
+         
 
     def get_rect(self):
         # Trả về hitbox của nhân vật (dùng cho va chạm)

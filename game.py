@@ -50,6 +50,13 @@ class Game:
             frame_duration=None,
             scale=2.0,
         )
+        self.sampleNPC_object = GameObject (
+            x = 1100, y = 300,
+            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
+            animation_folder="assets/sample", 
+            frame_duration=0.1,    # Mỗi frame hiển thị 0.15 giây
+            scale= 1.0,  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
+        )
 
         # với animation từ thư mục
         self.home002_objcect = GameObject(
@@ -67,6 +74,16 @@ class Game:
             frame_duration = 0.15,    
             scale = 2.0,
         )
+
+        self.lunebladeNPC_object = GameObject (
+            x = 1100, y = 700,
+            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
+            animation_folder="assets/luneblade", 
+            frame_duration=0.1,    # Mỗi frame hiển thị 0.15 giây
+            scale= 2.0,  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
+        )
+
+        
 
         #Home 3
         self.home003_object = GameObject(
@@ -161,14 +178,7 @@ class Game:
             scale= 2.0,
         )
 
-        self.sampleNPC_object = GameObject (
-            x = 1100, y = 300,
-            image_path=None,  # Không có ảnh tĩnh, chỉ dùng animation
-            animation_folder="assets/sample", 
-            frame_duration=0.1,    # Mỗi frame hiển thị 0.15 giây
-            scale= 1.0,  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
-        )
-
+        
 
         # Tạo plant target
         
@@ -176,13 +186,13 @@ class Game:
         
         # Danh sách tọa độ các plant được thêm vào
         plant_positions = [
-            #(700, 800),
-            #(760, 600),
-            #(700, 600),
+            (700, 800),
+            (760, 600),
+            (700, 600),
     
-            #(800, 1000),
-            #(100, 200),    # Thêm tọa độ tùy ý
-            #(1800, 600),   # Thêm tọa độ tùy ý
+            (800, 1000),
+            (100, 200),    # Thêm tọa độ tùy ý
+            (1800, 600),   # Thêm tọa độ tùy ý
         ]
         for x, y in plant_positions:
             plant = PlantTarget1(x, y, scale_factor=2.0)
@@ -194,11 +204,11 @@ class Game:
         self.slimes2 = []
         # Danh sách tọa độ các slime 2 được thêm vào
         slime2_positions = [
-            #(730, 700),
-            #(700, 600),
-            #(800, 1000),
-            #(100, 200),    # Thêm tọa độ tùy ý
-            #(1800, 600),   # Thêm tọa độ tùy ý
+            (730, 700),
+            (700, 600),
+            (800, 1000),
+            (100, 200),    # Thêm tọa độ tùy ý
+            (1800, 600),   # Thêm tọa độ tùy ý
         ]
         for x, y in slime2_positions:
             slime2 = Slime2(x, y, scale_factor=2.0)
@@ -282,6 +292,7 @@ class Game:
 
         self.home003_object.update(1/60)
         self.flag1_object.update(1/60)
+        self.lunebladeNPC_object.update(1/60)
 
 
 
@@ -362,6 +373,7 @@ class Game:
 
         self.home003_object.draw(self.game_surface, self.camera)
         self.flag1_object.draw(self.game_surface, self.camera)
+        self.lunebladeNPC_object.draw(self.game_surface, self.camera)
 
         self.home_base01_object.draw(self.game_surface, self.camera) #2
         self.dragonHome001_object.draw(self.game_surface, self.camera) #3

@@ -23,18 +23,12 @@ FPS = 10000
 PLAYER_SPEED = 3
 
 # Tốc độ khi chạy (bằng nửa PLAYER_SPEED? thực tế là 6 > 3 nên nhanh gấp đôi)
-RUN_SPEED = 6        # Tốc độ chạy (nhanh hơn đi bộ)
+RUN_SPEED = 5.5   # Tốc độ chạy (nhanh hơn đi bộ)
 
 # ==================== ĐƯỜNG DẪN ẢNH ====================
 
 # Đường dẫn đến file ảnh bản đồ nền (map background)
 MAP_IMAGE_PATH = "assets/map/MAP002.png"
 
-# Thư mục chứa các frame animation của nhân vật chính (các ảnh walking)
-PLAYER_ASSET_DIR = "assets/knight_lv3"
-
-# Tiền tố tên file animation: các file có dạng walk_up_0.png, walk_left_1.png, ...
-PLAYER_ANIM_PREFIX = "walk"   # khi đọc file, sẽ kết hợp: f"{PLAYER_ASSET_DIR}/{PLAYER_ANIM_PREFIX}_{dir}_{i}.png"
-
 # Chế độ debug: in ra thông tin, hiển thị hitbox, v.v.
-DEBUG_MODE = True
+DEBUG_MODE = False ##################
