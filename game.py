@@ -186,13 +186,13 @@ class Game:
         
         # Danh sách tọa độ các plant được thêm vào
         plant_positions = [
-            (700, 800),
-            (760, 600),
-            (700, 600),
+            #(700, 800),
+            #(760, 600),
+            #(700, 600),
     
-            (800, 1000),
-            (100, 200),    # Thêm tọa độ tùy ý
-            (1800, 600),   # Thêm tọa độ tùy ý
+            #(800, 1000),
+            #(100, 200),    # Thêm tọa độ tùy ý
+            #(1800, 600),   # Thêm tọa độ tùy ý
         ]
         for x, y in plant_positions:
             plant = PlantTarget1(x, y, scale_factor=2.0)
@@ -352,12 +352,10 @@ class Game:
 
     # ===== HÀM MỚI: Xóa slime đã chết =====
     def remove_dead_slimes(self):
-        """Xóa các slime2 đã chết khỏi danh sách"""
         before_count = len(self.slimes2)
-        self.slimes2 = [slime for slime in self.slimes2 if not slime.is_dead]
+        self.slimes2 = [slime for slime in self.slimes2 if not slime.fully_dead]  # ← đổi is_dead → fully_dead
         if before_count != len(self.slimes2):
             print(f"Đã xóa {before_count - len(self.slimes2)} slime2 chết")
-            # Cập nhật lại danh sách enemy cho player
             self.player.set_enemies(self.slimes2)
     
     def draw(self):
@@ -375,15 +373,15 @@ class Game:
         self.flag1_object.draw(self.game_surface, self.camera)
         self.lunebladeNPC_object.draw(self.game_surface, self.camera)
 
-        self.home_base01_object.draw(self.game_surface, self.camera) #2
-        self.dragonHome001_object.draw(self.game_surface, self.camera) #3
+        #self.home_base01_object.draw(self.game_surface, self.camera) #2
+        #self.dragonHome001_object.draw(self.game_surface, self.camera) #3
         
         #NPC Sample
         self.sampleNPC_object.draw(self.game_surface, self.camera)
 
         #Hàng rào dragon home
-        for fence in self.fences:
-            fence.draw(self.game_surface, self.camera)
+        #for fence in self.fences:
+        #    fence.draw(self.game_surface, self.camera)
 
         self.tree_01_object.draw(self.game_surface, self.camera)
         self.fruit_pasket_01.draw(self.game_surface, self.camera)
@@ -399,7 +397,7 @@ class Game:
 
         # VẼ TẤT CẢ SLIME2 (chỉ vẽ nếu chưa chết)
         for slime2 in self.slimes2:
-            if not slime2.is_dead:
+            #if not slime2.is_dead:
                 slime2.draw(self.game_surface, self.camera)
 
         self.player.draw(self.game_surface, self.camera)

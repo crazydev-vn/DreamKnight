@@ -64,6 +64,7 @@ SLIME2_ANIMATION_CONFIGS = {
     }
 }
 
+
 # Lớp Slime2 - kẻ địch slime
 class Slime2(pygame.sprite.Sprite):
     
@@ -109,13 +110,16 @@ class Slime2(pygame.sprite.Sprite):
         self.attack_start_time = 0            # thời điểm bắt đầu tấn công
         
         # THÔNG SỐ CHO BỊ THƯƠNG VÀ CHẾT
-        self.health = 30000000                     # máu của slime
-        self.max_health = 30000000
+        self.health = 500                # máu của slime
+        self.max_health = 500 
         self.hit_start_time = 0
         self.hit_duration = 300               # thời gian animation bị thương (ms)
         self.death_start_time = 0
-        self.death_duration = 500             # thời gian animation chết (ms)
+        self.death_frame_duration = 85   # khớp với frame_duration trong load_anim_type("death")
+        self.death_frames_count = 6      # khớp với "frames": 6 trong SLIME2_ANIMATION_CONFIGS
+        self.death_duration = self.death_frame_duration * self.death_frames_count  # = 510ms
         self.is_dead = False                  # trạng thái đã chết
+        self.fully_dead = False  # ← thêm dòng này
         self.is_invincible = False            # trạng thái bất tử (sau khi bị đánh)
         self.invincible_duration = 500        # thời gian bất tử (ms)
         self.invincible_start_time = 0
@@ -140,7 +144,14 @@ class Slime2(pygame.sprite.Sprite):
         self.body_radius = max(self.width, self.height) // 2
         
         # Debug
-        self.debug = True
+        self.debug = False
+
+        # LOAD ÂM THANH  ← THÊM TỪ ĐÂY
+        self.attack_sounds = []
+        self.hit_sound = None
+        self.death_sound = None
+        self.attack_sound_index = 0
+        self._load_sounds()
         
     # Load tất cả các frame animation từ thư mục assets/slime_target/slime2
     def _load_all_animations(self, scale_factor):
@@ -224,6 +235,15 @@ class Slime2(pygame.sprite.Sprite):
             self.idle_anims["left"] = Animation(default_frames, 200)
             self.idle_anims["right"] = Animation(default_frames, 200)
 
+    def _load_sounds(self):
+        sound_path = os.path.join("03_sounds", "slime2")
+        for i in range(1, 4):
+            path = os.path.join(sound_path, f"Attack{i}.mp3")
+            self.attack_sounds.append(pygame.mixer.Sound(path))
+        self.hit_sound = pygame.mixer.Sound(os.path.join(sound_path, "hit.mp3"))
+        self.death_sound = pygame.mixer.Sound(os.path.join(sound_path, "Death.mp3"))
+
+    
     # Gán tham chiếu đến player
     def set_player(self, player):
         self.player = player
@@ -249,6 +269,10 @@ class Slime2(pygame.sprite.Sprite):
             # Slime bị thương
             self.state = "hit"
             self.hit_start_time = pygame.time.get_ticks()
+            if self.hit_sound:   
+                self.hit_sound.play()
+
+            self.hit_start_time = pygame.time.get_ticks()
             
             # Bật trạng thái bất tử
             self.is_invincible = True
@@ -270,24 +294,22 @@ class Slime2(pygame.sprite.Sprite):
             self.is_dead = True
             self.state = "death"
             self.death_start_time = pygame.time.get_ticks()
-            
-            # Dừng mọi di chuyển
+            if self.death_sound:   
+                self.death_sound.play()
             self.dx = 0
             self.dy = 0
+            self.is_attacking = False
+        
             
-            # Reset animation death
             if self.direction in self.death_anims:
-                self.death_anims[self.direction].reset()
-            
-            print("Slime2 đã chết!")
+                self.death_anims[self.direction].reset() 
 
     # Cập nhật trạng thái bất tử
     def _update_invincible(self, current_time):
         if self.is_invincible:
             if current_time - self.invincible_start_time >= self.invincible_duration:
                 self.is_invincible = False
-                print("Slime2 hết trạng thái bất tử")
-
+            
     # Cập nhật trạng thái, di chuyển
     def update(self, delta_time, map_width, map_height):
         if self.player is None:
@@ -300,16 +322,13 @@ class Slime2(pygame.sprite.Sprite):
         
         # XỬ LÝ TRẠNG THÁI CHẾT
         if self.state == "death":
-            # Kiểm tra nếu animation death đã kết thúc
+            self._update_animation(delta_time)
             if current_time - self.death_start_time >= self.death_duration:
-                # Slime đã chết hoàn toàn, có thể xóa khỏi game
-                self.kill()
-                print("Slime2 đã biến mất khỏi game!")
-                return
-            else:
-                # Cập nhật animation chết
-                self._update_animation(delta_time)
-                return
+                self.fully_dead = True  # ← đổi từ self.kill()
+            self.dx = 0
+            self.dy = 0
+            return
+                    
         
         # XỬ LÝ TRẠNG THÁI BỊ THƯƠNG
         if self.state == "hit":
@@ -382,6 +401,9 @@ class Slime2(pygame.sprite.Sprite):
             # Reset animation tấn công để chạy từ đầu
             if self.direction in self.attack_anims:
                 self.attack_anims[self.direction].reset()
+            if self.attack_sounds:   
+                self.attack_sounds[self.attack_sound_index].play()
+                self.attack_sound_index = (self.attack_sound_index + 1) % len(self.attack_sounds)
             
             print(f"Slime2 phát hiện player trong tầm {self.attack_range}px - Bắt đầu tấn công!")
             return
@@ -540,8 +562,8 @@ class Slime2(pygame.sprite.Sprite):
     
     # Vẽ Slime2 và hitbox
     def draw(self, screen, camera):
-        if self.is_dead:
-            return
+        #if self.is_dead:
+        #    return
         
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y

@@ -158,8 +158,8 @@ class Player1(pygame.sprite.Sprite):
         self.debug = DEBUG_MODE
         self.attack_hitbox = None
 
-        # ===== THÊM MỚI: HỆ THỐNG SÁT THƯƠNG =====
-        self.damage = 10000000000000000000000000000                   # Sát thương mỗi đòn đánh
+        # HỆ THỐNG SÁT THƯƠNG =====
+        self.damage = 50                  # Sát thương mỗi đòn đánh
         self.has_dealt_damage = False       # Đã gây sát thương trong đòn tấn công này chưa
         self.damage_cooldown = 200          # Thời gian delay giữa các lần gây sát thương (ms)
         self.last_damage_time = 0           # Thời điểm gây sát thương lần cuối
