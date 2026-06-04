@@ -1,6 +1,6 @@
 import pygame
 from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
-from knight.animation_knight import (
+from animation_knight import (
     Animation, load_idle_frames, load_walk_frames, load_run_frames, 
     load_attack_idle_frames, load_attack_walk_frames, load_attack_run_frames,
     load_dash_frames  # THÊM MỚI: Import dash frames

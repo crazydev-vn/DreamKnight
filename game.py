@@ -1,6 +1,6 @@
 import pygame 
 from config import SCREEN_WIDTH, SCREEN_HEIGHT, MAP_WIDTH, MAP_HEIGHT, MAP_IMAGE_PATH
-from knight.knight1 import Player1
+from knight1 import Player1
 from camera import Camera
 
 from game_object import GameObject  
