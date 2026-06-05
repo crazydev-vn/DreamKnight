@@ -31,4 +31,5 @@ RUN_SPEED = 5.5   # Tốc độ chạy (nhanh hơn đi bộ)
 MAP_IMAGE_PATH = "assets/map/MAP002.png"
 
 # Chế độ debug: in ra thông tin, hiển thị hitbox, v.v.
-DEBUG_MODE = False ##################
+DEBUG_MODE = False 
+#DEBUG_MODE = True 

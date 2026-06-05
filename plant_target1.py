@@ -2,7 +2,7 @@ import pygame
 import os
 import math
 from config import PLAYER_SPEED, RUN_SPEED
-from animation_knight import Animation, AnimationManager
+from knight1_animation import Animation, AnimationManager
 #================================================================================================
 
 #================================================================================================

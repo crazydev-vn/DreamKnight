@@ -2,7 +2,7 @@ import pygame
 import os
 import math
 from config import PLAYER_SPEED, RUN_SPEED
-from animation_knight import Animation, AnimationManager
+from knight1_animation import Animation, AnimationManager
 #================================================================================================
 # CẤU HÌNH CHO SLIME2 TARGET
 
@@ -144,7 +144,7 @@ class Slime2(pygame.sprite.Sprite):
         self.body_radius = max(self.width, self.height) // 2
         
         # Debug
-        self.debug = False
+        self.debug = True
 
         # LOAD ÂM THANH  ← THÊM TỪ ĐÂY
         self.attack_sounds = []

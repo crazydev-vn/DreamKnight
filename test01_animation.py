@@ -1,6 +1,6 @@
 import pygame
 import os
-from animation_knight import Animation
+from knight1_animation import Animation
 
 # ================================================================================================
 # CẤU HÌNH ANIMATION CHO TEST01 (SLIME 3)

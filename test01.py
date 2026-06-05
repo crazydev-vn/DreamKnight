@@ -42,7 +42,7 @@ class Test01(pygame.sprite.Sprite):
         self.dx    = 0.0
         self.dy    = 0.0
 
-        # Tham số AI
+        
         self.home_chase_radius = 250
         self.home_leave_radius = 450
         self.walk_duration     = 1200   # ms trước khi chuyển sang run
@@ -64,7 +64,7 @@ class Test01(pygame.sprite.Sprite):
         self.death_start_time     = 0
         self.death_frame_duration = 85
         self.death_frames_count   = 6
-        self.death_duration       = self.death_frame_duration * self.death_frames_count  # 510 ms
+        self.death_duration = self.death_frame_duration * self.death_frames_count  # 510 ms
 
         # Cờ trạng thái
         self.is_dead       = False
@@ -82,9 +82,12 @@ class Test01(pygame.sprite.Sprite):
         self.rect   = self.image.get_rect(center=(self.x, self.y))
         self.width  = self.image.get_width()
         self.height = self.image.get_height()
-        self.body_radius = max(self.width, self.height) // 2
-
+        #self.body_radius = max(self.width, self.height) // 2
+        self.body_radius = 20 #int(min(self.width, self.height) * 0.2)  # 60% kích thước
+        
+        
         # Debug
+        #self.debug = True
         self.debug = False
 
         # Âm thanh
@@ -144,7 +147,8 @@ class Test01(pygame.sprite.Sprite):
             self.death_anims[self.direction].reset()
 
     def get_hitbox(self):
-        return (self.x + self.width // 2, self.y + self.height // 2, self.body_radius)
+        #return (self.x + self.width // 2, self.y + self.height // 2, self.body_radius)
+        return (self.rect.centerx, self.rect.centery, self.body_radius)
 
     # ------------------------------------------------------------------
     # UPDATE CHÍNH
@@ -382,7 +386,7 @@ class Test01(pygame.sprite.Sprite):
         self.rect.center = old_center
         self.width      = self.image.get_width()
         self.height     = self.image.get_height()
-        self.body_radius = max(self.width, self.height) // 2
+        self.body_radius = 20 #max(self.width, self.height) // 2
 
     # ------------------------------------------------------------------
     # VẼ
