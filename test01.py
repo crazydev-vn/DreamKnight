@@ -56,6 +56,7 @@ class Test01(pygame.sprite.Sprite):
 
         # Máu
         self.health     = 500
+        self.contact_damage = 15         # Sát thương khi chạm vào player
         self.max_health = 500
 
         # Thời gian trạng thái

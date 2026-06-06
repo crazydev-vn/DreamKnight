@@ -112,6 +112,7 @@ class Slime2(pygame.sprite.Sprite):
         # THÔNG SỐ CHO BỊ THƯƠNG VÀ CHẾT
         self.health = 500                # máu của slime
         self.max_health = 500 
+        self.contact_damage = 15         # Sát thương khi chạm thân vào player
         self.hit_start_time = 0
         self.hit_duration = 300               # thời gian animation bị thương (ms)
         self.death_start_time = 0
