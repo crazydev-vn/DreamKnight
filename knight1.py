@@ -458,7 +458,7 @@ class Player1(pygame.sprite.Sprite):
                             break
     """Gây sát thương lên tất cả kẻ địch trong vùng attack_hitbox"""                        
     """
-    def deal_damage_to_enemies(self):
+    def deal_damage_to_enemies():
         
         if not self.is_attacking or self.attack_hitbox is None:
             return
@@ -512,11 +512,19 @@ class Player1(pygame.sprite.Sprite):
                     break     
 
 
-    """                
+    """    
     # ===== HÀM MỚI: Gán danh sách enemy từ game chính =====
     def set_enemies(self, enemies):
-        """Gán danh sách kẻ địch để player có thể tấn công"""
         self.enemies = enemies
+
+    def take_damage(self, damage):
+        if self.is_dead:
+            return
+        self.health = max(0, self.health - damage)
+        print(f"Player nhận {damage} sát thương! Máu còn: {self.health}/{self.max_health}")
+        if self.health <= 0:
+            self.is_dead = True
+            print("Player đã chết!")
     
     # Cập nhật update_attack để hỗ trợ attack_walk
     def update_attack(self):

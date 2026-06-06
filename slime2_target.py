@@ -355,7 +355,19 @@ class Slime2(pygame.sprite.Sprite):
                 if self.direction in self.attack_anims:
                     self.attack_anims[self.direction].reset()
                 print("Kết thúc animation tấn công của Slime2")
+                # GÂY SÁT THƯƠNG LÊN PLAYER khi animation tấn công kết thúc
+                if self.player and not self.player.is_dead:
+                    slime_cx = self.x + self.width // 2
+                    slime_cy = self.y + self.height // 2
+                    px = self.player.x + self.player.width // 2
+                    py = self.player.y + self.player.height // 2
+                    if math.hypot(slime_cx - px, slime_cy - py) <= self.attack_range * 1.2:
+                        self.player.health = max(0, self.player.health - self.contact_damage)
+                        print(f"Slime2 đánh player! Máu player còn: {self.player.health}/{self.player.max_health}")
+                        if self.player.health <= 0:
+                            self.player.is_dead = True
             else:
+
                 # Đang trong animation tấn công, không di chuyển
                 self.dx = 0
                 self.dy = 0
