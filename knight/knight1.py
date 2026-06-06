@@ -159,6 +159,9 @@ class Player1(pygame.sprite.Sprite):
         self.attack_hitbox = None
 
         # HỆ THỐNG SÁT THƯƠNG =====
+        self.health = 100                 # Máu hiện tại
+        self.max_health = 100             # Máu tối đa
+        self.is_dead = False              # Trạng thái chết
         self.damage = 50                  # Sát thương mỗi đòn đánh
         self.has_dealt_damage = False       # Đã gây sát thương trong đòn tấn công này chưa
         self.damage_cooldown = 200          # Thời gian delay giữa các lần gây sát thương (ms)

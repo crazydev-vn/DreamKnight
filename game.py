@@ -7,6 +7,7 @@ from game_object import GameObject
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
+from ui import UI
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -43,6 +44,7 @@ class Game:
         self.setup_music()
         
         self.running = True # Cờ chạy vòng lặp game
+        self.ui = UI()      # Khởi tạo giao diện HUD
 
         self.home001_object = GameObject(
             x=900, y= 10, #100, 
@@ -443,6 +445,10 @@ class Game:
         
         scaled_surface = pygame.transform.scale(self.game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.screen.blit(scaled_surface, (0,0))
+        
+        # Vẽ HUD lên screen (sau khi scale để không bị zoom)
+        self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
+        
         pygame.display.flip()
     
     def run(self):
