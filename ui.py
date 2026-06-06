@@ -1,22 +1,12 @@
 import pygame
 import math
 
-#================================================================================================
-# Vai trò: Quản lý toàn bộ giao diện người dùng (HUD) hiển thị trên màn hình.
-# Bao gồm: thanh máu player, thanh dash cooldown, thông báo game over.
-#================================================================================================
-
 class UI:
     """Lớp quản lý giao diện người dùng (thanh máu, thanh cooldown dash, animation, game over)"""
     
     def __init__(self):
         """Khởi tạo các thành phần UI và load tài nguyên"""
         pygame.font.init()
-<<<<<<< Updated upstream
-        self.font       = pygame.font.SysFont("Arial", 16, bold=True)
-        self.font_big   = pygame.font.SysFont("Arial", 60, bold=True)
-        self.tick       = 0   # dùng để tạo hiệu ứng pulse
-=======
         self.font       = pygame.font.SysFont("Arial", 16, bold=True)  # Font nhỏ cho text UI
         self.font_big   = pygame.font.SysFont("Arial", 60, bold=True)  # Font lớn cho GAME OVER
         self.tick       = 0  # Biến đếm frame, dùng để tạo hiệu ứng nhấp nháy cho thanh máu khi thấp
@@ -62,9 +52,7 @@ class UI:
                 self.is_dashing_anim = False  # Kết thúc animation
                 self.dash_animation_progress = 0.0
                 self.reset_dash_animation_flag()  # Reset flag để lần dash sau có thể chạy lại
->>>>>>> Stashed changes
 
-    # ── Vẽ hình chữ nhật bo góc ──────────────────────────────────────────────
     def draw_rounded_rect(self, surface, color, rect, radius=8):
         """Vẽ hình chữ nhật bo góc (tay thủ công vì pygame không có sẵn hàm vẽ bo góc)
         
@@ -78,36 +66,17 @@ class UI:
         # Vẽ phần thân (hình chữ nhật không có góc)
         pygame.draw.rect(surface, color, (x + radius, y, w - 2*radius, h))
         pygame.draw.rect(surface, color, (x, y + radius, w, h - 2*radius))
-<<<<<<< Updated upstream
-        pygame.draw.circle(surface, color, (x + radius,     y + radius),     radius)
-        pygame.draw.circle(surface, color, (x + w - radius, y + radius),     radius)
-        pygame.draw.circle(surface, color, (x + radius,     y + h - radius), radius)
-=======
         # Vẽ 4 góc tròn
         pygame.draw.circle(surface, color, (x + radius, y + radius), radius)
         pygame.draw.circle(surface, color, (x + w - radius, y + radius), radius)
         pygame.draw.circle(surface, color, (x + radius, y + h - radius), radius)
->>>>>>> Stashed changes
         pygame.draw.circle(surface, color, (x + w - radius, y + h - radius), radius)
 
-    # ── Vẽ thanh máu ─────────────────────────────────────────────────────────
     def draw_health_bar(self, surface, player):
         """Vẽ thanh máu với hiệu ứng đổi màu theo % máu và nhấp nháy khi máu thấp"""
         self.tick += 1  # Tăng biến đếm frame để tạo hiệu ứng nhấp nháy
         health_percent = max(0, player.health / player.max_health)  # Tính % máu (0.0 → 1.0)
 
-<<<<<<< Updated upstream
-        PAD    = 14          # khoảng cách từ mép màn hình
-        BW     = 220         # chiều rộng thanh
-        BH     = 22          # chiều cao thanh
-        BAR_X  = PAD + 96    # dịch sang phải để icon trái tim không đè
-        BAR_Y  = PAD + 35
-
-        # ── Nền thanh (xám đậm) ──
-        self.draw_rounded_rect(surface, (255, 0, 0), (BAR_X, BAR_Y, BW, BH), radius=6)
-
-        # ── Phần máu hiện tại ──
-=======
         # Thông số thanh máu: vị trí và kích thước
         PAD    = 14      # Khoảng cách từ mép màn hình
         BW     = 220     # Chiều rộng thanh (Bar Width)
@@ -119,22 +88,10 @@ class UI:
         self.draw_rounded_rect(surface, (255, 0, 0), (BAR_X, BAR_Y, BW, BH), radius=6)
 
         # Tính chiều rộng phần máu còn lại
->>>>>>> Stashed changes
         fill_w = max(0, int(BW * health_percent))
         if fill_w > 8:  # Chỉ vẽ nếu còn đủ rộng (tránh lỗi khi fill_w quá nhỏ)
             # Chọn màu dựa trên % máu
             if health_percent > 0.5:
-<<<<<<< Updated upstream
-                bar_color = (210, 55, 55)       # đỏ bình thường
-                shine     = (255, 100, 100)
-            elif health_percent > 0.25:
-                bar_color = (210, 130, 30)      # vàng cam khi máu vừa
-                shine     = (255, 190, 60)
-            else:
-                # pulse đỏ nhấp nháy khi máu thấp
-                pulse = int(abs(math.sin(self.tick * 0.06)) * 40)
-                bar_color = (200 + pulse, 30, 30)
-=======
                 # Máu > 50%: Màu đỏ cam sáng
                 bar_color = (210, 55, 55)
                 shine     = (255, 100, 100)  # Màu ánh sáng phản chiếu
@@ -146,47 +103,26 @@ class UI:
                 # Máu < 25%: Màu đỏ nhấp nháy
                 pulse = int(abs(math.sin(self.tick * 0.06)) * 40)  # Tạo dao động từ 0-40
                 bar_color = (200 + pulse, 30, 30)  # Màu đỏ dao động
->>>>>>> Stashed changes
                 shine     = (255, 80 + pulse, 80)
 
             # Vẽ phần máu còn lại
             self.draw_rounded_rect(surface, bar_color, (BAR_X, BAR_Y, fill_w, BH), radius=6)
-<<<<<<< Updated upstream
-
-            # Sọc sáng phía trên (hiệu ứng bóng)
-=======
             
             # Vẽ hiệu ứng ánh sáng (phản chiếu ở nửa trên thanh máu)
->>>>>>> Stashed changes
             shine_surf = pygame.Surface((fill_w, BH // 2), pygame.SRCALPHA)
             shine_surf.fill((*shine, 60))  # Màu với độ trong suốt 60/255
             surface.blit(shine_surf, (BAR_X, BAR_Y))
 
-<<<<<<< Updated upstream
-        # ── Viền ngoài ──
-        pygame.draw.rect(surface, (255, 210, 100),
-                         (BAR_X, BAR_Y, BW, BH), 2, border_radius=6)
-
-        
-        # ── Số máu ──
-=======
         # Vẽ viền thanh máu (màu vàng)
         pygame.draw.rect(surface, (255, 210, 100), (BAR_X, BAR_Y, BW, BH), 2, border_radius=6)
         
         # Vẽ text hiển thị số máu (vd: "75 / 100")
->>>>>>> Stashed changes
         hp_text = self.font.render(f"{player.health} / {player.max_health}", True, (255, 255, 255))
         tx = BAR_X + (BW - hp_text.get_width()) // 2  # Căn giữa theo chiều ngang
         ty = BAR_Y + (BH - hp_text.get_height()) // 2  # Căn giữa theo chiều dọc
         surface.blit(hp_text, (tx, ty))
 
-    # ── Vẽ thanh dash ────────────────────────────────────────────────────────
     def draw_dash_cooldown(self, surface, player):
-<<<<<<< Updated upstream
-        remaining    = player.get_dash_cooldown_remaining()
-        ready_pct    = 1.0 - (remaining / player.dash_cooldown)
-        ready_pct    = max(0.0, min(1.0, ready_pct))
-=======
         """Vẽ thanh dash - chỉ chạy animation 1 lần mỗi lần dash"""
         
         # ===== CHỈ GỌI ANIMATION NẾU CHƯA CHẠY CHO LẦN DASH NÀY =====
@@ -201,32 +137,12 @@ class UI:
         remaining = player.get_dash_cooldown_remaining()
         ready_pct = 1.0 - (remaining / player.dash_cooldown)  # 0 = đang cooldown, 1 = sẵn sàng
         ready_pct = max(0.0, min(1.0, ready_pct))
->>>>>>> Stashed changes
 
         # Vị trí thanh dash (ngay dưới thanh máu)
         PAD   = 14
-        BW    = 220
-        BH    = 10
         BAR_X = PAD + 96
-        BAR_Y = PAD + 35 + 28     # ngay dưới thanh máu
+        BAR_Y = PAD + 35 + 28
 
-<<<<<<< Updated upstream
-        # Nền
-        self.draw_rounded_rect(surface, (30, 30, 60), (BAR_X, BAR_Y, BW, BH), radius=4)
-
-        # Phần đã hồi
-        fill_w = max(0, int(BW * ready_pct))
-        if fill_w > 4:
-            color = (80, 220, 255) if ready_pct >= 1.0 else (40, 130, 210)
-            self.draw_rounded_rect(surface, color, (BAR_X, BAR_Y, fill_w, BH), radius=4)
-
-        # Viền
-        pygame.draw.rect(surface, (100, 180, 255),
-                         (BAR_X, BAR_Y, BW, BH), 1, border_radius=4)
-
-        # Label
-        label_color = (80, 220, 255) if ready_pct >= 1.0 else (150, 180, 210)
-=======
         # ===== CHỌN FRAME HIỂN THỊ =====
         if self.is_dashing_anim:
             # ĐANG CHẠY ANIMATION: chọn frame dựa trên progress (0 → 4)
@@ -254,11 +170,9 @@ class UI:
             # Màu xanh sáng nếu sẵn sàng, xanh nhạt nếu đang cooldown
             label_color = (80, 220, 255) if ready_pct >= 1.0 else (150, 180, 210)
         
->>>>>>> Stashed changes
         label = self.font.render("DASH", True, label_color)
-        surface.blit(label, (BAR_X + BW + 8, BAR_Y - 3))
+        surface.blit(label, (BAR_X + frame_width + 8, BAR_Y + (frame_height // 2) - 8))
 
-    # ── Game Over ─────────────────────────────────────────────────────────────
     def draw_game_over(self, surface, screen_width, screen_height):
         """Vẽ màn hình Game Over với hiệu ứng mờ và hướng dẫn restart"""
         # Tạo lớp phủ mờ đen với độ trong suốt 160/255
@@ -268,7 +182,7 @@ class UI:
 
         # Vẽ chữ GAME OVER lớn màu đỏ ở giữa màn hình
         text = self.font_big.render("GAME OVER", True, (220, 50, 50))
-        x = (screen_width  - text.get_width())  // 2
+        x = (screen_width - text.get_width()) // 2
         y = (screen_height - text.get_height()) // 2
         surface.blit(text, (x, y))
 
@@ -276,13 +190,9 @@ class UI:
         hint = self.font.render("Nhấn R để chơi lại  |  ESC để thoát", True, (255, 255, 255))
         surface.blit(hint, ((screen_width - hint.get_width()) // 2, y + 80))
 
-    # ── Hàm chính ─────────────────────────────────────────────────────────────
     def draw(self, surface, player, screen_width, screen_height):
-<<<<<<< Updated upstream
-=======
         """Vẽ toàn bộ UI (hàm chính gọi từ game loop)"""
         # Vẽ thanh máu
->>>>>>> Stashed changes
         self.draw_health_bar(surface, player)
         
         # Vẽ thanh cooldown dash
@@ -291,88 +201,3 @@ class UI:
         # Nếu player đã chết, vẽ màn hình Game Over
         if hasattr(player, 'is_dead') and player.is_dead:
             self.draw_game_over(surface, screen_width, screen_height)
-
-<<<<<<< Updated upstream
-class PauseMenu:
-    def __init__(self):
-        pygame.font.init()
-        self.font_title  = pygame.font.SysFont("Arial", 48, bold=True)
-        self.font_btn    = pygame.font.SysFont("Arial", 26, bold=True)
-        self.font_small  = pygame.font.SysFont("Arial", 18)
-        self.visible     = False
-
-        # Các nút: (label, action)
-        self.buttons = ["Resume", "Volume", "Quit"]
-        self.hovered = -1  # nút đang hover
-
-    def toggle(self):
-        self.visible = not self.visible
-
-    def draw(self, surface, screen_width, screen_height, volume):
-        if not self.visible:
-            return
-
-        # Nền mờ
-        overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 170))
-        surface.blit(overlay, (0, 0))
-
-        # Khung menu
-        box_w, box_h = 320, 280
-        box_x = (screen_width  - box_w) // 2
-        box_y = (screen_height - box_h) // 2
-        pygame.draw.rect(surface, (30, 20, 50),   (box_x, box_y, box_w, box_h), border_radius=16)
-        pygame.draw.rect(surface, (255, 210, 100), (box_x, box_y, box_w, box_h), 2, border_radius=16)
-
-        # Tiêu đề
-        title = self.font_title.render("PAUSE", True, (255, 210, 100))
-        surface.blit(title, (box_x + (box_w - title.get_width()) // 2, box_y + 24))
-
-        btn_w, btn_h = 220, 44
-        btn_x = box_x + (box_w - btn_w) // 2
-        mouse_pos = pygame.mouse.get_pos()
-
-        # Nút Resume
-        resume_rect = pygame.Rect(btn_x, box_y + 110, btn_w, btn_h)
-        if resume_rect.collidepoint(mouse_pos):
-            color_bg, color_txt = (255, 210, 100), (30, 20, 50)
-        else:
-            color_bg, color_txt = (60, 45, 90), (255, 255, 255)
-        pygame.draw.rect(surface, color_bg,        resume_rect, border_radius=10)
-        pygame.draw.rect(surface, (255, 210, 100), resume_rect, 2, border_radius=10)
-        t = self.font_btn.render("Resume", True, color_txt)
-        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 110 + (btn_h - t.get_height()) // 2))
-
-        # Nút Quit
-        quit_rect = pygame.Rect(btn_x, box_y + 172, btn_w, btn_h)
-        if quit_rect.collidepoint(mouse_pos):
-            color_bg, color_txt = (200, 50, 50), (255, 255, 255)
-        else:
-            color_bg, color_txt = (100, 30, 30), (255, 180, 180)
-        pygame.draw.rect(surface, color_bg,      quit_rect, border_radius=10)
-        pygame.draw.rect(surface, (255, 80, 80), quit_rect, 2, border_radius=10)
-        t = self.font_btn.render("Quit", True, color_txt)
-        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 172 + (btn_h - t.get_height()) // 2))
-
-    def handle_click(self, pos, screen_width, screen_height):
-        if not self.visible:
-            return None
-
-        box_w, box_h = 320, 280
-        box_x = (screen_width  - box_w) // 2
-        box_y = (screen_height - box_h) // 2
-        btn_w, btn_h = 220, 44
-        btn_x = box_x + (box_w - btn_w) // 2
-
-        if pygame.Rect(btn_x, box_y + 110, btn_w, btn_h).collidepoint(pos):
-            self.visible = False
-            return "resume"
-        if pygame.Rect(btn_x, box_y + 172, btn_w, btn_h).collidepoint(pos):
-            return "quit"
-        return None
-=======
-
-
-
-#Hoan thien
->>>>>>> Stashed changes
