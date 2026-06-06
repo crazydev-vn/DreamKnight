@@ -201,3 +201,75 @@ class UI:
         # Nếu player đã chết, vẽ màn hình Game Over
         if hasattr(player, 'is_dead') and player.is_dead:
             self.draw_game_over(surface, screen_width, screen_height)
+
+class PauseMenu:
+    def __init__(self):
+        pygame.font.init()
+        self.font_title = pygame.font.SysFont("Arial", 48, bold=True)
+        self.font_btn   = pygame.font.SysFont("Arial", 26, bold=True)
+        self.visible    = False
+
+    def toggle(self):
+        self.visible = not self.visible
+
+    def draw(self, surface, screen_width, screen_height):
+        if not self.visible:
+            return
+
+        # Nền mờ
+        overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 170))
+        surface.blit(overlay, (0, 0))
+
+        # Khung menu
+        box_w, box_h = 320, 280
+        box_x = (screen_width  - box_w) // 2
+        box_y = (screen_height - box_h) // 2
+        pygame.draw.rect(surface, (30, 20, 50),    (box_x, box_y, box_w, box_h), border_radius=16)
+        pygame.draw.rect(surface, (255, 210, 100), (box_x, box_y, box_w, box_h), 2, border_radius=16)
+
+        # Tiêu đề
+        title = self.font_title.render("PAUSE", True, (255, 210, 100))
+        surface.blit(title, (box_x + (box_w - title.get_width()) // 2, box_y + 24))
+
+        btn_w, btn_h = 220, 44
+        btn_x = box_x + (box_w - btn_w) // 2
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Nút Resume
+        resume_rect = pygame.Rect(btn_x, box_y + 110, btn_w, btn_h)
+        if resume_rect.collidepoint(mouse_pos):
+            color_bg, color_txt = (255, 210, 100), (30, 20, 50)
+        else:
+            color_bg, color_txt = (60, 45, 90), (255, 255, 255)
+        pygame.draw.rect(surface, color_bg,        resume_rect, border_radius=10)
+        pygame.draw.rect(surface, (255, 210, 100), resume_rect, 2, border_radius=10)
+        t = self.font_btn.render("Resume", True, color_txt)
+        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 110 + (btn_h - t.get_height()) // 2))
+
+        # Nút Quit
+        quit_rect = pygame.Rect(btn_x, box_y + 172, btn_w, btn_h)
+        if quit_rect.collidepoint(mouse_pos):
+            color_bg, color_txt = (200, 50, 50), (255, 255, 255)
+        else:
+            color_bg, color_txt = (100, 30, 30), (255, 180, 180)
+        pygame.draw.rect(surface, color_bg,      quit_rect, border_radius=10)
+        pygame.draw.rect(surface, (255, 80, 80), quit_rect, 2, border_radius=10)
+        t = self.font_btn.render("Quit", True, color_txt)
+        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 172 + (btn_h - t.get_height()) // 2))
+
+    def handle_click(self, pos, screen_width, screen_height):
+        if not self.visible:
+            return None
+        box_w, box_h = 320, 280
+        box_x = (screen_width  - box_w) // 2
+        box_y = (screen_height - box_h) // 2
+        btn_w, btn_h = 220, 44
+        btn_x = box_x + (box_w - btn_w) // 2
+
+        if pygame.Rect(btn_x, box_y + 110, btn_w, btn_h).collidepoint(pos):
+            self.visible = False
+            return "resume"
+        if pygame.Rect(btn_x, box_y + 172, btn_w, btn_h).collidepoint(pos):
+            return "quit"
+        return None
