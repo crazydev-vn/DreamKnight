@@ -27,7 +27,8 @@ class Game:
         
         # Load map
         self.map_image = pygame.image.load(MAP_IMAGE_PATH).convert()
-        
+
+       
         # Tạo player tại trung tâm bản đồ (Chỉnh ở đây để chọn vị trí chỉ định)
         self.player = Player1(
             400, 450
@@ -303,7 +304,7 @@ class Game:
         
         # Cập nhật player VỚI EVENTS (để xử lý tấn công)
         self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
-        
+            
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
 
@@ -450,7 +451,7 @@ class Game:
         self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
         
         pygame.display.flip()
-    
+        
     def run(self):
         while self.running:
             self.update()
