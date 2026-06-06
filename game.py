@@ -7,7 +7,7 @@ from game_object import GameObject
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
-from ui import UI  # ← Chỉ import UI, không có PauseMenu
+from ui import UI, PauseMenu  # ← Import cả PauseMenu
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -44,8 +44,8 @@ class Game:
         self.setup_music()
         
         self.running = True # Cờ chạy vòng lặp game
-        self.ui = UI()      # Khởi tạo giao diện HUD
-        # Đã xóa: self.pause_menu = PauseMenu()
+        self.ui = UI()              # Khởi tạo giao diện HUD
+        self.pause_menu = PauseMenu()  # Khởi tạo menu tạm dừng
 
         self.home001_object = GameObject(
             x=900, y= 10, #100, 
@@ -246,15 +246,27 @@ class Game:
         for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                action = self.pause_menu.handle_click(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
+                if action == "quit":
+                    self.running = False
             elif event.type == pygame.KEYDOWN:
-                # Đã xóa xử lý ESC cho pause menu
-                if event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
+                if event.key == pygame.K_ESCAPE:
+                    self.pause_menu.toggle()
+                    if self.pause_menu.visible:
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
+                elif event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
                     self.toggle_music()
                 elif event.key == pygame.K_UP:  # Phím lên để tăng volume
                     self.change_volume(0.1)
                 elif event.key == pygame.K_DOWN:  # Phím xuống để giảm volume
                     self.change_volume(-0.1)
 
+        # Không truyền events cho player khi đang pause
+        if self.pause_menu.visible:
+            return []
         return events
     
     #Tắt/bật nhạc nền
@@ -389,6 +401,9 @@ class Game:
         
         # Vẽ HUD lên screen (sau khi scale để không bị zoom)
         self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        # Vẽ Pause Menu lên trên cùng
+        self.pause_menu.draw(self.screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
         # Đã xóa: self.pause_menu.draw(...)
 
