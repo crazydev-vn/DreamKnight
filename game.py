@@ -7,7 +7,7 @@ from game_object import GameObject
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
-from ui import UI
+from ui import UI, PauseMenu
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -27,8 +27,7 @@ class Game:
         
         # Load map
         self.map_image = pygame.image.load(MAP_IMAGE_PATH).convert()
-
-       
+        
         # Tạo player tại trung tâm bản đồ (Chỉnh ở đây để chọn vị trí chỉ định)
         self.player = Player1(
             400, 450
@@ -45,7 +44,8 @@ class Game:
         self.setup_music()
         
         self.running = True # Cờ chạy vòng lặp game
-        self.ui = UI()      # Khởi tạo giao diện HUD
+        self.ui = UI()          # Khởi tạo giao diện HUD
+        self.pause_menu = PauseMenu()  # Khởi tạo menu tạm dừng
 
         self.home001_object = GameObject(
             x=900, y= 10, #100, 
@@ -261,14 +261,22 @@ class Game:
 
     def handle_events(self):
         # Vai trò: xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc).
-        # Trả về danh sách events để player xử lý thêm (tấn công, di chuyển...).
+        # Trả về danh sách events để player xử lý thêm (tấn công, di chuyển...)
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                action = self.pause_menu.handle_click(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
+                if action == "quit":
+                    self.running = False
             elif event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
-                    self.running = False
+                    self.pause_menu.toggle()         # ESC mở/đóng pause menu
+                    if self.pause_menu.visible:
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
                 # Thêm phím tắt điều khiển nhạc
                 elif event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
                     self.toggle_music()
@@ -276,8 +284,10 @@ class Game:
                     self.change_volume(0.1)
                 elif event.key == pygame.K_DOWN:  # Phím xuống để giảm volume
                     self.change_volume(-0.1)
-        
-        # TRẢ VỀ EVENTS ĐỂ PLAYER XỬ LÝ TẤN CÔNG
+
+        # Không truyền events cho player khi đang pause
+        if self.pause_menu.visible:
+            return []
         return events
     
     #Tắt/bật nhạc nền
@@ -295,8 +305,11 @@ class Game:
         new_volume = current_volume + delta
         # Giới hạn volume trong khoảng 0.0 đến 1.0
         new_volume = max(0.0, min(1.0, new_volume))
+        # Chỉnh nhạc nền
         pygame.mixer.music.set_volume(new_volume)
-        print(f"Volume nhạc: {new_volume:.1f}")
+        # Chỉnh luôn tất cả SFX (chém, dash, quái...)
+        for channel in range(pygame.mixer.get_num_channels()):
+            pygame.mixer.Channel(channel).set_volume(new_volume)
 
     def update(self):
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
@@ -304,7 +317,7 @@ class Game:
         
         # Cập nhật player VỚI EVENTS (để xử lý tấn công)
         self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
-            
+        
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
 
@@ -449,9 +462,13 @@ class Game:
         
         # Vẽ HUD lên screen (sau khi scale để không bị zoom)
         self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
-        
+
+        # Vẽ Pause Menu lên trên cùng
+        volume = pygame.mixer.music.get_volume()
+        self.pause_menu.draw(self.screen, SCREEN_WIDTH, SCREEN_HEIGHT, volume)
+
         pygame.display.flip()
-        
+    
     def run(self):
         while self.running:
             self.update()
