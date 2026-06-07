@@ -8,6 +8,7 @@ from plant_target1 import PlantTarget1
 from slime2_target import Slime2
 from test01 import Test01
 from ui import UI, PauseMenu  # ← Import cả PauseMenu
+from npc_system import NPCSystem
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -221,6 +222,8 @@ class Game:
         
         # Gán danh sách enemy cho player
         self.player.set_enemies(self.slimes2 + self.test01)
+        # Thêm dòng này vào cuối hàm __init__ (dưới dòng self.player.set_enemies(...))
+        self.npc_manager = NPCSystem()
 
     #Khởi tạo và phát nhạc nền
     def setup_music(self): 
@@ -241,6 +244,7 @@ class Game:
             print(f"Lỗi khi phát nhạc: {e}")
 
     def handle_events(self):
+        
         # Xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc)
         events = pygame.event.get()
         for event in events:
@@ -251,6 +255,7 @@ class Game:
                 if action == "quit":
                     self.running = False
             elif event.type == pygame.KEYDOWN:
+                self.npc_manager.handle_keydown(event.key)  # Truyền sự kiện phím cho NPCSystem để xử lý đóng shop hoặc các tương tác khác
                 if event.key == pygame.K_ESCAPE:
                     self.pause_menu.toggle()
                     if self.pause_menu.visible:
@@ -293,9 +298,30 @@ class Game:
     def update(self):
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
         events = self.handle_events()
+        # 1. Quét khoảng cách giữa player và các NPC liên tục
+        self.npc_manager.update(self.player,self)
         
-        # Cập nhật player VỚI EVENTS (để xử lý tấn công)
-        self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
+        # 2. CHỈ cho phép cập nhật di chuyển player và quái vật khi KHÔNG xem hội thoại hoặc shop
+        if not self.npc_manager.is_showing_dialogue and not self.npc_manager.is_showing_shop:
+                   
+            # Cập nhật player VỚI EVENTS (để xử lý tấn công)
+            self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
+            # CẬP NHẬT TẤT CẢ PLANT
+            for plant in self.plants:
+                plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # CẬP NHẬT TẤT CẢ SLIME2
+            for slime2 in self.slimes2:
+                slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # CẬP NHẬT TẤT CẢ TEST01
+            for test01 in self.test01:
+                test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # Xử lý va chạm
+            self.check_plant_collisions()
+            self.remove_dead_slimes()
+            self.remove_dead_tests()
         
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
@@ -317,22 +343,7 @@ class Game:
         self.fruit_pasket_02.update(1/60)
         self.fruit_pasket_03.update(1/60)
 
-        # CẬP NHẬT TẤT CẢ PLANT
-        for plant in self.plants:
-            plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-
-        # CẬP NHẬT TẤT CẢ SLIME2
-        for slime2 in self.slimes2:
-            slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-
-        # CẬP NHẬT TẤT CẢ TEST01
-        for test01 in self.test01:
-            test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-
-        # Xử lý va chạm
-        self.check_plant_collisions()
-        self.remove_dead_slimes()
-        self.remove_dead_tests()
+        
 
     def check_plant_collisions(self):
         attack_hitbox = self.player.get_attack_hitbox()
@@ -406,7 +417,8 @@ class Game:
         self.pause_menu.draw(self.screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
         # Đã xóa: self.pause_menu.draw(...)
-
+        # Gọi hệ thống tự vẽ các hộp thoại và menu shop
+        self.npc_manager.draw(self.screen, self.camera, self)
         pygame.display.flip()
     
     def run(self):
