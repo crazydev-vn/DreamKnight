@@ -425,7 +425,7 @@ class Game:
         self.test01 = [test for test in self.test01 if not test.fully_dead]
         if before_count != len(self.test01):
             print(f"Đã xóa {before_count - len(self.test01)} test chết")
-            self.player.set_enemies(self.slimes2 + self.plant1 + self.test01)
+            self.player.set_enemies(self.plant1 + self.test01)
 
     def remove_dead_plants1(self):
         before_count = len(self.plant1)
@@ -433,7 +433,7 @@ class Game:
         if before_count != len(self.plant1):
             print(f"Đã xóa {before_count - len(self.plant1)} test chết")
 
-            self.player.set_enemies(self.slimes2 + self.plant1 + self.test01)
+            self.player.set_enemies(self.plant1 + self.test01)
 
     def draw(self):
         self.game_surface.fill((0,0,0))
