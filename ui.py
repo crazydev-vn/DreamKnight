@@ -228,12 +228,53 @@ class PauseMenu:
         pygame.font.init()
         self.font_title = pygame.font.SysFont("Arial", 48, bold=True)
         self.font_btn   = pygame.font.SysFont("Arial", 26, bold=True)
+        self.font_small = pygame.font.SysFont("Arial", 15, bold=True)
         self.visible    = False
+
+        # Thông số layout — dùng chung cho draw và handle
+        self.box_w, self.box_h = 340, 380
+        self.btn_w, self.btn_h = 220, 44
+
+        # Trạng thái kéo slider
+        self.dragging = None  # None | "music" | "sfx"
 
     def toggle(self):
         self.visible = not self.visible
 
-    def draw(self, surface, screen_width, screen_height):
+    def _get_positions(self, screen_width, screen_height):
+        """Tính vị trí các phần tử dựa theo kích thước màn hình"""
+        box_x = (screen_width  - self.box_w) // 2
+        box_y = (screen_height - self.box_h) // 2
+        btn_x = box_x + (self.box_w - self.btn_w) // 2
+        return box_x, box_y, btn_x
+
+    def _slider_rect(self, btn_x, y):
+        """Trả về rect của vùng kéo slider"""
+        return pygame.Rect(btn_x, y + 22, self.btn_w, 14)
+
+    def _draw_slider(self, surface, label, value, btn_x, y):
+        """Vẽ 1 thanh slider có thể kéo"""
+        txt = self.font_small.render(f"{label}: {int(value*100)}%", True, (200, 200, 200))
+        surface.blit(txt, (btn_x, y))
+
+        bar_y  = y + 22
+        bar_w  = self.btn_w
+        fill_w = int(bar_w * value)
+
+        # Nền thanh
+        pygame.draw.rect(surface, (60, 60, 60),    (btn_x, bar_y, bar_w, 10), border_radius=4)
+        # Phần fill
+        pygame.draw.rect(surface, (255, 210, 100), (btn_x, bar_y, fill_w, 10), border_radius=4)
+        # Viền
+        pygame.draw.rect(surface, (200, 200, 200), (btn_x, bar_y, bar_w, 10), 1, border_radius=4)
+
+        # Nút tròn kéo
+        knob_x = btn_x + fill_w
+        knob_x = max(btn_x + 7, min(btn_x + bar_w - 7, knob_x))
+        pygame.draw.circle(surface, (255, 210, 100), (knob_x, bar_y + 5), 8)
+        pygame.draw.circle(surface, (255, 255, 255), (knob_x, bar_y + 5), 8, 2)
+
+    def draw(self, surface, screen_width, screen_height, music_volume=0.5, sfx_volume=0.5):
         if not self.visible:
             return
 
@@ -242,23 +283,20 @@ class PauseMenu:
         overlay.fill((0, 0, 0, 170))
         surface.blit(overlay, (0, 0))
 
-        # Khung menu
-        box_w, box_h = 320, 280
-        box_x = (screen_width  - box_w) // 2
-        box_y = (screen_height - box_h) // 2
-        pygame.draw.rect(surface, (30, 20, 50),    (box_x, box_y, box_w, box_h), border_radius=16)
-        pygame.draw.rect(surface, (255, 210, 100), (box_x, box_y, box_w, box_h), 2, border_radius=16)
+        box_x, box_y, btn_x = self._get_positions(screen_width, screen_height)
+
+        # Khung
+        pygame.draw.rect(surface, (30, 20, 50),    (box_x, box_y, self.box_w, self.box_h), border_radius=16)
+        pygame.draw.rect(surface, (255, 210, 100), (box_x, box_y, self.box_w, self.box_h), 2, border_radius=16)
 
         # Tiêu đề
         title = self.font_title.render("PAUSE", True, (255, 210, 100))
-        surface.blit(title, (box_x + (box_w - title.get_width()) // 2, box_y + 24))
+        surface.blit(title, (box_x + (self.box_w - title.get_width()) // 2, box_y + 20))
 
-        btn_w, btn_h = 220, 44
-        btn_x = box_x + (box_w - btn_w) // 2
         mouse_pos = pygame.mouse.get_pos()
 
         # Nút Resume
-        resume_rect = pygame.Rect(btn_x, box_y + 110, btn_w, btn_h)
+        resume_rect = pygame.Rect(btn_x, box_y + 90, self.btn_w, self.btn_h)
         if resume_rect.collidepoint(mouse_pos):
             color_bg, color_txt = (255, 210, 100), (30, 20, 50)
         else:
@@ -266,10 +304,16 @@ class PauseMenu:
         pygame.draw.rect(surface, color_bg,        resume_rect, border_radius=10)
         pygame.draw.rect(surface, (255, 210, 100), resume_rect, 2, border_radius=10)
         t = self.font_btn.render("Resume", True, color_txt)
-        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 110 + (btn_h - t.get_height()) // 2))
+        surface.blit(t, (btn_x + (self.btn_w - t.get_width()) // 2, box_y + 90 + (self.btn_h - t.get_height()) // 2))
+
+        # Slider Music
+        self._draw_slider(surface, "Music", music_volume, btn_x, box_y + 158)
+
+        # Slider SFX
+        self._draw_slider(surface, "SFX  ", sfx_volume,   btn_x, box_y + 220)
 
         # Nút Quit
-        quit_rect = pygame.Rect(btn_x, box_y + 172, btn_w, btn_h)
+        quit_rect = pygame.Rect(btn_x, box_y + 296, self.btn_w, self.btn_h)
         if quit_rect.collidepoint(mouse_pos):
             color_bg, color_txt = (200, 50, 50), (255, 255, 255)
         else:
@@ -277,20 +321,45 @@ class PauseMenu:
         pygame.draw.rect(surface, color_bg,      quit_rect, border_radius=10)
         pygame.draw.rect(surface, (255, 80, 80), quit_rect, 2, border_radius=10)
         t = self.font_btn.render("Quit", True, color_txt)
-        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 172 + (btn_h - t.get_height()) // 2))
+        surface.blit(t, (btn_x + (self.btn_w - t.get_width()) // 2, box_y + 296 + (self.btn_h - t.get_height()) // 2))
 
-    def handle_click(self, pos, screen_width, screen_height):
+    def handle_mousedown(self, pos, screen_width, screen_height):
+        """Gọi khi nhấn chuột — kiểm tra có click vào slider không"""
         if not self.visible:
             return None
-        box_w, box_h = 320, 280
-        box_x = (screen_width  - box_w) // 2
-        box_y = (screen_height - box_h) // 2
-        btn_w, btn_h = 220, 44
-        btn_x = box_x + (box_w - btn_w) // 2
+        box_x, box_y, btn_x = self._get_positions(screen_width, screen_height)
 
-        if pygame.Rect(btn_x, box_y + 110, btn_w, btn_h).collidepoint(pos):
+        if self._slider_rect(btn_x, box_y + 158).collidepoint(pos):
+            self.dragging = "music"
+            return "drag"
+        if self._slider_rect(btn_x, box_y + 220).collidepoint(pos):
+            self.dragging = "sfx"
+            return "drag"
+        return None
+
+    def handle_mousemotion(self, pos, screen_width, screen_height):
+        """Gọi khi kéo chuột — trả về (loại, giá trị mới) hoặc None"""
+        if not self.visible or self.dragging is None:
+            return None
+        _, _, btn_x = self._get_positions(screen_width, screen_height)
+        # Tính volume từ vị trí chuột trên thanh
+        value = (pos[0] - btn_x) / self.btn_w
+        value = max(0.0, min(1.0, value))
+        return (self.dragging, value)
+
+    def handle_mouseup(self):
+        """Gọi khi thả chuột"""
+        self.dragging = None
+
+    def handle_click(self, pos, screen_width, screen_height):
+        """Xử lý click nút Resume/Quit"""
+        if not self.visible:
+            return None
+        box_x, box_y, btn_x = self._get_positions(screen_width, screen_height)
+
+        if pygame.Rect(btn_x, box_y + 90,  self.btn_w, self.btn_h).collidepoint(pos):
             self.visible = False
             return "resume"
-        if pygame.Rect(btn_x, box_y + 172, btn_w, btn_h).collidepoint(pos):
+        if pygame.Rect(btn_x, box_y + 296, self.btn_w, self.btn_h).collidepoint(pos):
             return "quit"
         return None

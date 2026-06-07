@@ -1,6 +1,7 @@
 import pygame
 from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
 from knight1_hiteffect import HitEffectManager
+import sound_manager
 from knight1_animation import (
     Animation, load_idle_frames, load_walk_frames, load_run_frames, 
     load_attack_idle_frames, load_attack_walk_frames, load_attack_run_frames,
@@ -85,6 +86,8 @@ class Player1(pygame.sprite.Sprite):
         self.attack_sound_3 = pygame.mixer.Sound("03_sounds/attack/Sword3.mp3")
         self.attack_sound_4 = pygame.mixer.Sound("03_sounds/attack/Sword4.mp3")
         
+        self.dash_sound = pygame.mixer.Sound("03_sounds/dash/dash03.mp3")
+
         self.attack_sounds = [
             self.attack_sound_1,
             self.attack_sound_2,
@@ -98,6 +101,11 @@ class Player1(pygame.sprite.Sprite):
         # Âm thanh khi thực hiện dash
         self.dash_sound = pygame.mixer.Sound("03_sounds/dash/dash03.mp3")  # Đảm bảo file tồn tại
         # Có thể thay bằng sound khác hoặc comment nếu chưa có file
+
+        # Đăng ký tất cả sound vào SoundManager để quản lý volume chung
+        for s in self.attack_sounds:
+            sound_manager.register_sound(s)
+        sound_manager.register_sound(self.dash_sound)
 
         # BIẾN TRẠNG THÁI CỦA PLAYER
         self.direction = "down"

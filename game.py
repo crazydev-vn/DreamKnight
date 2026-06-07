@@ -4,11 +4,12 @@ from knight1 import Player1
 from camera import Camera
 
 from game_object import GameObject  
+from npc_system import NPCSystem
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
-from ui import UI, PauseMenu  # ← Import cả PauseMenu
-from npc_system import NPCSystem
+from ui import UI, PauseMenu
+import sound_manager
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -226,6 +227,9 @@ class Game:
         # Thêm dòng này vào cuối hàm __init__ (dưới dòng self.player.set_enemies(...))
         self.npc_manager = NPCSystem()
 
+        # Đồng bộ volume SFX cho tất cả sound đã đăng ký
+        sound_manager.set_sfx_volume(sound_manager.get_sfx_volume())
+
     #Khởi tạo và phát nhạc nền
     def setup_music(self): 
         try:
@@ -251,10 +255,23 @@ class Game:
         for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
+                self.pause_menu.handle_mouseup()
+            elif event.type == pygame.MOUSEMOTION:
+                result = self.pause_menu.handle_mousemotion(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
+                if result:
+                    kind, value = result
+                    if kind == "music":
+                        sound_manager.set_music_volume(value)
+                    elif kind == "sfx":
+                        sound_manager.set_sfx_volume(value)
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                self.pause_menu.handle_mousedown(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
                 action = self.pause_menu.handle_click(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if action == "quit":
                     self.running = False
+                elif action == "resume":
+                    pygame.mixer.music.unpause()
                 # Click nút Play Again khi game over
                 if self.game_over:
                     box_w, box_h = 360, 260
@@ -290,6 +307,19 @@ class Game:
                         pygame.mixer.music.pause()
                     else:
                         pygame.mixer.music.unpause()
+                # Chỉnh volume khi đang pause
+                elif self.pause_menu.visible:
+                    mods = pygame.key.get_mods()
+                    if event.key == pygame.K_LEFT:
+                        if mods & pygame.KMOD_SHIFT:
+                            self.change_sfx_volume(-0.1)   # Shift+← giảm SFX
+                        else:
+                            self.change_volume(-0.1)        # ← giảm Music
+                    elif event.key == pygame.K_RIGHT:
+                        if mods & pygame.KMOD_SHIFT:
+                            self.change_sfx_volume(0.1)    # Shift+→ tăng SFX
+                        else:
+                            self.change_volume(0.1)         # → tăng Music
                 elif event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
                     self.toggle_music()
                 elif event.key == pygame.K_UP:  # Phím lên để tăng volume
@@ -306,22 +336,16 @@ class Game:
     def toggle_music(self):
         if pygame.mixer.music.get_busy():
             pygame.mixer.music.pause()
-            print("Đã tạm dừng nhạc")
         else:
             pygame.mixer.music.unpause()
-            print("Đã tiếp tục nhạc")
-            
+
     #Thay đổi volume nhạc nền
     def change_volume(self, delta):
-        current_volume = pygame.mixer.music.get_volume()
-        new_volume = current_volume + delta
-        # Giới hạn volume trong khoảng 0.0 đến 1.0
-        new_volume = max(0.0, min(1.0, new_volume))
-        # Chỉnh nhạc nền
-        pygame.mixer.music.set_volume(new_volume)
-        # Chỉnh luôn tất cả SFX (chém, dash, quái...)
-        for channel in range(pygame.mixer.get_num_channels()):
-            pygame.mixer.Channel(channel).set_volume(new_volume)
+        sound_manager.set_music_volume(sound_manager.get_music_volume() + delta)
+
+    #Thay đổi volume SFX
+    def change_sfx_volume(self, delta):
+        sound_manager.set_sfx_volume(sound_manager.get_sfx_volume() + delta)
 
     def update(self):
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
@@ -457,7 +481,8 @@ class Game:
         self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
 
         # Vẽ Pause Menu lên trên cùng
-        self.pause_menu.draw(self.screen, SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.pause_menu.draw(self.screen, SCREEN_WIDTH, SCREEN_HEIGHT,
+                             sound_manager.get_music_volume(), sound_manager.get_sfx_volume())
 
         # Đã xóa: self.pause_menu.draw(...)
         # Gọi hệ thống tự vẽ các hộp thoại và menu shop
