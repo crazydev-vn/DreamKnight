@@ -7,7 +7,7 @@ from game_object import GameObject
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
-from ui import UI
+from ui import UI  # ← Chỉ import UI, không có PauseMenu
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -45,6 +45,7 @@ class Game:
         
         self.running = True # Cờ chạy vòng lặp game
         self.ui = UI()      # Khởi tạo giao diện HUD
+        # Đã xóa: self.pause_menu = PauseMenu()
 
         self.home001_object = GameObject(
             x=900, y= 10, #100, 
@@ -62,12 +63,12 @@ class Game:
         )
 
         # với animation từ thư mục
-        self.home002_objcect = GameObject(
+        self.home002_object = GameObject(  # ← SỬA: đúng chính tả
             #Tọa độ x, y trong game
             x= 1500 ,  y= 10,
-            image_path= "assets/home2/home2.png",  # Không c  scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)ó ảnh tĩnh, chỉ dùng animation
+            image_path= "assets/home2/home2.png",
             animation_folder=None, 
-            frame_duration=None,    # Mỗi frame hiển thị 0.15 giây
+            frame_duration=None,
             scale=2.0 
         )
         self.chimney_home2_object = GameObject(
@@ -85,8 +86,6 @@ class Game:
             frame_duration=0.1,    # Mỗi frame hiển thị 0.15 giây
             scale= 2.0,  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
-
-        
 
         #Home 3
         self.home003_object = GameObject(
@@ -121,15 +120,12 @@ class Game:
             scale=2.0  # Tăng gấp đôi kích thước (có thể chỉnh 1.5, 2.5, 3.0...)
         )
 
-        
-
         self.fences = []
         # Tạo nhiều hàng rào bằng vòng lặp
         fence_positions = [
             (152, 101), (152, 133), (152, 165), (152, 197), (152, 229), (152, 261),
             (152, 293), (152, 325), (152, 357), (152, 389), (152, 421), (152, 453),
             (152, 485), (152, 517), (152, 549), (152, 581), (152, 613), (152, 645),
-
 
             (801, 101), (801, 133), (801, 165), (801, 197), (801, 229), (801, 261),
             (801, 293), (801, 325), (801, 357), (801, 389), (801, 421), (801, 453),
@@ -145,7 +141,6 @@ class Game:
                 scale=2.0,
             )
             self.fences.append(fence)  
-        
 
         self.tree_01_object = GameObject (
             x = 830 , y = 120,
@@ -162,8 +157,6 @@ class Game:
             frame_duration = 2.0,
             scale= 2.0,
         )
-        
-
 
         self.fruit_pasket_02 = GameObject(
             x = 1330, y  = 190,
@@ -181,10 +174,7 @@ class Game:
             scale= 2.0,
         )
 
-        
-
         # Tạo plant target
-        
         self.plants = []
         
         # Danh sách tọa độ các plant được thêm vào
@@ -192,17 +182,14 @@ class Game:
             #(700, 800),
             #(760, 600),
             #(700, 600),
-    
             #(800, 1000),
-            #(100, 200),    # Thêm tọa độ tùy ý
-            #(1800, 600),   # Thêm tọa độ tùy ý
+            #(100, 200),
+            #(1800, 600),
         ]
         for x, y in plant_positions:
             plant = PlantTarget1(x, y, scale_factor=2.0)
             plant.set_player(self.player)
             self.plants.append(plant)
-        #self.plant.set_player(self.player)
-           
            
         self.slimes2 = []
         # Danh sách tọa độ các slime 2 được thêm vào
@@ -210,34 +197,29 @@ class Game:
             #(730, 700), (760, 620), (800, 600),
             #(700, 600),
             #(800, 1000),
-            #(100, 200),    # Thêm tọa độ tùy ý
-            #(1800, 600),   # Thêm tọa độ tùy ý
+            #(100, 200),
+            #(1800, 600),
         ]
         for x, y in slime2_positions:
             slime2 = Slime2(x, y, scale_factor=2.0)
             slime2.set_player(self.player)
             self.slimes2.append(slime2)
-        
-        # ===== THÊM MỚI: Gán danh sách slime2 cho player để gây damage =====
-        #self.player.set_enemies(self.slimes2)
-
-
 
         self.test01 = []
-        # Danh sách tọa độ các test 01 được thêm vào
+        # Danh sách tọa độ các test 01 được thêm vào (COMMENT lại nếu chưa muốn có quái)
         test01_positions = [
-            (730, 700), (760, 620), (800, 600),
+            (730, 700), (760, 620), (800, 600),  # COMMENT hết
             (700, 600),
             (800, 1000),
-            (100, 200),    # Thêm tọa độ tùy ý
-            (1800, 600),   # Thêm tọa độ tùy ý
+            (100, 200),
+            (1800, 600),
         ]
         for x, y in test01_positions:
             test01 = Test01(x, y, scale_factor=2.0)
             test01.set_player(self.player)
             self.test01.append(test01)
         
-        # ===== THÊM MỚI: Gán danh sách test01 cho player để gây damage =====
+        # Gán danh sách enemy cho player
         self.player.set_enemies(self.slimes2 + self.test01)
 
     #Khởi tạo và phát nhạc nền
@@ -259,24 +241,20 @@ class Game:
             print(f"Lỗi khi phát nhạc: {e}")
 
     def handle_events(self):
-        # Vai trò: xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc).
-        # Trả về danh sách events để player xử lý thêm (tấn công, di chuyển...).
+        # Xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc)
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
             elif event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE:
-                    self.running = False
-                # Thêm phím tắt điều khiển nhạc
-                elif event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
+                # Đã xóa xử lý ESC cho pause menu
+                if event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
                     self.toggle_music()
                 elif event.key == pygame.K_UP:  # Phím lên để tăng volume
                     self.change_volume(0.1)
                 elif event.key == pygame.K_DOWN:  # Phím xuống để giảm volume
                     self.change_volume(-0.1)
-        
-        # TRẢ VỀ EVENTS ĐỂ PLAYER XỬ LÝ TẤN CÔNG
+
         return events
     
     #Tắt/bật nhạc nền
@@ -294,8 +272,11 @@ class Game:
         new_volume = current_volume + delta
         # Giới hạn volume trong khoảng 0.0 đến 1.0
         new_volume = max(0.0, min(1.0, new_volume))
+        # Chỉnh nhạc nền
         pygame.mixer.music.set_volume(new_volume)
-        print(f"Volume nhạc: {new_volume:.1f}")
+        # Chỉnh luôn tất cả SFX (chém, dash, quái...)
+        for channel in range(pygame.mixer.get_num_channels()):
+            pygame.mixer.Channel(channel).set_volume(new_volume)
 
     def update(self):
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
@@ -308,19 +289,11 @@ class Game:
         self.camera.update(self.player)
 
         self.home001_object.update(1/60)
-
-        self.home002_objcect.update(1/60)
+        self.home002_object.update(1/60)  # ← SỬA: tên biến đúng
         self.chimney_home2_object.update(1/60)
-
         self.home003_object.update(1/60)
         self.flag1_object.update(1/60)
         self.lunebladeNPC_object.update(1/60)
-
-
-
-        self.home001_object.update(1/60)
-
-
         self.dragonHome001_object.update(1/60)
         self.sampleNPC_object.update(1/60)
 
@@ -328,12 +301,10 @@ class Game:
             fence.update(1/60)
 
         self.tree_01_object.update(1/60)
-
         self.fruit_pasket_01.update(1/60)
         self.fruit_pasket_02.update(1/60)
         self.fruit_pasket_03.update(1/60)
 
-        
         # CẬP NHẬT TẤT CẢ PLANT
         for plant in self.plants:
             plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
@@ -342,104 +313,74 @@ class Game:
         for slime2 in self.slimes2:
             slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
-        # CẬP NHẬT TẤT CẢ SLIME2
+        # CẬP NHẬT TẤT CẢ TEST01
         for test01 in self.test01:
             test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
-        # ===== SỬA: Xử lý va chạm riêng biệt =====
-        # Plant: xóa ngay khi trúng đòn (giữ nguyên cơ chế cũ)
+        # Xử lý va chạm
         self.check_plant_collisions()
-        
-        # Slime2: không xóa ở đây nữa, player sẽ gây damage qua deal_damage_to_enemies()
-        # Chỉ cần cập nhật lại danh sách slime2 (xóa những con đã chết)
         self.remove_dead_slimes()
         self.remove_dead_tests()
 
-    # ===== HÀM MỚI: Xử lý va chạm cho PLANT (giữ nguyên cơ chế cũ) =====
     def check_plant_collisions(self):
         attack_hitbox = self.player.get_attack_hitbox()
         if not attack_hitbox:
             return
         
-        # Duyệt ngược để xóa an toàn cho PLANT
         for i in range(len(self.plants) - 1, -1, -1):
             plant = self.plants[i]
             cx, cy, radius = plant.get_hitbox()
             
-            # Tìm điểm gần nhất trên attack_hitbox đến tâm plant
             closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
             closest_y = max(attack_hitbox.top, min(cy, attack_hitbox.bottom))
             dx = closest_x - cx
             dy = closest_y - cy
             
-
             if dx*dx + dy*dy < radius * radius:
-                self.plants.pop(i)  # Xóa plant khi bị đánh trúng
+                self.plants.pop(i)
                 print(f"Plant bị tiêu diệt! Còn {len(self.plants)} plant")
 
-    # ===== HÀM MỚI: Xóa slime đã chết =====
     def remove_dead_slimes(self):
         before_count = len(self.slimes2)
-        self.slimes2 = [slime for slime in self.slimes2 if not slime.fully_dead]  # ← đổi is_dead → fully_dead
+        self.slimes2 = [slime for slime in self.slimes2 if not slime.fully_dead]
         if before_count != len(self.slimes2):
             print(f"Đã xóa {before_count - len(self.slimes2)} slime2 chết")
             self.player.set_enemies(self.slimes2 + self.test01)
 
-    # ===== HÀM MỚI: Xóa test01 đã chết =====
     def remove_dead_tests(self):
         before_count = len(self.test01)
-        self.test01 = [test for test in self.test01 if not test.fully_dead]  # ← đổi is_dead → fully_dead
+        self.test01 = [test for test in self.test01 if not test.fully_dead]
         if before_count != len(self.test01):
             print(f"Đã xóa {before_count - len(self.test01)} test chết")
             self.player.set_enemies(self.slimes2 + self.test01)
-
 
     def draw(self):
         self.game_surface.fill((0,0,0))
         self.game_surface.blit(self.map_image, (-self.camera.x, -self.camera.y))
         
-       
         self.home001_object.draw(self.game_surface, self.camera)
-        
-        
-        self.home002_objcect.draw(self.game_surface, self.camera)
+        self.home002_object.draw(self.game_surface, self.camera)  
         self.chimney_home2_object.draw(self.game_surface, self.camera)
-
         self.home003_object.draw(self.game_surface, self.camera)
         self.flag1_object.draw(self.game_surface, self.camera)
         self.lunebladeNPC_object.draw(self.game_surface, self.camera)
-
-        #self.home_base01_object.draw(self.game_surface, self.camera) #2
-        #self.dragonHome001_object.draw(self.game_surface, self.camera) #3
-        
-        #NPC Sample
         self.sampleNPC_object.draw(self.game_surface, self.camera)
-
-        #Hàng rào dragon home
-        #for fence in self.fences:
-        #    fence.draw(self.game_surface, self.camera)
-
         self.tree_01_object.draw(self.game_surface, self.camera)
         self.fruit_pasket_01.draw(self.game_surface, self.camera)
         self.fruit_pasket_02.draw(self.game_surface, self.camera)
         self.fruit_pasket_03.draw(self.game_surface, self.camera)
-
-       
-        
         
         # VẼ TẤT CẢ PLANT 
         for plant in self.plants:
             plant.draw(self.game_surface, self.camera)
 
-        # VẼ TẤT CẢ SLIME2 (chỉ vẽ nếu chưa chết)
+        # VẼ TẤT CẢ SLIME2
         for slime2 in self.slimes2:
-            #if not slime2.is_dead:
-                slime2.draw(self.game_surface, self.camera)
+            slime2.draw(self.game_surface, self.camera)
 
-        # VẼ TẤT CẢ test01 (chỉ vẽ nếu chưa chết)
+        # VẼ TẤT CẢ test01
         for test01 in self.test01:
-            #if not slime2.is_dead:
-                test01.draw(self.game_surface, self.camera)
+            test01.draw(self.game_surface, self.camera)
                 
         self.player.draw(self.game_surface, self.camera)
         
@@ -448,7 +389,9 @@ class Game:
         
         # Vẽ HUD lên screen (sau khi scale để không bị zoom)
         self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
-        
+
+        # Đã xóa: self.pause_menu.draw(...)
+
         pygame.display.flip()
     
     def run(self):
