@@ -160,9 +160,18 @@ class Player1(pygame.sprite.Sprite):
         self.attack_hitbox = None 
 
         # HỆ THỐNG SÁT THƯƠNG =====
-        self.health = 100                 # Máu hiện tại
-        self.max_health = 100             # Máu tối đa
-        self.is_dead = False              # Trạng thái chết
+        #PMD-Bất tử khi HP <= 30% với hiệu ứng mờ dần
+        self.health = 100
+        self.max_health = 100
+        self.is_dead = False
+        # GHOST MODE: khi HP <= 30% thì mờ và bất tử 2 giây
+        self.ghost_mode = False
+        self.ghost_start_time = 0
+        self.ghost_duration = 2000
+        self.ghost_used = False     # Chỉ dùng 1 lần duy nhất     # 2 giây bất tử
+        self.ghost_alpha = 80           # độ mờ (0=trong suốt, 255=bình thường)
+        #PMD
+
         self.damage = 50                  # Sát thương mỗi đòn đánh
         self.has_dealt_damage = False       # Đã gây sát thương trong đòn tấn công này chưa
         self.damage_cooldown = 200          # Thời gian delay giữa các lần gây sát thương (ms)
@@ -458,7 +467,7 @@ class Player1(pygame.sprite.Sprite):
                             break
     """Gây sát thương lên tất cả kẻ địch trong vùng attack_hitbox"""                        
     """
-    def deal_damage_to_enemies(self):
+    def deal_damage_to_enemies():
         
         if not self.is_attacking or self.attack_hitbox is None:
             return
@@ -512,11 +521,35 @@ class Player1(pygame.sprite.Sprite):
                     break     
 
 
-    """                
+    """    
     # ===== HÀM MỚI: Gán danh sách enemy từ game chính =====
     def set_enemies(self, enemies):
-        """Gán danh sách kẻ địch để player có thể tấn công"""
         self.enemies = enemies
+#PMD-Bất tử khi HP <= 30% với hiệu ứng mờ dần
+    def take_damage(self, damage):
+        if self.is_dead:
+            return
+        # Nếu đang ghost mode thì không nhận damage
+        if self.ghost_mode:
+            current_time = pygame.time.get_ticks()
+            if current_time - self.ghost_start_time < self.ghost_duration:
+                print("Player đang ghost mode - miễn sát thương!")
+                return
+            else:
+                self.ghost_mode = False  # Hết 2 giây, tắt ghost
+        # Trừ máu bình thường
+        self.health = max(0, self.health - damage)
+        print(f"Player nhận {damage} sát thương! Máu còn: {self.health}/{self.max_health}")
+        if self.health <= 0:
+            self.is_dead = True
+            print("Player đã chết!")
+            return
+        # Kích hoạt ghost mode nếu HP <= 30% và chưa từng dùng
+        if self.health <= self.max_health * 0.3 and not self.ghost_used:
+            self.ghost_mode = True
+            self.ghost_used = True
+            self.ghost_start_time = pygame.time.get_ticks()
+            print("⚠️ HP thấp! Ghost mode 2 giây!")
     
     # Cập nhật update_attack để hỗ trợ attack_walk
     def update_attack(self):
@@ -652,9 +685,10 @@ class Player1(pygame.sprite.Sprite):
                 offset_y = (self.height - dash_height) // 2
                 screen_x = self.x - camera.x + offset["offset_x"]
                 screen_y = self.y - camera.y + offset_y + offset["offset_y"]
-            
+            #PMD-BT
+            # Vẽ sprite với hiệu ứng mờ nếu đang ghost mode
             screen.blit(self.image, (screen_x, screen_y))
-            
+            #PMD-BT
             # ===== VẼ HITBOX DASH NỘI SUY GIỮA START VÀ TARGET =====
             if DEBUG_MODE:
                 # Tính tiến độ dash (0 -> 1)
