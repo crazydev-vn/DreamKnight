@@ -9,6 +9,7 @@ class UI:
         pygame.font.init()
         self.font       = pygame.font.SysFont("Arial", 16, bold=True)  # Font nhỏ cho text UI
         self.font_big   = pygame.font.SysFont("Arial", 60, bold=True)  # Font lớn cho GAME OVER
+        self.font_btn   = pygame.font.SysFont("Arial", 26, bold=True)  # Font cho nút bấm
         self.tick       = 0  # Biến đếm frame, dùng để tạo hiệu ứng nhấp nháy cho thanh máu khi thấp
         
         # Load ảnh dash
@@ -174,21 +175,41 @@ class UI:
         surface.blit(label, (BAR_X + frame_width + 8, BAR_Y + (frame_height // 2) - 8))
 
     def draw_game_over(self, surface, screen_width, screen_height):
-        """Vẽ màn hình Game Over với hiệu ứng mờ và hướng dẫn restart"""
-        # Tạo lớp phủ mờ đen với độ trong suốt 160/255
+        """Vẽ màn hình Game Over dạng khung menu"""
+        # Nền mờ toàn màn hình
         overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
-        overlay.fill((0, 0, 0, 160))
+        overlay.fill((0, 0, 0, 180))
         surface.blit(overlay, (0, 0))
 
-        # Vẽ chữ GAME OVER lớn màu đỏ ở giữa màn hình
-        text = self.font_big.render("GAME OVER", True, (220, 50, 50))
-        x = (screen_width - text.get_width()) // 2
-        y = (screen_height - text.get_height()) // 2
-        surface.blit(text, (x, y))
+        # Khung menu
+        box_w, box_h = 360, 260
+        box_x = (screen_width  - box_w) // 2
+        box_y = (screen_height - box_h) // 2
+        pygame.draw.rect(surface, (40, 10, 10),  (box_x, box_y, box_w, box_h), border_radius=16)
+        pygame.draw.rect(surface, (220, 50, 50), (box_x, box_y, box_w, box_h), 2, border_radius=16)
 
-        # Vẽ hướng dẫn phía dưới
-        hint = self.font.render("Nhấn R để chơi lại  |  ESC để thoát", True, (255, 255, 255))
-        surface.blit(hint, ((screen_width - hint.get_width()) // 2, y + 80))
+        # Chữ GAME OVER
+        title = self.font_big.render("GAME OVER", True, (220, 50, 50))
+        surface.blit(title, (box_x + (box_w - title.get_width()) // 2, box_y + 20))
+
+        # Nút Play Again
+        btn_w, btn_h = 220, 44
+        btn_x = box_x + (box_w - btn_w) // 2
+        mouse_pos = pygame.mouse.get_pos()
+
+        r_rect = pygame.Rect(btn_x, box_y + 140, btn_w, btn_h)
+        if r_rect.collidepoint(mouse_pos):
+            color_bg, color_txt = (220, 50, 50), (255, 255, 255)
+        else:
+            color_bg, color_txt = (100, 20, 20), (255, 180, 180)
+        pygame.draw.rect(surface, color_bg,      r_rect, border_radius=10)
+        pygame.draw.rect(surface, (220, 50, 50), r_rect, 2, border_radius=10)
+        t = self.font_btn.render("Play Again", True, color_txt)
+        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 140 + (btn_h - t.get_height()) // 2))
+
+        # Hint ESC
+        hint = self.font.render("ESC to Quit", True, (160, 160, 160))
+        surface.blit(hint, (box_x + (box_w - hint.get_width()) // 2, box_y + 205))
 
     def draw(self, surface, player, screen_width, screen_height):
         """Vẽ toàn bộ UI (hàm chính gọi từ game loop)"""
@@ -201,3 +222,75 @@ class UI:
         # Nếu player đã chết, vẽ màn hình Game Over
         if hasattr(player, 'is_dead') and player.is_dead:
             self.draw_game_over(surface, screen_width, screen_height)
+
+class PauseMenu:
+    def __init__(self):
+        pygame.font.init()
+        self.font_title = pygame.font.SysFont("Arial", 48, bold=True)
+        self.font_btn   = pygame.font.SysFont("Arial", 26, bold=True)
+        self.visible    = False
+
+    def toggle(self):
+        self.visible = not self.visible
+
+    def draw(self, surface, screen_width, screen_height):
+        if not self.visible:
+            return
+
+        # Nền mờ
+        overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 170))
+        surface.blit(overlay, (0, 0))
+
+        # Khung menu
+        box_w, box_h = 320, 280
+        box_x = (screen_width  - box_w) // 2
+        box_y = (screen_height - box_h) // 2
+        pygame.draw.rect(surface, (30, 20, 50),    (box_x, box_y, box_w, box_h), border_radius=16)
+        pygame.draw.rect(surface, (255, 210, 100), (box_x, box_y, box_w, box_h), 2, border_radius=16)
+
+        # Tiêu đề
+        title = self.font_title.render("PAUSE", True, (255, 210, 100))
+        surface.blit(title, (box_x + (box_w - title.get_width()) // 2, box_y + 24))
+
+        btn_w, btn_h = 220, 44
+        btn_x = box_x + (box_w - btn_w) // 2
+        mouse_pos = pygame.mouse.get_pos()
+
+        # Nút Resume
+        resume_rect = pygame.Rect(btn_x, box_y + 110, btn_w, btn_h)
+        if resume_rect.collidepoint(mouse_pos):
+            color_bg, color_txt = (255, 210, 100), (30, 20, 50)
+        else:
+            color_bg, color_txt = (60, 45, 90), (255, 255, 255)
+        pygame.draw.rect(surface, color_bg,        resume_rect, border_radius=10)
+        pygame.draw.rect(surface, (255, 210, 100), resume_rect, 2, border_radius=10)
+        t = self.font_btn.render("Resume", True, color_txt)
+        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 110 + (btn_h - t.get_height()) // 2))
+
+        # Nút Quit
+        quit_rect = pygame.Rect(btn_x, box_y + 172, btn_w, btn_h)
+        if quit_rect.collidepoint(mouse_pos):
+            color_bg, color_txt = (200, 50, 50), (255, 255, 255)
+        else:
+            color_bg, color_txt = (100, 30, 30), (255, 180, 180)
+        pygame.draw.rect(surface, color_bg,      quit_rect, border_radius=10)
+        pygame.draw.rect(surface, (255, 80, 80), quit_rect, 2, border_radius=10)
+        t = self.font_btn.render("Quit", True, color_txt)
+        surface.blit(t, (btn_x + (btn_w - t.get_width()) // 2, box_y + 172 + (btn_h - t.get_height()) // 2))
+
+    def handle_click(self, pos, screen_width, screen_height):
+        if not self.visible:
+            return None
+        box_w, box_h = 320, 280
+        box_x = (screen_width  - box_w) // 2
+        box_y = (screen_height - box_h) // 2
+        btn_w, btn_h = 220, 44
+        btn_x = box_x + (box_w - btn_w) // 2
+
+        if pygame.Rect(btn_x, box_y + 110, btn_w, btn_h).collidepoint(pos):
+            self.visible = False
+            return "resume"
+        if pygame.Rect(btn_x, box_y + 172, btn_w, btn_h).collidepoint(pos):
+            return "quit"
+        return None

@@ -7,7 +7,7 @@ from game_object import GameObject
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
-from ui import UI  # ← Chỉ import UI, không có PauseMenu
+from ui import UI, PauseMenu  # ← Import cả PauseMenu
 #================================================================================================
 #Vai trò: Lớp chính điều khiển toàn bộ vòng đời của game.
 #Quản lý cửa sổ, vòng lặp game, xử lý sự kiện, cập nhật logic, vẽ mọi thứ.
@@ -44,8 +44,9 @@ class Game:
         self.setup_music()
         
         self.running = True # Cờ chạy vòng lặp game
-        self.ui = UI()      # Khởi tạo giao diện HUD
-        # Đã xóa: self.pause_menu = PauseMenu()
+        self.game_over = False  # Trạng thái game over
+        self.ui = UI()              # Khởi tạo giao diện HUD
+        self.pause_menu = PauseMenu()  # Khởi tạo menu tạm dừng
 
         self.home001_object = GameObject(
             x=900, y= 10, #100, 
@@ -246,15 +247,54 @@ class Game:
         for event in events:
             if event.type == pygame.QUIT:
                 self.running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                action = self.pause_menu.handle_click(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
+                if action == "quit":
+                    self.running = False
+                # Click nút Play Again khi game over
+                if self.game_over:
+                    box_w, box_h = 360, 260
+                    box_x = (SCREEN_WIDTH  - box_w) // 2
+                    box_y = (SCREEN_HEIGHT - box_h) // 2
+                    btn_w, btn_h = 220, 44
+                    btn_x = box_x + (box_w - btn_w) // 2
+                    #PMD-Thêm đúng 3 dòng ghost_mode, ghost_used, ghost_start_time là xong. 
+                    #Lần chơi mới sẽ có ghost mode bình thường trở lại.
+                    if pygame.Rect(btn_x, box_y + 140, btn_w, btn_h).collidepoint(event.pos):
+                        self.player.health = self.player.max_health
+                        self.player.is_dead = False
+                        self.player.ghost_mode = False
+                        self.player.ghost_used = False
+                        self.player.ghost_start_time = 0
+                        self.player.x = 400
+                        self.player.y = 450
+                        self.player.rect.center = (400, 450)
+                        self.game_over = False
+                        pygame.mixer.music.unpause()
+                        #PMD
             elif event.type == pygame.KEYDOWN:
-                # Đã xóa xử lý ESC cho pause menu
-                if event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
+                # Xử lý phím khi Game Over
+                if self.game_over:
+                    if event.key == pygame.K_ESCAPE:
+                        self.running = False
+                    continue  # Bỏ qua các phím khác khi game over
+
+                if event.key == pygame.K_ESCAPE:
+                    self.pause_menu.toggle()
+                    if self.pause_menu.visible:
+                        pygame.mixer.music.pause()
+                    else:
+                        pygame.mixer.music.unpause()
+                elif event.key == pygame.K_m:  # Phím M để tắt/bật nhạc
                     self.toggle_music()
                 elif event.key == pygame.K_UP:  # Phím lên để tăng volume
                     self.change_volume(0.1)
                 elif event.key == pygame.K_DOWN:  # Phím xuống để giảm volume
                     self.change_volume(-0.1)
 
+        # Không truyền events cho player khi đang pause hoặc game over
+        if self.pause_menu.visible or self.game_over:
+            return []
         return events
     
     #Tắt/bật nhạc nền
@@ -281,10 +321,20 @@ class Game:
     def update(self):
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
         events = self.handle_events()
-        
+
+        # Kiểm tra player chết → kích hoạt game over
+        if self.player.is_dead and not self.game_over:
+            self.game_over = True
+            pygame.mixer.music.pause()
+            pygame.mixer.stop()  # Dừng toàn bộ SFX
+
+        # Nếu game over hoặc đang pause thì không update gì cả
+        if self.game_over or self.pause_menu.visible:
+            return
+
         # Cập nhật player VỚI EVENTS (để xử lý tấn công)
         self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
-        
+
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
 
@@ -389,6 +439,9 @@ class Game:
         
         # Vẽ HUD lên screen (sau khi scale để không bị zoom)
         self.ui.draw(self.screen, self.player, SCREEN_WIDTH, SCREEN_HEIGHT)
+
+        # Vẽ Pause Menu lên trên cùng
+        self.pause_menu.draw(self.screen, SCREEN_WIDTH, SCREEN_HEIGHT)
 
         # Đã xóa: self.pause_menu.draw(...)
 

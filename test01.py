@@ -56,6 +56,7 @@ class Test01(pygame.sprite.Sprite):
 
         # Máu
         self.health     = 500
+        self.contact_damage = 15         # Sát thương khi chạm vào player
         self.max_health = 500
 
         # Thời gian trạng thái
@@ -343,6 +344,14 @@ class Test01(pygame.sprite.Sprite):
         self.is_attacking = False
         if self.direction in self.attack_anims:
             self.attack_anims[self.direction].reset()
+        if self.player and not self.player.is_dead:
+            import math
+            slime_cx = self.x + self.width // 2
+            slime_cy = self.y + self.height // 2
+            px = self.player.x + self.player.width // 2
+            py = self.player.y + self.player.height // 2
+            if math.hypot(slime_cx - px, slime_cy - py) <= self.attack_range * 1.3:
+                self.player.take_damage(10)
 
     def _update_invincible(self, current_time):
         if self.is_invincible:
