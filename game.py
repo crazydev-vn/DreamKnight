@@ -378,12 +378,16 @@ class Game:
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
         events = self.handle_events()
 
+        # Nếu game over hoặc đang pause thì không update gì cả
+        if self.game_over or self.pause_menu.visible:
+            return
+
         # 1. Quét khoảng cách giữa player và các NPC liên tục
-        self.npc_manager.update(self.player,self)
-        
+        self.npc_manager.update(self.player, self)
+
         # 2. CHỈ cho phép cập nhật di chuyển player và quái vật khi KHÔNG xem hội thoại hoặc shop
         if not self.npc_manager.is_showing_dialogue and not self.npc_manager.is_showing_shop:
-                   
+
             # Cập nhật player VỚI EVENTS (để xử lý tấn công)
             self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
 
@@ -391,7 +395,7 @@ class Game:
             for test01 in self.test01:
                 test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
-            # CẬP NHẬT TẤT CẢ TEST01
+            # CẬP NHẬT TẤT CẢ PLANT1
             for plant1 in self.plant1:
                 plant1.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
@@ -421,13 +425,6 @@ class Game:
             self.game_over = True
             pygame.mixer.music.pause()
             pygame.mixer.stop()  # Dừng toàn bộ SFX
-
-        # Nếu game over hoặc đang pause thì không update gì cả
-        if self.game_over or self.pause_menu.visible:
-            return
-
-        # Cập nhật player VỚI EVENTS (để xử lý tấn công)
-        self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
 
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
