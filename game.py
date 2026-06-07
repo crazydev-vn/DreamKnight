@@ -277,16 +277,13 @@ class Game:
                         pygame.mixer.music.unpause()
                         #PMD
             elif event.type == pygame.KEYDOWN:
-<<<<<<< HEAD
                 self.npc_manager.handle_keydown(event.key)  # Truyền sự kiện phím cho NPCSystem để xử lý đóng shop hoặc các tương tác khác
-=======
-                # Xử lý phím khi Game Over
+          # Xử lý phím khi Game Over
                 if self.game_over:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
                     continue  # Bỏ qua các phím khác khi game over
 
->>>>>>> 35ea7b52fb9d661ad28a25cbab7175de0d11d901
                 if event.key == pygame.K_ESCAPE:
                     self.pause_menu.toggle()
                     if self.pause_menu.visible:
@@ -329,7 +326,7 @@ class Game:
     def update(self):
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
         events = self.handle_events()
-<<<<<<< HEAD
+
         # 1. Quét khoảng cách giữa player và các NPC liên tục
         self.npc_manager.update(self.player,self)
         
@@ -355,7 +352,6 @@ class Game:
             self.remove_dead_slimes()
             self.remove_dead_tests()
         
-=======
 
         # Kiểm tra player chết → kích hoạt game over
         if self.player.is_dead and not self.game_over:
@@ -370,7 +366,6 @@ class Game:
         # Cập nhật player VỚI EVENTS (để xử lý tấn công)
         self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
 
->>>>>>> 35ea7b52fb9d661ad28a25cbab7175de0d11d901
         # Cập nhật camera để theo dõi player
         self.camera.update(self.player)
 
