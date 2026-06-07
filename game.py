@@ -5,9 +5,13 @@ from camera import Camera
 
 from game_object import GameObject  
 from npc_system import NPCSystem
-from plant_target1 import PlantTarget1   
+
 from slime2_target import Slime2
+
 from test01 import Test01
+
+from plant1 import Plant1
+
 from ui import UI, PauseMenu
 import sound_manager
 #================================================================================================
@@ -176,23 +180,6 @@ class Game:
             frame_duration = 2.0,
             scale= 2.0,
         )
-
-        # Tạo plant target
-        self.plants = []
-        
-        # Danh sách tọa độ các plant được thêm vào
-        plant_positions = [
-            #(700, 800),
-            #(760, 600),
-            #(700, 600),
-            #(800, 1000),
-            #(100, 200),
-            #(1800, 600),
-        ]
-        for x, y in plant_positions:
-            plant = PlantTarget1(x, y, scale_factor=2.0)
-            plant.set_player(self.player)
-            self.plants.append(plant)
            
         self.slimes2 = []
         # Danh sách tọa độ các slime 2 được thêm vào
@@ -211,21 +198,43 @@ class Game:
         self.test01 = []
         # Danh sách tọa độ các test 01 được thêm vào (COMMENT lại nếu chưa muốn có quái)
         test01_positions = [
-            (730, 700), (760, 620), (800, 600),  # COMMENT hết
-            (700, 600),
-            (800, 1000),
-            (100, 200),
-            (1800, 600),
+          
+            #(730, 700), (760, 620), (800, 600),  # COMMENT hết
+            #(700, 600),
+            #(800, 1000),
+            #(100, 200),
+            #(1800, 600),
+          
         ]
         for x, y in test01_positions:
             test01 = Test01(x, y, scale_factor=2.0)
             test01.set_player(self.player)
             self.test01.append(test01)
-        
-        # Gán danh sách enemy cho player
         self.player.set_enemies(self.slimes2 + self.test01)
+
+        self.plant1 = []
+        plant1_positions = [
+          
+            (730, 700), (760, 620), (800, 600),  
+            (700, 600),
+            (800, 1000),
+            (100, 200),
+            (1800, 600),
+          
+        ]
+        for x, y in plant1_positions:
+            plant1 = Plant1(x, y, scale_factor=2.0)
+            plant1.set_player(self.player)
+            self.plant1.append(plant1)
+
+        # Gán danh sách enemy cho player
+        self.player.set_enemies(self.slimes2 + self.test01 + self.plant1 )
+        
         # Thêm dòng này vào cuối hàm __init__ (dưới dòng self.player.set_enemies(...))
         self.npc_manager = NPCSystem()
+
+
+        
 
         # Đồng bộ volume SFX cho tất cả sound đã đăng ký
         sound_manager.set_sfx_volume(sound_manager.get_sfx_volume())
@@ -249,7 +258,6 @@ class Game:
             print(f"Lỗi khi phát nhạc: {e}")
 
     def handle_events(self):
-        
         # Xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc)
         events = pygame.event.get()
         for event in events:
@@ -359,9 +367,7 @@ class Game:
                    
             # Cập nhật player VỚI EVENTS (để xử lý tấn công)
             self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
-            # CẬP NHẬT TẤT CẢ PLANT
-            for plant in self.plants:
-                plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+       
 
             # CẬP NHẬT TẤT CẢ SLIME2
             for slime2 in self.slimes2:
@@ -371,11 +377,15 @@ class Game:
             for test01 in self.test01:
                 test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
+            # CẬP NHẬT TẤT CẢ TEST01
+            for plant1 in self.plant1:
+                plant1.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
             # Xử lý va chạm
-            self.check_plant_collisions()
+            self.check_plant1_collisions()
             self.remove_dead_slimes()
             self.remove_dead_tests()
-        
+            self.remove_dead_plants1()
 
         # Kiểm tra player chết → kích hoạt game over
         if self.player.is_dead and not self.game_over:
@@ -412,14 +422,17 @@ class Game:
 
         
 
-    def check_plant_collisions(self):
+    def check_plant1_collisions(self):
         attack_hitbox = self.player.get_attack_hitbox()
         if not attack_hitbox:
             return
         
-        for i in range(len(self.plants) - 1, -1, -1):
-            plant = self.plants[i]
-            cx, cy, radius = plant.get_hitbox()
+        for i in range(len(self.plant1) - 1, -1, -1):  # ← SỬA: self.plant1 (không phải self.plants)
+            plant1 = self.plant1[i]  # ← SỬA: self.plant1 (không phải self.plants1)
+            if plant1.is_dead:  # ← THÊM: kiểm tra nếu đã chết thì bỏ qua
+                continue
+                
+            cx, cy, radius = plant1.get_hitbox()
             
             closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
             closest_y = max(attack_hitbox.top, min(cy, attack_hitbox.bottom))
@@ -427,8 +440,9 @@ class Game:
             dy = closest_y - cy
             
             if dx*dx + dy*dy < radius * radius:
-                self.plants.pop(i)
-                print(f"Plant bị tiêu diệt! Còn {len(self.plants)} plant")
+                plant1.take_damage(self.player.damage)  # ← SỬA: gây sát thương, không pop ngay
+                print(f"Plant1 bị tấn công! Máu còn: {plant1.health}")
+
 
     def remove_dead_slimes(self):
         before_count = len(self.slimes2)
@@ -442,7 +456,15 @@ class Game:
         self.test01 = [test for test in self.test01 if not test.fully_dead]
         if before_count != len(self.test01):
             print(f"Đã xóa {before_count - len(self.test01)} test chết")
-            self.player.set_enemies(self.slimes2 + self.test01)
+            self.player.set_enemies(self.slimes2 + self.plant1 + self.test01)
+
+    def remove_dead_plants1(self):
+        before_count = len(self.plant1)
+        self.plant1 = [plant1 for plant1 in self.plant1 if not plant1.fully_dead]
+        if before_count != len(self.plant1):
+            print(f"Đã xóa {before_count - len(self.plant1)} test chết")
+
+            self.player.set_enemies(self.slimes2 + self.plant1 + self.test01)
 
     def draw(self):
         self.game_surface.fill((0,0,0))
@@ -460,9 +482,7 @@ class Game:
         self.fruit_pasket_02.draw(self.game_surface, self.camera)
         self.fruit_pasket_03.draw(self.game_surface, self.camera)
         
-        # VẼ TẤT CẢ PLANT 
-        for plant in self.plants:
-            plant.draw(self.game_surface, self.camera)
+       
 
         # VẼ TẤT CẢ SLIME2
         for slime2 in self.slimes2:
@@ -471,6 +491,10 @@ class Game:
         # VẼ TẤT CẢ test01
         for test01 in self.test01:
             test01.draw(self.game_surface, self.camera)
+
+        # VẼ TẤT CẢ test01
+        for plant1 in self.plant1:
+            plant1.draw(self.game_surface, self.camera)
                 
         self.player.draw(self.game_surface, self.camera)
         
