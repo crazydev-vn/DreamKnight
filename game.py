@@ -6,10 +6,12 @@ from camera import Camera
 from game_object import GameObject  
 from npc_system import NPCSystem
 
-
 from test01 import Test01
 from plant1 import Plant1
+from slime1 import Slime1
+from slime2 import Slime2
 
+from gold_drop import GoldDrop
 from ui import UI, PauseMenu
 import sound_manager
 #================================================================================================
@@ -184,11 +186,11 @@ class Game:
         # Danh sách tọa độ các test 01 được thêm vào (COMMENT lại nếu chưa muốn có quái)
         test01_positions = [
           
-            #(730, 700), (760, 620), (800, 600),  # COMMENT hết
-            #(700, 600),
-            #(800, 1000),
-            #(100, 200),
-            #(1800, 600),
+            # (730, 700), (760, 620), (800, 600),  # COMMENT hết
+            # (700, 600),
+            # (800, 1000),
+            # (100, 200),
+            # (1800, 600),
           
         ]
         for x, y in test01_positions:
@@ -201,11 +203,11 @@ class Game:
         self.plant1 = []
         plant1_positions = [
           
-            (730, 700), (760, 620), (800, 600),  
-            (700, 600),
-            (800, 1000),
-            (100, 200),
-            (1800, 600),
+            # (730, 700), (760, 620), (800, 600),  
+            # (700, 600),
+            # (800, 1000),
+            # (100, 200),
+            # (1800, 600),
           
         ]
         for x, y in plant1_positions:
@@ -213,8 +215,42 @@ class Game:
             plant1.set_player(self.player)
             self.plant1.append(plant1)
 
+
+        self.slime1 = []
+        slime1_positions = [
+          
+            # (730, 700), (760, 620), (800, 600),  
+            # (700, 600),
+            # (800, 1000),
+            # (100, 200),
+            # (1800, 600),
+          
+        ]
+        for x, y in slime1_positions:
+            slime1 = Slime1(x, y, scale_factor=2.0)
+            slime1.set_player(self.player)
+            self.slime1.append(slime1)
+
+
+        self.slime2 = []
+        slime2_positions = [
+                      
+            (730, 700), (760, 620), (800, 600),  
+            (700, 600),
+            (800, 1000),
+            (100, 200),
+            (1800, 600),
+                      
+        ]
+        for x, y in slime2_positions:
+            slime2 = Slime2(x, y, scale_factor=2.0)
+            slime2.set_player(self.player)
+            self.slime2.append(slime2)
+
+        self.gold_drops = []
+
         # Gán danh sách enemy cho player
-        self.player.set_enemies(self.test01 + self.plant1 )
+        self.player.set_enemies(self.test01 + self.plant1 + self.slime1 + self.slime2) 
         
         # Thêm dòng này vào cuối hàm __init__ (dưới dòng self.player.set_enemies(...))
         self.npc_manager = NPCSystem()
@@ -359,10 +395,26 @@ class Game:
             for plant1 in self.plant1:
                 plant1.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
+            # CẬP NHẬT TẤT CẢ SLIME1
+            for slime1 in self.slime1:
+                slime1.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # CẬP NHẬT TẤT CẢ SLIME2
+            for slime2 in self.slime2:
+                slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+                
             # Xử lý va chạm
             self.check_plant1_collisions()
+            self.check_enemy_collisions()
             self.remove_dead_tests()
             self.remove_dead_plants1()
+            self.remove_dead_slime1()
+            self.remove_dead_slime2()
+
+        # Cập nhật vàng rơi (ngoài block dialogue để luôn chạy)
+        self.gold_drops = [g for g in self.gold_drops if not g.collected]
+        for gold in self.gold_drops:
+            gold.update(self.player)
 
         # Kiểm tra player chết → kích hoạt game over
         if self.player.is_dead and not self.game_over:
@@ -420,20 +472,75 @@ class Game:
                 plant1.take_damage(self.player.damage)  # ← SỬA: gây sát thương, không pop ngay
                 print(f"Plant1 bị tấn công! Máu còn: {plant1.health}")
 
+
+    def check_enemy_collisions(self):
+        attack_hitbox = self.player.get_attack_hitbox()
+        if not attack_hitbox:
+            return
+        for enemy_list in [self.test01, self.slime1, self.slime2]:
+            for enemy in enemy_list:
+                if enemy.is_dead:
+                    continue
+                cx, cy, radius = enemy.get_hitbox()
+                closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
+                closest_y = max(attack_hitbox.top,  min(cy, attack_hitbox.bottom))
+                dx = closest_x - cx
+                dy = closest_y - cy
+                if dx*dx + dy*dy < radius * radius:
+                    enemy.take_damage(self.player.damage)
+
     def remove_dead_tests(self):
-        before_count = len(self.test01)
-        self.test01 = [test for test in self.test01 if not test.fully_dead]
-        if before_count != len(self.test01):
-            print(f"Đã xóa {before_count - len(self.test01)} test chết")
-            self.player.set_enemies(self.slimes2 + self.plant1 + self.test01)
+        alive = []
+        for test in self.test01:
+            if test.fully_dead:
+                cx = test.x + test.width  // 2
+                cy = test.y + test.height // 2
+                self.gold_drops.append(GoldDrop(cx, cy, value=10))
+            else:
+                alive.append(test)
+        if len(alive) != len(self.test01):
+            self.test01 = alive
+            self.player.set_enemies(self.plant1 + self.test01 + self.slime1 + self.slime2)
 
     def remove_dead_plants1(self):
-        before_count = len(self.plant1)
-        self.plant1 = [plant1 for plant1 in self.plant1 if not plant1.fully_dead]
-        if before_count != len(self.plant1):
-            print(f"Đã xóa {before_count - len(self.plant1)} test chết")
+        alive = []
+        for plant1 in self.plant1:
+            if plant1.fully_dead:
+                cx = plant1.x + plant1.width  // 2
+                cy = plant1.y + plant1.height // 2
+                self.gold_drops.append(GoldDrop(cx, cy, value=8))
+            else:
+                alive.append(plant1)
+        if len(alive) != len(self.plant1):
+            self.plant1 = alive
+            self.player.set_enemies(self.plant1 + self.test01 + self.slime1 + self.slime2)
 
-            self.player.set_enemies(self.slimes2 + self.plant1 + self.test01)
+    def remove_dead_slime1(self):
+        alive = []
+        for slime1 in self.slime1:
+            if slime1.fully_dead:
+                cx = slime1.x + slime1.width  // 2
+                cy = slime1.y + slime1.height // 2
+                self.gold_drops.append(GoldDrop(cx, cy, value=5))
+            else:
+                alive.append(slime1)
+        if len(alive) != len(self.slime1):
+            self.slime1 = alive
+            self.player.set_enemies(self.plant1 + self.test01 + self.slime1 + self.slime2)
+
+    def remove_dead_slime2(self):
+        alive = []
+        for slime2 in self.slime2:
+            if slime2.fully_dead:
+                cx = slime2.x + slime2.width  // 2
+                cy = slime2.y + slime2.height // 2
+                self.gold_drops.append(GoldDrop(cx, cy, value=7))
+            else:
+                alive.append(slime2)
+        if len(alive) != len(self.slime2):
+            self.slime2 = alive
+            self.player.set_enemies(self.plant1 + self.test01 + self.slime1 + self.slime2)
+
 
     def draw(self):
         self.game_surface.fill((0,0,0))
@@ -458,7 +565,19 @@ class Game:
         # VẼ TẤT CẢ test01
         for plant1 in self.plant1:
             plant1.draw(self.game_surface, self.camera)
-                
+
+        # VẼ TẤT CẢ slime1
+        for slime1 in self.slime1:
+            slime1.draw(self.game_surface, self.camera)
+
+        # VẼ TẤT CẢ slime2
+        for slime2 in self.slime2:
+            slime2.draw(self.game_surface, self.camera)
+
+        # VẼ VÀNG RƠI
+        for gold in self.gold_drops:
+            gold.draw(self.game_surface, self.camera)
+
         self.player.draw(self.game_surface, self.camera)
         
         scaled_surface = pygame.transform.scale(self.game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))

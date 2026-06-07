@@ -82,8 +82,8 @@ class UI:
         PAD    = 14      # Khoảng cách từ mép màn hình
         BW     = 220     # Chiều rộng thanh (Bar Width)
         BH     = 22      # Chiều cao thanh (Bar Height)
-        BAR_X  = PAD + 96
-        BAR_Y  = PAD + 35
+        BAR_X  = PAD
+        BAR_Y  = PAD
 
         # Vẽ nền thanh máu (màu đỏ)
         self.draw_rounded_rect(surface, (255, 0, 0), (BAR_X, BAR_Y, BW, BH), radius=6)
@@ -141,8 +141,8 @@ class UI:
 
         # Vị trí thanh dash (ngay dưới thanh máu)
         PAD   = 14
-        BAR_X = PAD + 96
-        BAR_Y = PAD + 35 + 28
+        BAR_X = PAD
+        BAR_Y = PAD + 28
 
         # ===== CHỌN FRAME HIỂN THỊ =====
         if self.is_dashing_anim:
@@ -211,6 +211,26 @@ class UI:
         hint = self.font.render("ESC to Quit", True, (160, 160, 160))
         surface.blit(hint, (box_x + (box_w - hint.get_width()) // 2, box_y + 205))
 
+    def draw_gold(self, surface, player):
+        """Vẽ icon đồng vàng + số vàng hiện có bên dưới thanh dash"""
+        PAD   = 14
+        BAR_Y = PAD + 28  # cùng Y với dash
+        # Ước tính chiều cao frame dash (scale x2 từ ảnh gốc ~18px)
+        DASH_H = 36
+        GOLD_Y = PAD + DASH_H + 36  # dưới thanh dash ~10px
+
+        # Vẽ hình tròn vàng làm icon
+        icon_x = PAD + 10
+        icon_y = GOLD_Y + 10
+        pygame.draw.circle(surface, (180, 120, 0), (icon_x, icon_y), 11)
+        pygame.draw.circle(surface, (255, 210, 0), (icon_x, icon_y), 10)
+        pygame.draw.circle(surface, (255, 245, 150), (icon_x - 3, icon_y - 3), 4)
+
+        # Vẽ số vàng
+        gold = getattr(player, 'gold', 0)
+        gold_text = self.font.render(f"{gold}", True, (255, 230, 80))
+        surface.blit(gold_text, (PAD + 26, GOLD_Y + 2))
+
     def draw(self, surface, player, screen_width, screen_height):
         """Vẽ toàn bộ UI (hàm chính gọi từ game loop)"""
         # Vẽ thanh máu
@@ -218,6 +238,9 @@ class UI:
         
         # Vẽ thanh cooldown dash
         self.draw_dash_cooldown(surface, player)
+
+        # Vẽ số vàng
+        self.draw_gold(surface, player)
 
         # Nếu player đã chết, vẽ màn hình Game Over
         if hasattr(player, 'is_dead') and player.is_dead:
