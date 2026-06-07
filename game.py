@@ -4,6 +4,7 @@ from knight1 import Player1
 from camera import Camera
 
 from game_object import GameObject  
+from npc_system import NPCSystem
 from plant_target1 import PlantTarget1   
 from slime2_target import Slime2
 from test01 import Test01
@@ -223,6 +224,8 @@ class Game:
         
         # Gán danh sách enemy cho player
         self.player.set_enemies(self.slimes2 + self.test01)
+        # Thêm dòng này vào cuối hàm __init__ (dưới dòng self.player.set_enemies(...))
+        self.npc_manager = NPCSystem()
 
         # Đồng bộ volume SFX cho tất cả sound đã đăng ký
         sound_manager.set_sfx_volume(sound_manager.get_sfx_volume())
@@ -246,6 +249,7 @@ class Game:
             print(f"Lỗi khi phát nhạc: {e}")
 
     def handle_events(self):
+        
         # Xử lý các sự kiện cửa sổ (đóng, thoát, phím điều khiển nhạc)
         events = pygame.event.get()
         for event in events:
@@ -290,7 +294,8 @@ class Game:
                         pygame.mixer.music.unpause()
                         #PMD
             elif event.type == pygame.KEYDOWN:
-                # Xử lý phím khi Game Over
+                self.npc_manager.handle_keydown(event.key)  # Truyền sự kiện phím cho NPCSystem để xử lý đóng shop hoặc các tương tác khác
+          # Xử lý phím khi Game Over
                 if self.game_over:
                     if event.key == pygame.K_ESCAPE:
                         self.running = False
@@ -346,6 +351,32 @@ class Game:
         # LẤY EVENTS VÀ TRUYỀN CHO PLAYER
         events = self.handle_events()
 
+        # 1. Quét khoảng cách giữa player và các NPC liên tục
+        self.npc_manager.update(self.player,self)
+        
+        # 2. CHỈ cho phép cập nhật di chuyển player và quái vật khi KHÔNG xem hội thoại hoặc shop
+        if not self.npc_manager.is_showing_dialogue and not self.npc_manager.is_showing_shop:
+                   
+            # Cập nhật player VỚI EVENTS (để xử lý tấn công)
+            self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
+            # CẬP NHẬT TẤT CẢ PLANT
+            for plant in self.plants:
+                plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # CẬP NHẬT TẤT CẢ SLIME2
+            for slime2 in self.slimes2:
+                slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # CẬP NHẬT TẤT CẢ TEST01
+            for test01 in self.test01:
+                test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+
+            # Xử lý va chạm
+            self.check_plant_collisions()
+            self.remove_dead_slimes()
+            self.remove_dead_tests()
+        
+
         # Kiểm tra player chết → kích hoạt game over
         if self.player.is_dead and not self.game_over:
             self.game_over = True
@@ -379,22 +410,7 @@ class Game:
         self.fruit_pasket_02.update(1/60)
         self.fruit_pasket_03.update(1/60)
 
-        # CẬP NHẬT TẤT CẢ PLANT
-        for plant in self.plants:
-            plant.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-
-        # CẬP NHẬT TẤT CẢ SLIME2
-        for slime2 in self.slimes2:
-            slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-
-        # CẬP NHẬT TẤT CẢ TEST01
-        for test01 in self.test01:
-            test01.update(1/60, MAP_WIDTH, MAP_HEIGHT)
-
-        # Xử lý va chạm
-        self.check_plant_collisions()
-        self.remove_dead_slimes()
-        self.remove_dead_tests()
+        
 
     def check_plant_collisions(self):
         attack_hitbox = self.player.get_attack_hitbox()
@@ -469,7 +485,8 @@ class Game:
                              sound_manager.get_music_volume(), sound_manager.get_sfx_volume())
 
         # Đã xóa: self.pause_menu.draw(...)
-
+        # Gọi hệ thống tự vẽ các hộp thoại và menu shop
+        self.npc_manager.draw(self.screen, self.camera, self)
         pygame.display.flip()
     
     def run(self):
