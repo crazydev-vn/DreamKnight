@@ -6,10 +6,8 @@ from camera import Camera
 from game_object import GameObject  
 from npc_system import NPCSystem
 
-from slime2_target import Slime2
 
 from test01 import Test01
-
 from plant1 import Plant1
 
 from ui import UI, PauseMenu
@@ -181,19 +179,6 @@ class Game:
             scale= 2.0,
         )
            
-        self.slimes2 = []
-        # Danh sách tọa độ các slime 2 được thêm vào
-        slime2_positions = [
-            #(730, 700), (760, 620), (800, 600),
-            #(700, 600),
-            #(800, 1000),
-            #(100, 200),
-            #(1800, 600),
-        ]
-        for x, y in slime2_positions:
-            slime2 = Slime2(x, y, scale_factor=2.0)
-            slime2.set_player(self.player)
-            self.slimes2.append(slime2)
 
         self.test01 = []
         # Danh sách tọa độ các test 01 được thêm vào (COMMENT lại nếu chưa muốn có quái)
@@ -210,7 +195,8 @@ class Game:
             test01 = Test01(x, y, scale_factor=2.0)
             test01.set_player(self.player)
             self.test01.append(test01)
-        self.player.set_enemies(self.slimes2 + self.test01)
+        self.player.set_enemies(self.test01)
+
 
         self.plant1 = []
         plant1_positions = [
@@ -228,13 +214,10 @@ class Game:
             self.plant1.append(plant1)
 
         # Gán danh sách enemy cho player
-        self.player.set_enemies(self.slimes2 + self.test01 + self.plant1 )
+        self.player.set_enemies(self.test01 + self.plant1 )
         
         # Thêm dòng này vào cuối hàm __init__ (dưới dòng self.player.set_enemies(...))
         self.npc_manager = NPCSystem()
-
-
-        
 
         # Đồng bộ volume SFX cho tất cả sound đã đăng ký
         sound_manager.set_sfx_volume(sound_manager.get_sfx_volume())
@@ -367,11 +350,6 @@ class Game:
                    
             # Cập nhật player VỚI EVENTS (để xử lý tấn công)
             self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
-       
-
-            # CẬP NHẬT TẤT CẢ SLIME2
-            for slime2 in self.slimes2:
-                slime2.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
             # CẬP NHẬT TẤT CẢ TEST01
             for test01 in self.test01:
@@ -383,7 +361,6 @@ class Game:
 
             # Xử lý va chạm
             self.check_plant1_collisions()
-            self.remove_dead_slimes()
             self.remove_dead_tests()
             self.remove_dead_plants1()
 
@@ -443,14 +420,6 @@ class Game:
                 plant1.take_damage(self.player.damage)  # ← SỬA: gây sát thương, không pop ngay
                 print(f"Plant1 bị tấn công! Máu còn: {plant1.health}")
 
-
-    def remove_dead_slimes(self):
-        before_count = len(self.slimes2)
-        self.slimes2 = [slime for slime in self.slimes2 if not slime.fully_dead]
-        if before_count != len(self.slimes2):
-            print(f"Đã xóa {before_count - len(self.slimes2)} slime2 chết")
-            self.player.set_enemies(self.slimes2 + self.test01)
-
     def remove_dead_tests(self):
         before_count = len(self.test01)
         self.test01 = [test for test in self.test01 if not test.fully_dead]
@@ -481,12 +450,6 @@ class Game:
         self.fruit_pasket_01.draw(self.game_surface, self.camera)
         self.fruit_pasket_02.draw(self.game_surface, self.camera)
         self.fruit_pasket_03.draw(self.game_surface, self.camera)
-        
-       
-
-        # VẼ TẤT CẢ SLIME2
-        for slime2 in self.slimes2:
-            slime2.draw(self.game_surface, self.camera)
 
         # VẼ TẤT CẢ test01
         for test01 in self.test01:
