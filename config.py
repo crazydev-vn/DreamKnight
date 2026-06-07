@@ -20,10 +20,10 @@ PLAYER_HEIGHT = 40  # Chiều cao nhân vật
 FPS = 10000
 
 # Tốc độ di chuyển cơ bản của nhân vật (pixel/frame)
-PLAYER_SPEED = 3
+PLAYER_SPEED = 1.5
 
 # Tốc độ khi chạy (bằng nửa PLAYER_SPEED? thực tế là 6 > 3 nên nhanh gấp đôi)
-RUN_SPEED = 5.5   # Tốc độ chạy (nhanh hơn đi bộ)
+RUN_SPEED = 2.2 # Tốc độ chạy (nhanh hơn đi bộ)
 
 # ==================== ĐƯỜNG DẪN ẢNH ====================
 
