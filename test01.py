@@ -344,7 +344,6 @@ class Test01(pygame.sprite.Sprite):
         self.is_attacking = False
         if self.direction in self.attack_anims:
             self.attack_anims[self.direction].reset()
-        # Gây sát thương lên player khi animation tấn công kết thúc
         if self.player and not self.player.is_dead:
             import math
             slime_cx = self.x + self.width // 2

@@ -258,14 +258,20 @@ class Game:
                     box_y = (SCREEN_HEIGHT - box_h) // 2
                     btn_w, btn_h = 220, 44
                     btn_x = box_x + (box_w - btn_w) // 2
+                    #PMD-Thêm đúng 3 dòng ghost_mode, ghost_used, ghost_start_time là xong. 
+                    #Lần chơi mới sẽ có ghost mode bình thường trở lại.
                     if pygame.Rect(btn_x, box_y + 140, btn_w, btn_h).collidepoint(event.pos):
                         self.player.health = self.player.max_health
                         self.player.is_dead = False
-                        self.player.x = 400  # Về vị trí spawn
+                        self.player.ghost_mode = False
+                        self.player.ghost_used = False
+                        self.player.ghost_start_time = 0
+                        self.player.x = 400
                         self.player.y = 450
                         self.player.rect.center = (400, 450)
                         self.game_over = False
                         pygame.mixer.music.unpause()
+                        #PMD
             elif event.type == pygame.KEYDOWN:
                 # Xử lý phím khi Game Over
                 if self.game_over:
