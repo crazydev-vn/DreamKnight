@@ -3,62 +3,62 @@ import os
 from knight1_animation import Animation
 
 # ================================================================================================
-# CẤU HÌNH ANIMATION CHO TEST01 (SLIME 3)
+# CẤU HÌNH ANIMATION CHO PLANT1
 # ================================================================================================
 
-TEST01_ANIMATION_CONFIGS = {
+PLANT1_ANIMATION_CONFIGS = {
     "idle": {
-        "folder": "slime3_idle",
+        "folder": "plant2_idle",
         "directions": {
-            "up":    {"prefix": "slime3_idle_up",    "frames": 6},
-            "down":  {"prefix": "slime3_idle_down",  "frames": 6},
-            "left":  {"prefix": "slime3_idle_left",  "frames": 6},
-            "right": {"prefix": "slime3_idle_right", "frames": 6},
+            "up":    {"prefix": "plant2_idle_up",    "frames": 4},
+            "down":  {"prefix": "plant2_idle_down",  "frames": 4},
+            "left":  {"prefix": "plant2_idle_left",  "frames": 4},
+            "right": {"prefix": "plant2_idle_right", "frames": 4},
         },
     },
     "walk": {
-        "folder": "slime3_walk",
+        "folder": "plant2_walk",
         "directions": {
-            "up":    {"prefix": "slime3_walk_up",    "frames": 8},
-            "down":  {"prefix": "slime3_walk_down",  "frames": 8},
-            "left":  {"prefix": "slime3_walk_left",  "frames": 8},
-            "right": {"prefix": "slime3_walk_right", "frames": 8},
+            "up":    {"prefix": "plant2_walk_up",    "frames": 6},
+            "down":  {"prefix": "plant2_walk_down",  "frames": 6},
+            "left":  {"prefix": "plant2_walk_left",  "frames": 6},
+            "right": {"prefix": "plant2_walk_right", "frames": 6},
         },
     },
     "run": {
-        "folder": "slime3_run",
+        "folder": "plant2_run",
         "directions": {
-            "up":    {"prefix": "slime3_run_up",    "frames": 8},
-            "down":  {"prefix": "slime3_run_down",  "frames": 8},
-            "left":  {"prefix": "slime3_run_left",  "frames": 8},
-            "right": {"prefix": "slime3_run_right", "frames": 8},
+            "up":    {"prefix": "plant2_run_up",    "frames": 8},
+            "down":  {"prefix": "plant2_run_down",  "frames": 8},
+            "left":  {"prefix": "plant2_run_left",  "frames": 8},
+            "right": {"prefix": "plant2_run_right", "frames": 8},
         },
     },
     "attack": {
-        "folder": "slime3_attack",
+        "folder": "plant2_attack",
         "directions": {
-            "up":    {"prefix": "slime3_attack_up",    "frames": 9},
-            "down":  {"prefix": "slime3_attack_down",  "frames": 9},
-            "left":  {"prefix": "slime3_attack_left",  "frames": 9},
-            "right": {"prefix": "slime3_attack_right", "frames": 9},
+            "up":    {"prefix": "plant2_attack_up",    "frames": 7},
+            "down":  {"prefix": "plant2_attack_down",  "frames": 7},
+            "left":  {"prefix": "plant2_attack_left",  "frames": 7},
+            "right": {"prefix": "plant2_attack_right", "frames": 7},
         },
     },
     "hit": {
-        "folder": "slime3_hurt",
+        "folder": "plant2_hurt",
         "directions": {
-            "up":    {"prefix": "slime3_hurt_up",    "frames": 5},
-            "down":  {"prefix": "slime3_hurt_down",  "frames": 5},
-            "left":  {"prefix": "slime3_hurt_left",  "frames": 5},
-            "right": {"prefix": "slime3_hurt_right", "frames": 5},
+            "up":    {"prefix": "plant2_hurt_up",    "frames": 5},
+            "down":  {"prefix": "plant2_hurt_down",  "frames": 5},
+            "left":  {"prefix": "plant2_hurt_left",  "frames": 5},
+            "right": {"prefix": "plant2_hurt_right", "frames": 5},
         },
     },
     "death": {
-        "folder": "slime3_die",
+        "folder": "plant2_death",
         "directions": {
-            "up":    {"prefix": "slime3_die_up",    "frames": 6},
-            "down":  {"prefix": "slime3_die_down",  "frames": 6},
-            "left":  {"prefix": "slime3_die_left",  "frames": 6},
-            "right": {"prefix": "slime3_die_right", "frames": 6},
+            "up":    {"prefix": "plant2_die_up",    "frames": 10},
+            "down":  {"prefix": "plant2_die_down",  "frames": 10},
+            "left":  {"prefix": "plant2_die_left",  "frames": 10},
+            "right": {"prefix": "plant2_die_right", "frames": 10},
         },
     },
 }
@@ -74,29 +74,29 @@ FRAME_DURATIONS = {
 }
 
 # Màu fallback khi không tìm thấy sprite
-FALLBACK_COLOR = (128, 0, 128)  # tím
+FALLBACK_COLOR = (34, 139, 34)  # màu xanh lá cây
 
 
 # ================================================================================================
-# CLASS LOADER — tải tất cả animation cho Test01
+# CLASS LOADER — tải tất cả animation cho Plant1
 # ================================================================================================
 
-class Test01AnimationLoader:
+class Plant1AnimationLoader:
     """
-    Tải toàn bộ animation của Test01 từ thư mục assets.
+    Tải toàn bộ animation của Plant1 từ thư mục assets.
     Trả về dict: { anim_type: { direction: Animation } }
     """
 
-    BASE_PATH = os.path.join("assets", "resource_slime1_2_3", "slime_3")
+    BASE_PATH = os.path.join("assets", "plant_target", "plant2")
 
     @classmethod
     def load_all(cls, scale_factor: float = 2.0) -> dict:
         """
-        Tải tất cả animation theo TEST01_ANIMATION_CONFIGS.
+        Tải tất cả animation theo PLANT1_ANIMATION_CONFIGS.
         Trả về dict đầy đủ các loại animation.
         """
         if not os.path.exists(cls.BASE_PATH):
-            print(f"[Test01Anim] Thư mục không tồn tại: {cls.BASE_PATH}")
+            print(f"[Plant1Anim] Thư mục không tồn tại: {cls.BASE_PATH}")
 
         all_anims = {}
         for anim_type, duration in FRAME_DURATIONS.items():
@@ -113,7 +113,7 @@ class Test01AnimationLoader:
     def _load_anim_type(cls, anim_type: str, frame_duration: int, scale_factor: float) -> dict:
         """Tải một loại animation (idle / walk / …) cho cả 4 hướng."""
         anims = {}
-        config = TEST01_ANIMATION_CONFIGS.get(anim_type)
+        config = PLANT1_ANIMATION_CONFIGS.get(anim_type)
         if not config:
             return anims
 
@@ -122,7 +122,7 @@ class Test01AnimationLoader:
             frames = cls._load_frames(folder, dir_cfg, scale_factor)
             if frames:
                 anims[direction] = Animation(frames, frame_duration)
-                print(f"[Test01Anim] Loaded {len(frames)} frames — {anim_type}/{direction}")
+                print(f"[Plant1Anim] Loaded {len(frames)} frames — {anim_type}/{direction}")
 
         return anims
 
@@ -148,7 +148,7 @@ class Test01AnimationLoader:
                 else:
                     frames.append(cls._make_fallback())
             except Exception as e:
-                print(f"[Test01Anim] Lỗi load {filepath}: {e}")
+                print(f"[Plant1Anim] Lỗi load {filepath}: {e}")
                 frames.append(cls._make_fallback())
 
         return frames
@@ -165,6 +165,6 @@ class Test01AnimationLoader:
         if anims:
             return anims
 
-        print(f"[Test01Anim] Tạo animation fallback cho: {anim_type}")
+        print(f"[Plant1Anim] Tạo animation fallback cho: {anim_type}")
         fallback_frame = [cls._make_fallback()]
         return {d: Animation(fallback_frame, duration) for d in ("up", "down", "left", "right")}

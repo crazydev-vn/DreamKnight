@@ -3,62 +3,62 @@ import os
 from knight1_animation import Animation
 
 # ================================================================================================
-# CẤU HÌNH ANIMATION CHO TEST01 (SLIME 3)
+# CẤU HÌNH ANIMATION CHO SLIME1
 # ================================================================================================
 
-TEST01_ANIMATION_CONFIGS = {
+SLIME1_ANIMATION_CONFIGS = {
     "idle": {
-        "folder": "slime3_idle",
+        "folder": "slime1_idle",
         "directions": {
-            "up":    {"prefix": "slime3_idle_up",    "frames": 6},
-            "down":  {"prefix": "slime3_idle_down",  "frames": 6},
-            "left":  {"prefix": "slime3_idle_left",  "frames": 6},
-            "right": {"prefix": "slime3_idle_right", "frames": 6},
+            "up":    {"prefix": "slime1_idle_up",    "frames": 6},
+            "down":  {"prefix": "slime1_idle_down",  "frames": 6},
+            "left":  {"prefix": "slime1_idle_left",  "frames": 6},
+            "right": {"prefix": "slime1_idle_right", "frames": 6},
         },
     },
     "walk": {
-        "folder": "slime3_walk",
+        "folder": "slime1_walk",
         "directions": {
-            "up":    {"prefix": "slime3_walk_up",    "frames": 8},
-            "down":  {"prefix": "slime3_walk_down",  "frames": 8},
-            "left":  {"prefix": "slime3_walk_left",  "frames": 8},
-            "right": {"prefix": "slime3_walk_right", "frames": 8},
+            "up":    {"prefix": "slime1_walk_up",    "frames": 6},
+            "down":  {"prefix": "slime1_walk_down",  "frames": 6},
+            "left":  {"prefix": "slime1_walk_left",  "frames": 6},
+            "right": {"prefix": "slime1_walk_right", "frames": 6},
         },
     },
     "run": {
-        "folder": "slime3_run",
+        "folder": "slime1_run",
         "directions": {
-            "up":    {"prefix": "slime3_run_up",    "frames": 8},
-            "down":  {"prefix": "slime3_run_down",  "frames": 8},
-            "left":  {"prefix": "slime3_run_left",  "frames": 8},
-            "right": {"prefix": "slime3_run_right", "frames": 8},
+            "up":    {"prefix": "slime1_run_up",    "frames": 8},
+            "down":  {"prefix": "slime1_run_down",  "frames": 8},
+            "left":  {"prefix": "slime1_run_left",  "frames": 8},
+            "right": {"prefix": "slime1_run_right", "frames": 8},
         },
     },
     "attack": {
-        "folder": "slime3_attack",
+        "folder": "slime1_attack",
         "directions": {
-            "up":    {"prefix": "slime3_attack_up",    "frames": 9},
-            "down":  {"prefix": "slime3_attack_down",  "frames": 9},
-            "left":  {"prefix": "slime3_attack_left",  "frames": 9},
-            "right": {"prefix": "slime3_attack_right", "frames": 9},
+            "up":    {"prefix": "slime1_attack_up",    "frames": 10},
+            "down":  {"prefix": "slime1_attack_down",  "frames": 10},
+            "left":  {"prefix": "slime1_attack_left",  "frames": 10},
+            "right": {"prefix": "slime1_attack_right", "frames": 10},
         },
     },
     "hit": {
-        "folder": "slime3_hurt",
+        "folder": "slime1_hurt",
         "directions": {
-            "up":    {"prefix": "slime3_hurt_up",    "frames": 5},
-            "down":  {"prefix": "slime3_hurt_down",  "frames": 5},
-            "left":  {"prefix": "slime3_hurt_left",  "frames": 5},
-            "right": {"prefix": "slime3_hurt_right", "frames": 5},
+            "up":    {"prefix": "slime1_hurt_up",    "frames": 5},
+            "down":  {"prefix": "slime1_hurt_down",  "frames": 5},
+            "left":  {"prefix": "slime1_hurt_left",  "frames": 5},
+            "right": {"prefix": "slime1_hurt_right", "frames": 5},
         },
     },
     "death": {
-        "folder": "slime3_die",
+        "folder": "slime1_die",
         "directions": {
-            "up":    {"prefix": "slime3_die_up",    "frames": 6},
-            "down":  {"prefix": "slime3_die_down",  "frames": 6},
-            "left":  {"prefix": "slime3_die_left",  "frames": 6},
-            "right": {"prefix": "slime3_die_right", "frames": 6},
+            "up":    {"prefix": "slime1_die_up",    "frames": 10},
+            "down":  {"prefix": "slime1_die_down",  "frames": 10},
+            "left":  {"prefix": "slime1_die_left",  "frames": 10},
+            "right": {"prefix": "slime1_die_right", "frames": 10},
         },
     },
 }
@@ -78,25 +78,25 @@ FALLBACK_COLOR = (128, 0, 128)  # tím
 
 
 # ================================================================================================
-# CLASS LOADER — tải tất cả animation cho Test01
+# CLASS LOADER — tải tất cả animation cho Slime1
 # ================================================================================================
 
-class Test01AnimationLoader:
+class Slime1AnimationLoader:
     """
-    Tải toàn bộ animation của Test01 từ thư mục assets.
+    Tải toàn bộ animation của Slime1 từ thư mục assets.
     Trả về dict: { anim_type: { direction: Animation } }
     """
 
-    BASE_PATH = os.path.join("assets", "resource_slime1_2_3", "slime_3")
+    BASE_PATH = os.path.join("assets", "resource_slime1_2_3", "slime_1")
 
     @classmethod
     def load_all(cls, scale_factor: float = 2.0) -> dict:
         """
-        Tải tất cả animation theo TEST01_ANIMATION_CONFIGS.
+        Tải tất cả animation theo SLIME1_ANIMATION_CONFIGS.
         Trả về dict đầy đủ các loại animation.
         """
         if not os.path.exists(cls.BASE_PATH):
-            print(f"[Test01Anim] Thư mục không tồn tại: {cls.BASE_PATH}")
+            print(f"[Slime1Anim] Thư mục không tồn tại: {cls.BASE_PATH}")
 
         all_anims = {}
         for anim_type, duration in FRAME_DURATIONS.items():
@@ -113,7 +113,7 @@ class Test01AnimationLoader:
     def _load_anim_type(cls, anim_type: str, frame_duration: int, scale_factor: float) -> dict:
         """Tải một loại animation (idle / walk / …) cho cả 4 hướng."""
         anims = {}
-        config = TEST01_ANIMATION_CONFIGS.get(anim_type)
+        config = SLIME1_ANIMATION_CONFIGS.get(anim_type)
         if not config:
             return anims
 
@@ -122,7 +122,7 @@ class Test01AnimationLoader:
             frames = cls._load_frames(folder, dir_cfg, scale_factor)
             if frames:
                 anims[direction] = Animation(frames, frame_duration)
-                print(f"[Test01Anim] Loaded {len(frames)} frames — {anim_type}/{direction}")
+                print(f"[Slime1Anim] Loaded {len(frames)} frames — {anim_type}/{direction}")
 
         return anims
 
@@ -148,7 +148,7 @@ class Test01AnimationLoader:
                 else:
                     frames.append(cls._make_fallback())
             except Exception as e:
-                print(f"[Test01Anim] Lỗi load {filepath}: {e}")
+                print(f"[Slime1Anim] Lỗi load {filepath}: {e}")
                 frames.append(cls._make_fallback())
 
         return frames
@@ -165,6 +165,6 @@ class Test01AnimationLoader:
         if anims:
             return anims
 
-        print(f"[Test01Anim] Tạo animation fallback cho: {anim_type}")
+        print(f"[Slime1Anim] Tạo animation fallback cho: {anim_type}")
         fallback_frame = [cls._make_fallback()]
         return {d: Animation(fallback_frame, duration) for d in ("up", "down", "left", "right")}

@@ -171,6 +171,7 @@ class Player1(pygame.sprite.Sprite):
         #PMD-Bất tử khi HP <= 30% với hiệu ứng mờ dần
         self.health = 100
         self.max_health = 100
+        self.gold = 0
         self.is_dead = False
         # GHOST MODE: khi HP <= 30% thì mờ và bất tử 2 giây
         self.ghost_mode = False
