@@ -571,12 +571,16 @@ class Game:
         for slime2 in self.slime2:
             slime2.draw(self.game_surface, self.camera)
 
-        # VẼ VÀNG RƠI
+
+
+        # Vẽ vàng rơi, hiện  trước nhân vật
         for gold in self.gold_drops:
             gold.draw(self.game_surface, self.camera)
-
+            
         self.player.draw(self.game_surface, self.camera)
+
         
+
         scaled_surface = pygame.transform.scale(self.game_surface, (SCREEN_WIDTH, SCREEN_HEIGHT))
         self.screen.blit(scaled_surface, (0,0))
         
