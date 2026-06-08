@@ -6,62 +6,63 @@ from knight1_animation import Animation
 # CẤU HÌNH ANIMATION CHO PLANT1
 # ================================================================================================
 
-PLANT1_ANIMATION_CONFIGS = {
+SLIME1_ANIMATION_CONFIGS = {
     "idle": {
-        "folder": "plant2_idle",
+        "folder": "slime1_idle",
         "directions": {
-            "up":    {"prefix": "plant2_idle_up",    "frames": 4},
-            "down":  {"prefix": "plant2_idle_down",  "frames": 4},
-            "left":  {"prefix": "plant2_idle_left",  "frames": 4},
-            "right": {"prefix": "plant2_idle_right", "frames": 4},
+            "up":    {"prefix": "slime1_idle_up",    "frames": 6},
+            "down":  {"prefix": "slime1_idle_down",  "frames": 6},
+            "left":  {"prefix": "slime1_idle_left",  "frames": 6},
+            "right": {"prefix": "slime1_idle_right", "frames": 6},
         },
     },
     "walk": {
-        "folder": "plant2_walk",
+        "folder": "slime1_walk",
         "directions": {
-            "up":    {"prefix": "plant2_walk_up",    "frames": 6},
-            "down":  {"prefix": "plant2_walk_down",  "frames": 6},
-            "left":  {"prefix": "plant2_walk_left",  "frames": 6},
-            "right": {"prefix": "plant2_walk_right", "frames": 6},
+            "up":    {"prefix": "slime1_walk_up",    "frames": 6},
+            "down":  {"prefix": "slime1_walk_down",  "frames": 6},
+            "left":  {"prefix": "slime1_walk_left",  "frames": 6},
+            "right": {"prefix": "slime1_walk_right", "frames": 6},
         },
     },
     "run": {
-        "folder": "plant2_run",
+        "folder": "slime1_run",
         "directions": {
-            "up":    {"prefix": "plant2_run_up",    "frames": 8},
-            "down":  {"prefix": "plant2_run_down",  "frames": 8},
-            "left":  {"prefix": "plant2_run_left",  "frames": 8},
-            "right": {"prefix": "plant2_run_right", "frames": 8},
+            "up":    {"prefix": "slime1_run_up",    "frames": 8},
+            "down":  {"prefix": "slime1_run_down",  "frames": 8},
+            "left":  {"prefix": "slime1_run_left",  "frames": 8},
+            "right": {"prefix": "slime1_run_right", "frames": 8},
         },
     },
     "attack": {
-        "folder": "plant2_attack",
+        "folder": "slime1_attack",
         "directions": {
-            "up":    {"prefix": "plant2_attack_up",    "frames": 7},
-            "down":  {"prefix": "plant2_attack_down",  "frames": 7},
-            "left":  {"prefix": "plant2_attack_left",  "frames": 7},
-            "right": {"prefix": "plant2_attack_right", "frames": 7},
+            "up":    {"prefix": "slime1_attack_up",    "frames": 10},
+            "down":  {"prefix": "slime1_attack_down",  "frames": 10},
+            "left":  {"prefix": "slime1_attack_left",  "frames": 10},
+            "right": {"prefix": "slime1_attack_right", "frames": 10},
         },
     },
     "hit": {
-        "folder": "plant2_hurt",
+        "folder": "slime1_hurt",
         "directions": {
-            "up":    {"prefix": "plant2_hurt_up",    "frames": 5},
-            "down":  {"prefix": "plant2_hurt_down",  "frames": 5},
-            "left":  {"prefix": "plant2_hurt_left",  "frames": 5},
-            "right": {"prefix": "plant2_hurt_right", "frames": 5},
+            "up":    {"prefix": "slime1_hurt_up",    "frames": 5},
+            "down":  {"prefix": "slime1_hurt_down",  "frames": 5},
+            "left":  {"prefix": "slime1_hurt_left",  "frames": 5},
+            "right": {"prefix": "slime1_hurt_right", "frames": 5},
         },
     },
     "death": {
-        "folder": "plant2_death",
+        "folder": "slime1_death",
         "directions": {
-            "up":    {"prefix": "plant2_die_up",    "frames": 10},
-            "down":  {"prefix": "plant2_die_down",  "frames": 10},
-            "left":  {"prefix": "plant2_die_left",  "frames": 10},
-            "right": {"prefix": "plant2_die_right", "frames": 10},
+            "up":    {"prefix": "slime1_death_up",    "frames": 10},
+            "down":  {"prefix": "slime1_death_down",  "frames": 10},
+            "left":  {"prefix": "slime1_death_left",  "frames": 10},
+            "right": {"prefix": "slime1_death_right", "frames": 10},
         },
     },
 }
+
 
 # Thời gian mỗi frame (ms) cho từng loại animation
 FRAME_DURATIONS = {
