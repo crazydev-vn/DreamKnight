@@ -1,98 +1,79 @@
-# plant1.py
+# plant2.py
 import pygame
 import os
 import math
 from config import PLAYER_SPEED
-from plant1_animation import Plant1AnimationLoader
+from plant2_animation import Plant2AnimationLoader
 
 # ================================================================================================
-# CLASS PLANT1 — Kẻ địch Plant 1 (đứng yên)
+# CLASS PLANT2 — Kẻ địch Plant 2 (đứng yên, mạnh hơn Plant1)
 # ================================================================================================
 
-class Plant1(pygame.sprite.Sprite):
-
-    # ------------------------------------------------------------------
-    # KHỞI TẠO
-    # ------------------------------------------------------------------
+class Plant2(pygame.sprite.Sprite):
 
     def __init__(self, x, y, scale_factor=2.0):
         super().__init__()
 
-        # Vị trí & vị trí nhà (plant đứng yên nên home = vị trí hiện tại)
-        self.x      = float(x)
-        self.y      = float(y)
+        self.x = float(x)
+        self.y = float(y)
         self.home_x = float(x)
         self.home_y = float(y)
 
-        # Tải toàn bộ animation qua loader
-        all_anims = Plant1AnimationLoader.load_all(scale_factor)
+        all_anims = Plant2AnimationLoader.load_all(scale_factor)
         self.idle_anims   = all_anims["idle"]
         self.attack_anims = all_anims["attack"]
         self.hit_anims    = all_anims["hit"]
         self.death_anims  = all_anims["death"]
 
-        # Trạng thái
-        self.direction   = "down"
-        self.state       = "idle"
+        self.direction = "down"
+        self.state = "idle"
         self.is_attacking = False
 
-        # Di chuyển (plant không di chuyển)
         self.speed = 0.0
-        self.dx    = 0.0
-        self.dy    = 0.0
+        self.dx = 0.0
+        self.dy = 0.0
 
-        self.attack_range    = 50
-        self.attack_duration = 600    # ms cho animation tấn công
+        self.attack_range    = 55
+        self.attack_duration = 650
 
         self.attack_start_time  = 0
         self.attack_sound_index = 0
 
-        # Máu
-        self.health     = 300
-        self.contact_damage = 10
-        self.max_health = 300
+        self.health = 400
+        self.contact_damage = 12
+        self.max_health = 400
 
-        # Thời gian trạng thái
-        self.hit_start_time       = 0
-        self.hit_duration         = 300
-        self.death_start_time     = 0
+        self.hit_start_time = 0
+        self.hit_duration = 300
+        self.death_start_time = 0
         self.death_frame_duration = 85
-        self.death_frames_count   = 6
+        self.death_frames_count = 6
         self.death_duration = self.death_frame_duration * self.death_frames_count
 
-        # Cờ trạng thái
-        self.is_dead       = False
-        self.fully_dead    = False
+        self.is_dead = False
+        self.fully_dead = False
         self.is_invincible = False
-        self.invincible_duration   = 500
+        self.invincible_duration = 500
         self.invincible_start_time = 0
 
-        # Tham chiếu player
         self.player = None
 
-        # Hình ảnh & rect ban đầu
         start_frame = self.idle_anims["down"].current_frame
-        self.image  = start_frame
-        self.rect   = self.image.get_rect(center=(self.x, self.y))
-        self.width  = self.image.get_width()
+        self.image = start_frame
+        self.rect = self.image.get_rect(center=(self.x, self.y))
+        self.width = self.image.get_width()
         self.height = self.image.get_height()
-        self.body_radius = 25
-        
-        # Debug
+        self.body_radius = 28
+
         self.debug = False
 
-        # Âm thanh
         self.attack_sounds = []
-        self.hit_sound     = None
-        self.death_sound   = None
+        self.hit_sound = None
+        self.death_sound = None
         self._load_sounds()
 
-    # ------------------------------------------------------------------
-    # ÂM THANH
-    # ------------------------------------------------------------------
-
     def _load_sounds(self):
-        sound_path = os.path.join("03_sounds", "plant1")
+        sound_path = os.path.join("03_sounds", "plant2")
         try:
             for i in range(1, 3):
                 path = os.path.join(sound_path, f"Attack{i}.mp3")
@@ -105,11 +86,7 @@ class Plant1(pygame.sprite.Sprite):
             if os.path.exists(death_path):
                 self.death_sound = pygame.mixer.Sound(death_path)
         except Exception as e:
-            print(f"[Plant1] Lỗi load âm thanh: {e}")
-
-    # ------------------------------------------------------------------
-    # API CÔNG KHAI
-    # ------------------------------------------------------------------
+            print(f"[Plant2] Lỗi load âm thanh: {e}")
 
     def set_player(self, player):
         self.player = player
@@ -119,7 +96,7 @@ class Plant1(pygame.sprite.Sprite):
             return False
 
         self.health -= damage
-        print(f"[Plant1] Nhận {damage} sát thương! Máu còn: {self.health}/{self.max_health}")
+        print(f"[Plant2] Nhận {damage} sát thương! Máu còn: {self.health}/{self.max_health}")
 
         if self.health <= 0:
             self.health = 0
@@ -132,11 +109,11 @@ class Plant1(pygame.sprite.Sprite):
     def die(self):
         if self.is_dead:
             return
-        self.is_dead        = True
-        self.state          = "death"
+        self.is_dead = True
+        self.state = "death"
         self.death_start_time = pygame.time.get_ticks()
-        self.dx = self.dy   = 0
-        self.is_attacking   = False
+        self.dx = self.dy = 0
+        self.is_attacking = False
         if self.death_sound:
             self.death_sound.play()
         if self.direction in self.death_anims:
@@ -145,10 +122,6 @@ class Plant1(pygame.sprite.Sprite):
     def get_hitbox(self):
         return (self.rect.centerx, self.rect.centery, self.body_radius)
 
-    # ------------------------------------------------------------------
-    # UPDATE CHÍNH
-    # ------------------------------------------------------------------
-
     def update(self, delta_time, map_width, map_height):
         if self.player is None:
             return
@@ -156,14 +129,12 @@ class Plant1(pygame.sprite.Sprite):
         current_time = pygame.time.get_ticks()
         self._update_invincible(current_time)
 
-        # --- Chết ---
         if self.state == "death":
             self._update_animation(delta_time)
             if current_time - self.death_start_time >= self.death_duration:
                 self.fully_dead = True
             return
 
-        # --- Bị thương ---
         if self.state == "hit":
             if current_time - self.hit_start_time >= self.hit_duration:
                 self.state = "idle"
@@ -171,7 +142,6 @@ class Plant1(pygame.sprite.Sprite):
                 self._update_animation(delta_time)
                 return
 
-        # --- Đang tấn công ---
         if self.state == "attack":
             if current_time - self.attack_start_time >= self.attack_duration:
                 self._end_attack()
@@ -179,28 +149,20 @@ class Plant1(pygame.sprite.Sprite):
                 self._update_animation(delta_time)
                 return
 
-        # --- Tính khoảng cách đến player ---
         if self.player and not self.player.is_dead:
             px, py = self._player_center()
             slime_cx = self.x + self.width // 2
             slime_cy = self.y + self.height // 2
             dist_to_player = math.hypot(slime_cx - px, slime_cy - py)
 
-            # Cập nhật hướng nhìn về phía player
             self._update_direction(px, py)
 
-            # Kích hoạt tấn công
             if dist_to_player <= self.attack_range and self.state != "attack":
                 self._start_attack(current_time)
                 return
 
-        # Plant đứng yên
         self.dx = self.dy = 0
         self._update_animation(delta_time)
-
-    # ------------------------------------------------------------------
-    # INTERNAL
-    # ------------------------------------------------------------------
 
     def _player_center(self):
         return (
@@ -221,10 +183,10 @@ class Plant1(pygame.sprite.Sprite):
             self.direction = "up"
 
     def _start_hit(self):
-        self.state          = "hit"
+        self.state = "hit"
         self.hit_start_time = pygame.time.get_ticks()
-        self.dx = self.dy   = 0
-        self.is_invincible  = True
+        self.dx = self.dy = 0
+        self.is_invincible = True
         self.invincible_start_time = self.hit_start_time
         if self.hit_sound:
             self.hit_sound.play()
@@ -232,18 +194,18 @@ class Plant1(pygame.sprite.Sprite):
             self.hit_anims[self.direction].reset()
 
     def _start_attack(self, current_time):
-        self.state              = "attack"
-        self.is_attacking       = True
-        self.attack_start_time  = current_time
+        self.state = "attack"
+        self.is_attacking = True
+        self.attack_start_time = current_time
         if self.direction in self.attack_anims:
             self.attack_anims[self.direction].reset()
         if self.attack_sounds:
             self.attack_sounds[self.attack_sound_index].play()
             self.attack_sound_index = (self.attack_sound_index + 1) % len(self.attack_sounds)
-        print(f"[Plant1] Bắt đầu tấn công (dist <= {self.attack_range}px)")
+        print(f"[Plant2] Bắt đầu tấn công")
 
     def _end_attack(self):
-        self.state        = "idle"
+        self.state = "idle"
         self.is_attacking = False
         if self.direction in self.attack_anims:
             self.attack_anims[self.direction].reset()
@@ -253,23 +215,19 @@ class Plant1(pygame.sprite.Sprite):
             px = self.player.x + self.player.width // 2
             py = self.player.y + self.player.height // 2
             if math.hypot(slime_cx - px, slime_cy - py) <= self.attack_range * 1.3:
-                self.player.take_damage(8)
+                self.player.take_damage(12)
 
     def _update_invincible(self, current_time):
         if self.is_invincible:
             if current_time - self.invincible_start_time >= self.invincible_duration:
                 self.is_invincible = False
 
-    # ------------------------------------------------------------------
-    # INTERNAL — ANIMATION
-    # ------------------------------------------------------------------
-
     def _update_animation(self, delta_time):
         anim_map = {
-            "idle":   self.idle_anims,
+            "idle": self.idle_anims,
             "attack": self.attack_anims,
-            "hit":    self.hit_anims,
-            "death":  self.death_anims,
+            "hit": self.hit_anims,
+            "death": self.death_anims,
         }
         anim_dict = anim_map.get(self.state, self.idle_anims)
         anim = anim_dict.get(self.direction) \
@@ -282,7 +240,6 @@ class Plant1(pygame.sprite.Sprite):
         anim.update()
         self.image = anim.current_frame
 
-        # Nhấp nháy khi bất tử
         if self.is_invincible and not self.is_dead:
             alpha = 128 + int(127 * math.sin(pygame.time.get_ticks() * 0.015))
             self.image.set_alpha(max(128, alpha))
@@ -295,10 +252,6 @@ class Plant1(pygame.sprite.Sprite):
         self.width = self.image.get_width()
         self.height = self.image.get_height()
 
-    # ------------------------------------------------------------------
-    # VẼ
-    # ------------------------------------------------------------------
-
     def draw(self, screen, camera):
         screen_x = self.x - camera.x
         screen_y = self.y - camera.y
@@ -310,7 +263,6 @@ class Plant1(pygame.sprite.Sprite):
         cx = int(self.x + self.width // 2 - camera.x)
         cy = int(self.y + self.height // 2 - camera.y)
 
-        # Thanh máu
         bar_w, bar_h = 40, 6
         bar_x = int(screen_x + (self.width - bar_w) // 2)
         bar_y = int(screen_y - 15)

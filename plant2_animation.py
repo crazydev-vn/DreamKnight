@@ -1,52 +1,47 @@
-# plant1_animation.py
+# plant2_animation.py
 import pygame
 import os
 from knight1_animation import Animation
 
-# ================================================================================================
-# CẤU HÌNH ANIMATION CHO PLANT1
-# ================================================================================================
-
-PLANT1_ANIMATION_CONFIGS = {
+PLANT2_ANIMATION_CONFIGS = {
     "idle": {
-        "folder": "plant1_idle",
+        "folder": "plant2_idle",
         "directions": {
-            "up":    {"prefix": "plant1_idle_up",    "frames": 4},
-            "down":  {"prefix": "plant1_idle_down",  "frames": 4},
-            "left":  {"prefix": "plant1_idle_left",  "frames": 4},
-            "right": {"prefix": "plant1_idle_right", "frames": 4},
+            "up":    {"prefix": "plant2_idle_up",    "frames": 4},
+            "down":  {"prefix": "plant2_idle_down",  "frames": 4},
+            "left":  {"prefix": "plant2_idle_left",  "frames": 4},
+            "right": {"prefix": "plant2_idle_right", "frames": 4},
         },
     },
     "attack": {
-        "folder": "plant1_attack",
+        "folder": "plant2_attack",
         "directions": {
-            "up":    {"prefix": "plant1_attack_up",    "frames": 6},
-            "down":  {"prefix": "plant1_attack_down",  "frames": 6},
-            "left":  {"prefix": "plant1_attack_left",  "frames": 6},
-            "right": {"prefix": "plant1_attack_right", "frames": 6},
+            "up":    {"prefix": "plant2_attack_up",    "frames": 6},
+            "down":  {"prefix": "plant2_attack_down",  "frames": 6},
+            "left":  {"prefix": "plant2_attack_left",  "frames": 6},
+            "right": {"prefix": "plant2_attack_right", "frames": 6},
         },
     },
     "hit": {
-        "folder": "plant1_hurt",
+        "folder": "plant2_hurt",
         "directions": {
-            "up":    {"prefix": "plant1_hurt_up",    "frames": 3},
-            "down":  {"prefix": "plant1_hurt_down",  "frames": 3},
-            "left":  {"prefix": "plant1_hurt_left",  "frames": 3},
-            "right": {"prefix": "plant1_hurt_right", "frames": 3},
+            "up":    {"prefix": "plant2_hurt_up",    "frames": 3},
+            "down":  {"prefix": "plant2_hurt_down",  "frames": 3},
+            "left":  {"prefix": "plant2_hurt_left",  "frames": 3},
+            "right": {"prefix": "plant2_hurt_right", "frames": 3},
         },
     },
     "death": {
-        "folder": "plant1_die",
+        "folder": "plant2_die",
         "directions": {
-            "up":    {"prefix": "plant1_die_up",    "frames": 6},
-            "down":  {"prefix": "plant1_die_down",  "frames": 6},
-            "left":  {"prefix": "plant1_die_left",  "frames": 6},
-            "right": {"prefix": "plant1_die_right", "frames": 6},
+            "up":    {"prefix": "plant2_die_up",    "frames": 6},
+            "down":  {"prefix": "plant2_die_down",  "frames": 6},
+            "left":  {"prefix": "plant2_die_left",  "frames": 6},
+            "right": {"prefix": "plant2_die_right", "frames": 6},
         },
     },
 }
 
-# Thời gian mỗi frame (ms) cho từng loại animation
 FRAME_DURATIONS = {
     "idle":   200,
     "attack": 100,
@@ -54,19 +49,16 @@ FRAME_DURATIONS = {
     "death":  85,
 }
 
-# Màu fallback
-FALLBACK_COLOR = (34, 139, 34)  # Forest Green
+FALLBACK_COLOR = (50, 205, 50)  # Lime Green
 
 
-class Plant1AnimationLoader:
-    """Tải toàn bộ animation của Plant1"""
-
-    BASE_PATH = os.path.join("assets", "resource_plant1_2_3", "plant_1")
+class Plant2AnimationLoader:
+    BASE_PATH = os.path.join("assets", "resource_plant1_2_3", "plant_2")
 
     @classmethod
     def load_all(cls, scale_factor: float = 2.0) -> dict:
         if not os.path.exists(cls.BASE_PATH):
-            print(f"[Plant1Anim] Thư mục không tồn tại: {cls.BASE_PATH}")
+            print(f"[Plant2Anim] Thư mục không tồn tại: {cls.BASE_PATH}")
 
         all_anims = {}
         for anim_type, duration in FRAME_DURATIONS.items():
@@ -78,7 +70,7 @@ class Plant1AnimationLoader:
     @classmethod
     def _load_anim_type(cls, anim_type: str, frame_duration: int, scale_factor: float) -> dict:
         anims = {}
-        config = PLANT1_ANIMATION_CONFIGS.get(anim_type)
+        config = PLANT2_ANIMATION_CONFIGS.get(anim_type)
         if not config:
             return anims
 
@@ -87,7 +79,7 @@ class Plant1AnimationLoader:
             frames = cls._load_frames(folder, dir_cfg, scale_factor)
             if frames:
                 anims[direction] = Animation(frames, frame_duration)
-                print(f"[Plant1Anim] Loaded {len(frames)} frames — {anim_type}/{direction}")
+                print(f"[Plant2Anim] Loaded {len(frames)} frames — {anim_type}/{direction}")
 
         return anims
 
@@ -112,7 +104,7 @@ class Plant1AnimationLoader:
                 else:
                     frames.append(cls._make_fallback())
             except Exception as e:
-                print(f"[Plant1Anim] Lỗi load {filepath}: {e}")
+                print(f"[Plant2Anim] Lỗi load {filepath}: {e}")
                 frames.append(cls._make_fallback())
 
         return frames
@@ -128,6 +120,6 @@ class Plant1AnimationLoader:
         if anims:
             return anims
 
-        print(f"[Plant1Anim] Tạo animation fallback cho: {anim_type}")
+        print(f"[Plant2Anim] Tạo animation fallback cho: {anim_type}")
         fallback_frame = [cls._make_fallback()]
         return {d: Animation(fallback_frame, duration) for d in ("up", "down", "left", "right")}
