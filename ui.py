@@ -1,5 +1,9 @@
+from typing import Self
+
 import pygame
 import math
+
+from knight1 import Player1
 
 class UI:
     """Lớp quản lý giao diện người dùng (thanh máu, thanh cooldown dash, animation, game over)"""
@@ -15,6 +19,8 @@ class UI:
         # Load ảnh dash
         self.dash_frames = []  # Mảng chứa 5 khung hình animation của dash
         self.load_dash_frames()
+
+
         
         # ===== BIẾN ANIMATION =====
         self.dash_animation_progress = 0.0   # Tiến độ animation (0.0 → 1.0)
@@ -22,6 +28,15 @@ class UI:
         self.dash_animation_speed = 0.04    # Tốc độ chạy animation (mỗi frame tăng 0.04)
         self.has_played_dash_anim = False   # THÊM: đánh dấu đã chạy animation cho lần dash này
         
+        # Load animation gold
+        self.gold_frames = []
+        self.gold_frame_index = 0
+        self.gold_frame_timer = 0
+        self.gold_frame_duration = 100
+        for i in range(1, 6):
+            img = pygame.image.load(f"assets/gold/gold01/gold{i}.png").convert_alpha()
+            img = pygame.transform.scale(img, (img.get_width() * 2, img.get_height() * 2))
+            self.gold_frames.append(img)
     def load_dash_frames(self):
         """Load 5 ảnh dash từ thư mục assets/dash_UI/ và scale gấp đôi kích thước"""
         for i in range(5):  # Duyệt từ 0 đến 4 tương ứng dashUI00.png → dashUI04.png
@@ -214,22 +229,27 @@ class UI:
     def draw_gold(self, surface, player):
         """Vẽ icon đồng vàng + số vàng hiện có bên dưới thanh dash"""
         PAD   = 14
-        BAR_Y = PAD + 28  # cùng Y với dash
-        # Ước tính chiều cao frame dash (scale x2 từ ảnh gốc ~18px)
-        DASH_H = 36
-        GOLD_Y = PAD + DASH_H + 36  # dưới thanh dash ~10px
-
-        # Vẽ hình tròn vàng làm icon
-        icon_x = PAD + 10
-        icon_y = GOLD_Y + 10
-        pygame.draw.circle(surface, (180, 120, 0), (icon_x, icon_y), 11)
-        pygame.draw.circle(surface, (255, 210, 0), (icon_x, icon_y), 10)
-        pygame.draw.circle(surface, (255, 245, 150), (icon_x - 3, icon_y - 3), 4)
-
+        BAR_Y = PAD + 28
+        DASH_H = 30
+        GOLD_Y = PAD + DASH_H + 30
+        
+        # Cập nhật animation
+        current_time = pygame.time.get_ticks()
+        if current_time - self.gold_frame_timer >= self.gold_frame_duration:
+            self.gold_frame_timer = current_time
+            self.gold_frame_index = (self.gold_frame_index + 1) % len(self.gold_frames)
+        
+        # Vẽ icon vàng animation
+        gold_icon = self.gold_frames[self.gold_frame_index]
+        surface.blit(gold_icon, (PAD, GOLD_Y))
+        
         # Vẽ số vàng
         gold = getattr(player, 'gold', 0)
         gold_text = self.font.render(f"{gold}", True, (255, 230, 80))
-        surface.blit(gold_text, (PAD + 26, GOLD_Y + 2))
+        
+        text_x = PAD + gold_icon.get_width() + 1   # Cách icon 5px (chỉnh + để xa hơn, - để gần hơn)
+        text_y = GOLD_Y + 22       # Cách icon x(px) (chỉnh + để xuống, - để lên)
+        surface.blit(gold_text, (text_x, text_y))
 
     def draw(self, surface, player, screen_width, screen_height):
         """Vẽ toàn bộ UI (hàm chính gọi từ game loop)"""
@@ -386,3 +406,13 @@ class PauseMenu:
         if pygame.Rect(btn_x, box_y + 296, self.btn_w, self.btn_h).collidepoint(pos):
             return "quit"
         return None
+class gold_hero:
+    def __init__(self):
+        self.gold_text = Self.font.render(
+            f"Gold: {Player1.gold}",
+            True,
+            (255,255,0)
+        )
+
+    def draw(self, surface):
+        surface.blit(self.gold_text, (20, 80))

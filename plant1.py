@@ -1,3 +1,4 @@
+# plant1.py
 import pygame
 import os
 import math
@@ -5,7 +6,7 @@ from config import PLAYER_SPEED, RUN_SPEED
 from plant1_animation import Plant1AnimationLoader
 
 # ================================================================================================
-# CLASS PLANT1 — Kẻ địch Plant
+# CLASS PLANT1 — Kẻ địch Plant 1 (giống logic Slime2)
 # ================================================================================================
 
 class Plant1(pygame.sprite.Sprite):
@@ -42,7 +43,6 @@ class Plant1(pygame.sprite.Sprite):
         self.dx    = 0.0
         self.dy    = 0.0
 
-        
         self.home_chase_radius = 250
         self.home_leave_radius = 450
         self.walk_duration     = 1200   # ms trước khi chuyển sang run
@@ -55,17 +55,17 @@ class Plant1(pygame.sprite.Sprite):
         self.attack_sound_index   = 0
 
         # Máu
-        self.health     = 500
-        self.contact_damage = 15         # Sát thương khi chạm vào player
-        self.max_health = 500
+        self.health     = 300
+        self.contact_damage = 10
+        self.max_health = 300
 
         # Thời gian trạng thái
         self.hit_start_time       = 0
         self.hit_duration         = 300
         self.death_start_time     = 0
         self.death_frame_duration = 85
-        self.death_frames_count   = 10
-        self.death_duration = self.death_frame_duration * self.death_frames_count  # 340 ms
+        self.death_frames_count   = 6
+        self.death_duration = self.death_frame_duration * self.death_frames_count
 
         # Cờ trạng thái
         self.is_dead       = False
@@ -99,18 +99,13 @@ class Plant1(pygame.sprite.Sprite):
     # ------------------------------------------------------------------
 
     def _load_sounds(self):
-        sound_path = os.path.join("03_sounds", "slime3")
+        sound_path = os.path.join("03_sounds", "plant1")
         try:
             for i in range(1, 3):
                 path = os.path.join(sound_path, f"Attack{i}.mp3")
-                if os.path.exists(path):
-                    self.attack_sounds.append(pygame.mixer.Sound(path))
-            hit_path = os.path.join(sound_path, "hit.mp3")
-            if os.path.exists(hit_path):
-                self.hit_sound = pygame.mixer.Sound(hit_path)
-            death_path = os.path.join(sound_path, "Death.mp3")
-            if os.path.exists(death_path):
-                self.death_sound = pygame.mixer.Sound(death_path)
+                self.attack_sounds.append(pygame.mixer.Sound(path))
+            self.hit_sound   = pygame.mixer.Sound(os.path.join(sound_path, "hit.mp3"))
+            self.death_sound = pygame.mixer.Sound(os.path.join(sound_path, "Death.mp3"))
         except Exception as e:
             print(f"[Plant1] Lỗi load âm thanh: {e}")
 

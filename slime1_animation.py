@@ -53,12 +53,12 @@ SLIME1_ANIMATION_CONFIGS = {
         },
     },
     "death": {
-        "folder": "slime1_die",
+        "folder": "slime1_death",
         "directions": {
-            "up":    {"prefix": "slime1_die_up",    "frames": 10},
-            "down":  {"prefix": "slime1_die_down",  "frames": 10},
-            "left":  {"prefix": "slime1_die_left",  "frames": 10},
-            "right": {"prefix": "slime1_die_right", "frames": 10},
+            "up":    {"prefix": "slime1_death_up",    "frames": 10},
+            "down":  {"prefix": "slime1_death_down",  "frames": 10},
+            "left":  {"prefix": "slime1_death_left",  "frames": 10},
+            "right": {"prefix": "slime1_death_right", "frames": 10},
         },
     },
 }
