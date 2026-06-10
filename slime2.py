@@ -100,7 +100,7 @@ class Slime2(pygame.sprite.Sprite):
     # ------------------------------------------------------------------
 
     def _load_sounds(self):
-        sound_path = os.path.join("03_sounds", "slime2")
+        sound_path = os.path.join("03_sounds", "slime3")
         try:
             for i in range(1, 3):
                 path = os.path.join(sound_path, f"Attack{i}.mp3")
