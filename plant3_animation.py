@@ -1,49 +1,74 @@
+# plant3_animation.py
 import pygame
 import os
 from knight1_animation import Animation
+
+# ================================================================================================
+# CẤU HÌNH ANIMATION CHO PLANT3 (đầy đủ idle, walk, run, attack, hit, death)
+# ================================================================================================
 
 PLANT3_ANIMATION_CONFIGS = {
     "idle": {
         "folder": "plant3_idle",
         "directions": {
-            "up":    {"prefix": "plant3_idle_up",    "frames": 4},
-            "down":  {"prefix": "plant3_idle_down",  "frames": 4},
-            "left":  {"prefix": "plant3_idle_left",  "frames": 4},
-            "right": {"prefix": "plant3_idle_right", "frames": 4},
+            "up":    {"prefix": "plant3_idle_up",    "frames": 6},
+            "down":  {"prefix": "plant3_idle_down",  "frames": 6},
+            "left":  {"prefix": "plant3_idle_left",  "frames": 6},
+            "right": {"prefix": "plant3_idle_right", "frames": 6},
+        },
+    },
+    "walk": {
+        "folder": "plant3_walk",
+        "directions": {
+            "up":    {"prefix": "plant3_walk_up",    "frames": 8},
+            "down":  {"prefix": "plant3_walk_down",  "frames": 8},
+            "left":  {"prefix": "plant3_walk_left",  "frames": 8},
+            "right": {"prefix": "plant3_walk_right", "frames": 8},
+        },
+    },
+    "run": {
+        "folder": "plant3_run",
+        "directions": {
+            "up":    {"prefix": "plant3_run_up",    "frames": 8},
+            "down":  {"prefix": "plant3_run_down",  "frames": 8},
+            "left":  {"prefix": "plant3_run_left",  "frames": 8},
+            "right": {"prefix": "plant3_run_right", "frames": 8},
         },
     },
     "attack": {
         "folder": "plant3_attack",
         "directions": {
-            "up":    {"prefix": "plant3_attack_up",    "frames": 8},
-            "down":  {"prefix": "plant3_attack_down",  "frames": 8},
-            "left":  {"prefix": "plant3_attack_left",  "frames": 8},
-            "right": {"prefix": "plant3_attack_right", "frames": 8},
+            "up":    {"prefix": "plant3_attack_up",    "frames": 11},
+            "down":  {"prefix": "plant3_attack_down",  "frames": 11},
+            "left":  {"prefix": "plant3_attack_left",  "frames": 11},
+            "right": {"prefix": "plant3_attack_right", "frames": 11},
         },
     },
     "hit": {
         "folder": "plant3_hurt",
         "directions": {
-            "up":    {"prefix": "plant3_hurt_up",    "frames": 4},
-            "down":  {"prefix": "plant3_hurt_down",  "frames": 4},
-            "left":  {"prefix": "plant3_hurt_left",  "frames": 4},
-            "right": {"prefix": "plant3_hurt_right", "frames": 4},
+            "up":    {"prefix": "plant3_hurt_up",    "frames": 5},
+            "down":  {"prefix": "plant3_hurt_down",  "frames": 5},
+            "left":  {"prefix": "plant3_hurt_left",  "frames": 5},
+            "right": {"prefix": "plant3_hurt_right", "frames": 5},
         },
     },
     "death": {
         "folder": "plant3_die",
         "directions": {
-            "up":    {"prefix": "plant3_die_up",    "frames": 8},
-            "down":  {"prefix": "plant3_die_down",  "frames": 8},
-            "left":  {"prefix": "plant3_die_left",  "frames": 8},
-            "right": {"prefix": "plant3_die_right", "frames": 8},
+            "up":    {"prefix": "plant3_die_up",    "frames": 10},
+            "down":  {"prefix": "plant3_die_down",  "frames": 10},
+            "left":  {"prefix": "plant3_die_left",  "frames": 10},
+            "right": {"prefix": "plant3_die_right", "frames": 10},
         },
     },
 }
 
 FRAME_DURATIONS = {
     "idle":   200,
-    "attack": 100,
+    "walk":   100,
+    "run":    90,
+    "attack": 70,
     "hit":    75,
     "death":  85,
 }

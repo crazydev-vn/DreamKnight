@@ -4,7 +4,7 @@ import os
 from knight1_animation import Animation
 
 # ================================================================================================
-# CẤU HÌNH ANIMATION CHO PLANT1
+# CẤU HÌNH ANIMATION CHO PLANT1 (đầy đủ idle, walk, run, attack, hit, death)
 # ================================================================================================
 
 PLANT1_ANIMATION_CONFIGS = {
@@ -17,51 +17,67 @@ PLANT1_ANIMATION_CONFIGS = {
             "right": {"prefix": "plant1_idle_right", "frames": 4},
         },
     },
+    "walk": {
+        "folder": "plant1_walk",
+        "directions": {
+            "up":    {"prefix": "plant1_walk_up",    "frames": 6},
+            "down":  {"prefix": "plant1_walk_down",  "frames": 6},
+            "left":  {"prefix": "plant1_walk_left",  "frames": 6},
+            "right": {"prefix": "plant1_walk_right", "frames": 6},
+        },
+    },
+    "run": {
+        "folder": "plant1_run",
+        "directions": {
+            "up":    {"prefix": "plant1_run_up",    "frames": 8},
+            "down":  {"prefix": "plant1_run_down",  "frames": 8},
+            "left":  {"prefix": "plant1_run_left",  "frames": 8},
+            "right": {"prefix": "plant1_run_right", "frames": 8},
+        },
+    },
     "attack": {
         "folder": "plant1_attack",
         "directions": {
-            "up":    {"prefix": "plant1_attack_up",    "frames": 6},
-            "down":  {"prefix": "plant1_attack_down",  "frames": 6},
-            "left":  {"prefix": "plant1_attack_left",  "frames": 6},
-            "right": {"prefix": "plant1_attack_right", "frames": 6},
+            "up":    {"prefix": "plant1_attack_up",    "frames": 7},
+            "down":  {"prefix": "plant1_attack_down",  "frames": 7},
+            "left":  {"prefix": "plant1_attack_left",  "frames": 7},
+            "right": {"prefix": "plant1_attack_right", "frames": 7},
         },
     },
     "hit": {
         "folder": "plant1_hurt",
         "directions": {
-            "up":    {"prefix": "plant1_hurt_up",    "frames": 3},
-            "down":  {"prefix": "plant1_hurt_down",  "frames": 3},
-            "left":  {"prefix": "plant1_hurt_left",  "frames": 3},
-            "right": {"prefix": "plant1_hurt_right", "frames": 3},
+            "up":    {"prefix": "plant1_hurt_up",    "frames": 5},
+            "down":  {"prefix": "plant1_hurt_down",  "frames": 5},
+            "left":  {"prefix": "plant1_hurt_left",  "frames": 5},
+            "right": {"prefix": "plant1_hurt_right", "frames": 5},
         },
     },
     "death": {
-        "folder": "plant1_die",
+        "folder": "plant1_death",
         "directions": {
-            "up":    {"prefix": "plant1_die_up",    "frames": 6},
-            "down":  {"prefix": "plant1_die_down",  "frames": 6},
-            "left":  {"prefix": "plant1_die_left",  "frames": 6},
-            "right": {"prefix": "plant1_die_right", "frames": 6},
+            "up":    {"prefix": "plant1_die_up",    "frames": 10},
+            "down":  {"prefix": "plant1_die_down",  "frames": 10},
+            "left":  {"prefix": "plant1_die_left",  "frames": 10},
+            "right": {"prefix": "plant1_die_right", "frames": 10},
         },
     },
 }
 
-# Thời gian mỗi frame (ms) cho từng loại animation
 FRAME_DURATIONS = {
     "idle":   200,
-    "attack": 100,
+    "walk":   100,
+    "run":    90,
+    "attack": 70,
     "hit":    75,
     "death":  85,
 }
 
-# Màu fallback
 FALLBACK_COLOR = (34, 139, 34)  # Forest Green
 
 
 class Plant1AnimationLoader:
-    """Tải toàn bộ animation của Plant1"""
-
-    BASE_PATH = os.path.join("assets", "resource_plant1_2_3", "plant_1")
+    BASE_PATH = os.path.join("assets", "resource_plant1_2_3", "plant1")
 
     @classmethod
     def load_all(cls, scale_factor: float = 2.0) -> dict:
