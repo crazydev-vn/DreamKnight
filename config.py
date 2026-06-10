@@ -5,7 +5,11 @@ SCREEN_WIDTH = 1520 # Độ rộng cửa sổ game -100 cho đến khi phù hợ
 SCREEN_HEIGHT  = 740 # Độ cao cửa sổ game -100 cho đến khi phù hợp
 
 # Kích thước vùng nhìn của camera (vùng thế giới game được hiển thị trong game_surface)
-VIEW_WIDTH = 800   # Độ rộng vùng nhìn (camera viewport width) 600
+#VIEW_WIDTH = 760    # Độ rộng vùng nhìn (camera viewport width) 600
+#VIEW_HEIGHT = 370   # Độ cao vùng nhìn (camera viewport height)  400
+
+#Thiết lập mặc định
+VIEW_WIDTH =  800   # Độ rộng vùng nhìn (camera viewport width) 600
 VIEW_HEIGHT = 450  # Độ cao vùng nhìn (camera viewport height)  400
 
 # Kích thước toàn bộ bản đồ game (thế giới game rộng hơn màn hình)
@@ -17,7 +21,7 @@ PLAYER_WIDTH = 40   # Chiều rộng nhân vật (dùng cho va chạm)
 PLAYER_HEIGHT = 40  # Chiều cao nhân vật
 
 # Giới hạn FPS (frames per second) - thiết lập rất cao (10000) có thể để test hoặc debug
-FPS = 10000
+FPS = 10000000
 
 # Tốc độ di chuyển cơ bản của nhân vật (pixel/frame)
 PLAYER_SPEED = 3.0
