@@ -1,4 +1,3 @@
-# plant1.py
 import pygame
 import os
 import math

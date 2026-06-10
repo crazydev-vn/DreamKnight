@@ -1,6 +1,8 @@
 from test01 import Test01
 
 from plant1 import Plant1
+from plant2 import Plant2
+from plant3 import Plant3
 
 from slime1 import Slime1
 from slime2 import Slime2
@@ -30,6 +32,16 @@ PLANT1_POSITIONS = [
     #(730, 700),
     #(800, 1000),
 ]
+PLANT2_POSITIONS = [
+    #(x, y)
+    #(730, 700),
+    #(800, 1000),
+]
+PLANT3_POSITIONS = [
+    #(x, y)
+    #(730, 700),
+    #(800, 1000),
+]
 
 SLIME1_POSITIONS = [
     # (x, y)
@@ -55,7 +67,11 @@ SLIME3_POSITIONS = [
 # Giá trị vàng khi quái chết
 GOLD_VALUES = {
     "test01": 10,
+
     "plant1": 8,
+    "plant2": 8,
+    "plant3": 8,
+
     "slime1": 5,
     "slime2": 7,
     "slime3": 7,
@@ -73,7 +89,12 @@ class EnemyManager:
         self.gold_drops = []
 
         self.test01  = self._spawn(Test01,  TEST01_POSITIONS)
+
         self.plant1  = self._spawn(Plant1,  PLANT1_POSITIONS)
+        self.plant2  = self._spawn(Plant2,  PLANT2_POSITIONS)
+        self.plant3  = self._spawn(Plant3,  PLANT3_POSITIONS)
+
+        
         self.slime1  = self._spawn(Slime1,  SLIME1_POSITIONS)
         self.slime2  = self._spawn(Slime2,  SLIME2_POSITIONS)
         self.slime3  = self._spawn(Slime3,  SLIME3_POSITIONS)
@@ -94,7 +115,7 @@ class EnemyManager:
 
     def _sync_enemies(self):
         """Đồng bộ danh sách enemy cho player để player biết mục tiêu."""
-        all_enemies = self.test01 + self.plant1 + self.slime1 + self.slime2 + self.slime3
+        all_enemies = self.test01 + self.plant1 + self.plant2 + self.plant3 + self.slime1 + self.slime2 + self.slime3
         self.player.set_enemies(all_enemies)
 
     # ------------------------------------------------------------------
@@ -104,8 +125,14 @@ class EnemyManager:
     def update(self, dt, map_width, map_height):
         for e in self.test01:
             e.update(dt, map_width, map_height)
+
         for e in self.plant1:
             e.update(dt, map_width, map_height)
+        for e in self.plant2:
+            e.update(dt, map_width, map_height)
+        for e in self.plant3:
+            e.update(dt, map_width, map_height)
+
         for e in self.slime1:
             e.update(dt, map_width, map_height)
         for e in self.slime2:
@@ -113,7 +140,6 @@ class EnemyManager:
         for e in self.slime3:
             e.update(dt, map_width, map_height)
 
-        self._check_plant1_collisions()
         self._check_enemy_collisions()
         self._remove_dead()
 
@@ -126,27 +152,11 @@ class EnemyManager:
     # Va chạm
     # ------------------------------------------------------------------
 
-    def _check_plant1_collisions(self):
-        attack_hitbox = self.player.get_attack_hitbox()
-        if not attack_hitbox:
-            return
-        for plant1 in self.plant1:
-            if plant1.is_dead:
-                continue
-            cx, cy, radius = plant1.get_hitbox()
-            closest_x = max(attack_hitbox.left, min(cx, attack_hitbox.right))
-            closest_y = max(attack_hitbox.top,  min(cy, attack_hitbox.bottom))
-            dx = closest_x - cx
-            dy = closest_y - cy
-            if dx*dx + dy*dy < radius * radius:
-                plant1.take_damage(self.player.damage)
-                print(f"Plant1 bị tấn công! Máu còn: {plant1.health}")
-
     def _check_enemy_collisions(self):
         attack_hitbox = self.player.get_attack_hitbox()
         if not attack_hitbox:
             return
-        for enemy_list in [self.test01, self.slime1, self.slime2, self.slime3]:
+        for enemy_list in [self.test01, self.plant1, self.plant2, self.plant3, self.slime1, self.slime2, self.slime3]:
             for enemy in enemy_list:
                 if enemy.is_dead:
                     continue
@@ -181,13 +191,15 @@ class EnemyManager:
 
         self.plant1,  c = self._remove_list(self.plant1,  GOLD_VALUES["plant1"])
         changed |= c
+        self.plant2,  c = self._remove_list(self.plant2,  GOLD_VALUES["plant2"])
+        changed |= c
+        self.plant3,  c = self._remove_list(self.plant3,  GOLD_VALUES["plant3"])
+        changed |= c
 
         self.slime1,  c = self._remove_list(self.slime1,  GOLD_VALUES["slime1"])
         changed |= c
-
         self.slime2,  c = self._remove_list(self.slime2,  GOLD_VALUES["slime2"])
         changed |= c
-
         self.slime3,  c = self._remove_list(self.slime3,  GOLD_VALUES["slime3"])
         changed |= c
 
@@ -201,7 +213,12 @@ class EnemyManager:
     def draw(self, surface, camera):
         for e in self.test01:
             e.draw(surface, camera)
+
         for e in self.plant1:
+            e.draw(surface, camera)
+        for e in self.plant2:
+            e.draw(surface, camera)
+        for e in self.plant3:
             e.draw(surface, camera)
 
         for e in self.slime1:

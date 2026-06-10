@@ -1,4 +1,3 @@
-# plant3_animation.py
 import pygame
 import os
 from knight1_animation import Animation
