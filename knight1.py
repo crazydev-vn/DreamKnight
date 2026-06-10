@@ -1,3 +1,5 @@
+from typing import Self
+
 import pygame
 from config import PLAYER_SPEED, RUN_SPEED, DEBUG_MODE
 from knight1_hiteffect import HitEffectManager
@@ -182,7 +184,12 @@ class Player1(pygame.sprite.Sprite):
         #PMD
 
         self.damage = 50                  # Sát thương mỗi đòn đánh
-        self.has_dealt_damage = False       # Đã gây sát thương trong đòn tấn công này chưa
+        self.attack_range = 60            # Tầm đánh cơ bản của kiếm
+        self.attack_damage_level = 0      # Cấp độ nâng cấp sát thương
+        self.attack_speed_level = 0       # Cấp độ nâng cấp tốc độ đánh
+        self.dash_upgrade_level = 0       # Cấp độ nâng cấp dash 
+        self.range_upgrade_level = 0      # Cấp độ nâng cấp tầm đánh
+        self.has_dealt_damage = False     # Đã gây sát thương trong đòn tấn công này chưa
         self.damage_cooldown = 200          # Thời gian delay giữa các lần gây sát thương (ms)
         self.last_damage_time = 0           # Thời điểm gây sát thương lần cuối
         self.enemies = None                 # Danh sách kẻ địch (sẽ được gán từ game chính)
@@ -375,26 +382,26 @@ class Player1(pygame.sprite.Sprite):
             "up": {
                 "offset_x": 0,      # Dịch ngang (so với tâm)
                 "offset_y": -25,    # Dịch dọc (âm = lên trên, dương = xuống dưới)
-                "width": 80,        # Độ rộng hitbox khi đánh lên
-                "height": 20        # Chiều cao hitbox khi đánh lên
+                "width": self.attack_range,        # Độ rộng hitbox khi đánh lên
+                "height": self.attack_range        # Chiều cao hitbox khi đánh lên
             },
             "down": {
                 "offset_x": 0,
                 "offset_y": 45,     # Dịch xuống dưới
-                "width": 80,
-                "height": 20
+                "width": self.attack_range,
+                "height": self.attack_range
             },
             "left": {
                 "offset_x": -35,    # Dịch sang trái
                 "offset_y": 0,
-                "width": 20,
-                "height": 70
+                "width": self.attack_range,
+                "height": self.attack_range
             },
             "right": {
                 "offset_x": 40,     # Dịch sang phải
                 "offset_y": 0,
-                "width": 20,
-                "height": 70
+                "width": self.attack_range,
+                "height": self.attack_range
             }
         }
         

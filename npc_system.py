@@ -1,3 +1,5 @@
+from multiprocessing.resource_sharer import stop
+
 import pygame
 import math
 from config import SCREEN_WIDTH, SCREEN_HEIGHT
@@ -22,6 +24,54 @@ class NPCSystem:
         self.active_npc_id = None          # ID của NPC mà người chơi đang đứng ở gần (1 hoặc 2)
         self.current_step = 0              # Tiến trình câu thoại hiện tại đang đọc (Bắt đầu từ 0)
         self.selected_option = 0           # Lựa chọn shop tại câu cuối: 0 là Vật Phẩm, 1 là Kỹ Năng
+       
+        # ===== DỮ LIỆU SHOP =====
+        self.shop_selected_index = 0  # Chỉ số lựa chọn hiện tại trong cửa hàng (Dùng để điều khiển di chuyển lên xuống giữa các mục)                                               
+        self.item_shop = [
+            {
+                "name": "Apple",
+                "price": 20,
+                "heal": 20,
+                "image": "assets/shop/apple.png"
+            },
+            {
+                "name": "Orange",
+                "price": 40,
+                "heal": 40,
+                "image": "assets/shop/orange.png"
+            },
+            {
+                "name": "Watermelon",
+                "price": 80,
+                "heal": 80,
+                "image": "assets/shop/watermelon.png"
+            },
+            {
+                "name": "Golden Fruit",
+                "price": 150,
+                "heal": 150,
+                "image": "assets/shop/golden_fruit.png"
+            }
+        ]
+
+        self.skill_shop = [
+            {
+                "name": "Fast Slash",
+                "price": 100
+            },
+            {
+                "name": "Quick Dash",
+                "price": 150
+            },
+            {
+                "name": "Long Slash",
+                "price": 200
+            },
+            {
+                "name": "Power Slash",
+                "price": 250
+            }
+        ]
 
         # Kịch bản kịch tính phù hợp với ngoại hình nhân vật (Chữ hiển thị trong game bắt buộc KHÔNG DẤU)
         self.npc_data = {
@@ -88,22 +138,35 @@ class NPCSystem:
     # ------------------------------------------------------------------
     def handle_keydown(self, key):
         """Hành động xử lý khi người chơi ấn các phím điều khiển từ bàn phím"""
-        # THỬ THÁCH 1: Nếu đang mở cửa hàng Shop, ấn phím ESC để đóng bảng rời đi nhanh
+       # THỬ THÁCH 1:ĐANG Ở TRONG SHOP
+
         if self.is_showing_shop:
-            if key == pygame.K_ESCAPE:
-                self.is_showing_shop = False
-                self.shop_type = None
+
+            # Chọn lên
+            if key == pygame.K_UP:
+                self.shop_selected_index -= 1
+
+            # Chọn xuống
+            elif key == pygame.K_DOWN:
+                self.shop_selected_index += 1
+
+            # Giới hạn chỉ số
+            if self.shop_type == "vat pham":
+                max_index = len(self.item_shop) - 1
+            else:
+                max_index = len(self.skill_shop) - 1
+
+            self.shop_selected_index = max(
+                0,
+                min(self.shop_selected_index, max_index)
+            )
+
+            # Mua bằng F
+            if key == pygame.K_f:
+                self.buy_selected_item()
+
             return
-
-        # THỬ THÁCH 2: Nếu đang di chuyển bình thường, ấn phím F để bắt đầu kích hoạt cuộc trò chuyện
-        if not self.is_showing_dialogue and not self.is_showing_shop:
-            if key == pygame.K_f and self.active_npc_id is not None:
-                self.is_showing_dialogue = True
-                self.current_step = 0
-                self.selected_option = 0
-                return
-
-        # THỬ THÁCH 3: Logic chuyển câu thoại hoặc chọn nhánh khi đang mở bảng hộp thoại hội thoại
+        # THỬ THÁCH 2: Logic chuyển câu thoại hoặc chọn nhánh khi đang mở bảng hộp thoại hội thoại
         if self.is_showing_dialogue and self.active_npc_id:
             npc = self.npc_data[self.active_npc_id]
             total_dialogues = len(npc["dialogues"])
@@ -116,7 +179,8 @@ class NPCSystem:
                 elif key == pygame.K_f:
                     # Nhấn F để chốt lựa chọn phương án, tự động tắt hộp thoại nói và bật bảng Shop lên
                     self.is_showing_dialogue = False 
-                    self.is_showing_shop = True      
+                    self.is_showing_shop = True   
+                    self.shop_selected_index = 0 # Reset chỉ số lựa chọn trong shop về 0 mỗi khi mở shop mới 
                     if self.selected_option == 0:
                         self.shop_type = "vat pham"
                     else:
@@ -230,3 +294,24 @@ class NPCSystem:
             close_surf = font_small.render("Nhan [ESC] de roi khoi cua hang", True, (255, 100, 100))
             close_surf_x = SCREEN_WIDTH // 2 - close_surf.get_width() // 2
             surface.blit(close_surf, (close_surf_x, SCREEN_HEIGHT - 90))
+
+def buy_selected_item(self):
+
+    if self.shop_type == "vat pham":
+
+        item = self.item_shop[self.shop_selected_index]
+
+        print(
+            f"Mua {item['name']} - "
+            f"{item['price']} Gold - "
+            f"+{item['heal']} HP"
+        )
+
+    elif self.shop_type == "ky nang":
+
+        skill = self.skill_shop[self.shop_selected_index]
+
+        print(
+            f"Mua ky nang {skill['name']} - "
+            f"{skill['price']} Gold"
+        )
