@@ -406,13 +406,3 @@ class PauseMenu:
         if pygame.Rect(btn_x, box_y + 296, self.btn_w, self.btn_h).collidepoint(pos):
             return "quit"
         return None
-class gold_hero:
-    def __init__(self):
-        self.gold_text = Self.font.render(
-            f"Gold: {Player1.gold}",
-            True,
-            (255,255,0)
-        )
-
-    def draw(self, surface):
-        surface.blit(self.gold_text, (20, 80))

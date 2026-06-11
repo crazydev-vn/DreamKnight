@@ -49,8 +49,7 @@ class NPCSystem:
             }
         }
 
-       # KHO HÀNG HÓA SHOP CẬP NHẬT: Chia nhỏ các loại trái cây công dụng khác nhau
-        # Mặc định quantity = 1 phục vụ nút + - bấm chuột trái
+       # KHO HÀNG HÓA SHOP CẬP NHẬT: Chia nhỏ các loại trái cây công dụng khác nhau thành 3 món riêng biệt, mỗi món có giá trị hồi máu khác nhau              
         self.shop_goods = {
             "vat pham": [
                 {"name": "Qua Tao Pixel", "desc": "Hoi 20 Mau Nho Le", "price": 15, "type": "heal", "value": 20, "quantity": 1, "basket_id": 1},
@@ -131,14 +130,6 @@ class NPCSystem:
                 if btn["action"] == "close":
                     self.is_showing_shop = False
                     self.shop_type = None
-                    return
-                # Nhấn nút dấu trừ (-) để giảm số lượng đặt mua
-                elif btn["action"] == "minus":
-                    goods_list[idx]["quantity"] = max(1, goods_list[idx]["quantity"] - 1)
-                    return
-                # Nhấn nút dấu cộng (+) để gia tăng số lượng đặt mua (Giới hạn tối đa là 9 món một lượt)
-                elif btn["action"] == "plus":
-                    goods_list[idx]["quantity"] = min(9, goods_list[idx]["quantity"] + 1)
                     return
                 # Nhấn nút MUA để tiến hành khấu trừ Vàng và gia tăng vĩnh viễn thuộc tính nhân vật
                 elif btn["action"] == "buy":
@@ -353,27 +344,7 @@ class NPCSystem:
                 desc_surf = font_small.render(item["desc"], True, (170, 170, 170))
                 surface.blit(name_surf, (row_rect.x + 65, row_rect.y + 10))
                 surface.blit(desc_surf, (row_rect.x + 65, row_rect.y + 35))
-                
-                # ---- THIẾT KẾ CỤM NÚT BẤM CHUỘT TRÁI TĂNG GIẢM SỐ LƯỢNG MUA ----
-                btn_minus = pygame.Rect(row_rect.x + 360, row_rect.y + 17, 30, 30)
-                btn_plus = pygame.Rect(row_rect.x + 430, row_rect.y + 17, 30, 30)
-                
-                # Vẽ hộp nút trừ (-) bằng chuột trái
-                pygame.draw.rect(surface, (100, 40, 40), btn_minus, border_radius=4)
-                txt_m = font_bold.render("-", True, (255, 255, 255))
-                surface.blit(txt_m, (btn_minus.x + 11, btn_minus.y + 2))
-                self.button_rects.append({"rect": btn_minus, "action": "minus", "item_index": i})
-                
-                # Vẽ con số hiển thị số lượng đặt mua ở chính giữa hai nút bấm
-                qty_surf = font_bold.render(str(item["quantity"]), True, (0, 255, 255))
-                surface.blit(qty_surf, (row_rect.x + 405, row_rect.y + 19))
-                
-                # Vẽ hộp nút cộng (+) bằng chuột trái
-                pygame.draw.rect(surface, (40, 100, 40), btn_plus, border_radius=4)
-                txt_p = font_bold.render("+", True, (255, 255, 255))
-                surface.blit(txt_p, (btn_plus.x + 8, btn_plus.y + 2))
-                self.button_rects.append({"rect": btn_plus, "action": "plus", "item_index": i})
-                
+                               
                 # ---- THIẾT KẾ KHỐI Ô NÚT BẤM MUA THANH TOÁN TỔNG TIỀN VÀNG ----
                 total_item_price = item["price"] * item["quantity"]
                 btn_buy = pygame.Rect(row_rect.right - 145, row_rect.y + 15, 130, 35)
