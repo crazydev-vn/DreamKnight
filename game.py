@@ -180,6 +180,9 @@ class Game:
                         sound_manager.set_sfx_volume(value)
 
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                # --- CHÈN MỚI: Nếu đang xem Shop, ưu tiên xử lý click chuột mua hàng trước ---
+                if self.npc_manager.is_showing_shop:
+                    self.npc_manager.handle_click(event.pos, self.player)
                 self.pause_menu.handle_mousedown(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
                 action = self.pause_menu.handle_click(event.pos, SCREEN_WIDTH, SCREEN_HEIGHT)
                 if action == "quit":
@@ -247,31 +250,38 @@ class Game:
     # ------------------------------------------------------------------
 
     def update(self):
-        events = self.handle_events()
+            # 1. Luôn luân chuyển lấy sự kiện từ bàn phím/chuột ở mọi frame đầu tiên
+            events = self.handle_events()
 
-        if self.game_over or self.pause_menu.visible:
-            return
+            # Nếu đang chết hoặc đang ở Pause Menu thì dừng toàn bộ logic cập nhật game
+            if self.game_over or self.pause_menu.visible:
+                return
 
-        self.npc_manager.update(self.player, self)
+            # 2. Cập nhật hệ thống tương tác và quét khoảng cách NPC (Bắt buộc truyền thêm "self")
+            self.npc_manager.update(self.player, self)
 
-        if not self.npc_manager.is_showing_dialogue and not self.npc_manager.is_showing_shop:
-            self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
+            # 3. KHÓA CHÂN LUỒNG GAME: Chỉ cập nhật di chuyển và AI quái vật khi KHÔNG xem chữ hội thoại và KHÔNG mở shop
+            if not self.npc_manager.is_showing_dialogue and not self.npc_manager.is_showing_shop:
+                # Player di chuyển và chém quái chuẩn chỉnh bằng list events
+                self.player.update(MAP_WIDTH, MAP_HEIGHT, events)
 
-            # ← MỚI: một dòng thay cho ~60 dòng cũ
-            self.enemies.update(1/60, MAP_WIDTH, MAP_HEIGHT)
+                # Cập nhật toàn bộ AI quái vật gom gọn mới tinh của con
+                self.enemies.update(1/60, MAP_WIDTH, MAP_HEIGHT)
 
-        if self.player.is_dead and not self.game_over:
-            self.game_over = True
-            pygame.mixer.music.pause()
-            pygame.mixer.stop()
+            # 4. Kiểm tra điều kiện sập nguồn của Hiệp sĩ chính
+            if self.player.is_dead and not self.game_over:
+                self.game_over = True
+                pygame.mixer.music.pause()
+                pygame.mixer.stop()
 
-        self.camera.update(self.player)
+            # 5. Camera cập nhật bám đuôi theo player bình thường
+            self.camera.update(self.player)
 
-        # Cập nhật scene objects
-        for obj in self._scene_objects():
-            obj.update(1/60)
-        for fence in self.fences:
-            fence.update(1/60)
+            # 6. Cập nhật hoạt ảnh cho toàn bộ các vật thể tĩnh môi trường xung quanh bản đồ
+            for obj in self._scene_objects():
+                obj.update(1/60)
+            for fence in self.fences:
+                fence.update(1/60)
 
     # ------------------------------------------------------------------
     # Vẽ
