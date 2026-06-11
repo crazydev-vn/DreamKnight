@@ -197,6 +197,7 @@ class Game:
                     btn_w, btn_h = 220, 44
                     btn_x = box_x + (box_w - btn_w) // 2
                     if pygame.Rect(btn_x, box_y + 140, btn_w, btn_h).collidepoint(event.pos):
+                        # Reset máu và trạng thái player
                         self.player.health          = self.player.max_health
                         self.player.is_dead         = False
                         self.player.ghost_mode      = False
@@ -205,6 +206,16 @@ class Game:
                         self.player.x               = 400
                         self.player.y               = 450
                         self.player.rect.center     = (400, 450)
+                        # Reset vàng và cấp kĩ năng
+                        self.player.gold                 = 0
+                        self.player.attack_damage_level  = 0
+                        self.player.attack_speed_level   = 0
+                        self.player.dash_upgrade_level   = 0
+                        self.player.range_upgrade_level  = 0
+                        self.player.damage               = 50    # Về sát thương gốc
+                        self.player.dash_cooldown        = 500   # Về cooldown gốc
+                        # Reset wave và quái
+                        self.enemies = EnemyManager(self.player)
                         self.game_over              = False
                         pygame.mixer.music.unpause()
 
