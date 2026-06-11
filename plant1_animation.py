@@ -56,10 +56,10 @@ PLANT1_ANIMATION_CONFIGS = {
     "death": {
         "folder": "plant1_death",
         "directions": {
-            "up":    {"prefix": "plant1_die_up",    "frames": 10},
-            "down":  {"prefix": "plant1_die_down",  "frames": 10},
-            "left":  {"prefix": "plant1_die_left",  "frames": 10},
-            "right": {"prefix": "plant1_die_right", "frames": 10},
+            "up":    {"prefix": "plant1_death_up",    "frames": 10},
+            "down":  {"prefix": "plant1_death_down",  "frames": 10},
+            "left":  {"prefix": "plant1_death_left",  "frames": 10},
+            "right": {"prefix": "plant1_death_right", "frames": 10},
         },
     },
 }

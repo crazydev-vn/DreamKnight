@@ -19,20 +19,20 @@ from config import SCREEN_WIDTH, SCREEN_HEIGHT, MAP_WIDTH, MAP_HEIGHT
 WAVE_ORDER = [
     "slime1",
     "slime2",
-    "slime3",
+    "slime3", 
     "plant1",
     "plant2",
     "plant3",
 ]
 
-ENEMIES_PER_WAVE = 30       # số con mỗi đợt — chỉnh số này
-SPAWN_INTERVAL   = 2        # giây giữa mỗi lần spawn 1 con
+ENEMIES_PER_WAVE = 10       # số con mỗi đợt — chỉnh số này
+SPAWN_INTERVAL   = 2        # giây giữa mỗi lần spawn x con
 SPAWN_OFFSET     = 80       # px ngoài rìa camera — quái spawn ngoài tầm nhìn
 
 # Giá trị vàng khi quái chết
 GOLD_VALUES = {
-    "slime1": 5,  "slime2": 7,  "slime3": 9,
-    "plant1": 8,  "plant2": 10, "plant3": 12,
+    "slime1": 10,  "slime2": 20,  "slime3": 30,
+    "plant1": 15,  "plant2": 25, "plant3": 35,
 }
 
 
@@ -43,8 +43,6 @@ ENEMY_CLASSES = {
 
 # Scale mặc định cho tất cả quái
 DEFAULT_SCALE = 2.0
-
-
 
 class EnemyManager:
     def __init__(self, player):

@@ -2,11 +2,11 @@
 
 # Kích thước cửa sổ hiển thị chính của game (tính bằng pixel)
 
-#SCREEN_WIDTH = 1220  #1920  # Độ rộng cửa sổ game 800
-#SCREEN_HEIGHT = 540  #1040  # Độ cao cửa sổ game 520
+SCREEN_WIDTH = 1220  #1920  # Độ rộng cửa sổ game 800
+SCREEN_HEIGHT = 540  #1040  # Độ cao cửa sổ game 520
 
-SCREEN_WIDTH = 1920 # Độ rộng cửa sổ game -100 cho đến khi phù hợp
-SCREEN_HEIGHT  = 1040 # Độ cao cửa sổ game -100 cho đến khi phù hợp
+#SCREEN_WIDTH = 1920 # Độ rộng cửa sổ game -100 cho đến khi phù hợp
+#SCREEN_HEIGHT  = 1040 # Độ cao cửa sổ game -100 cho đến khi phù hợp
 
 
 # Kích thước vùng nhìn của camera (vùng thế giới game được hiển thị trong game_surface)
@@ -26,7 +26,7 @@ PLAYER_WIDTH = 40   # Chiều rộng nhân vật (dùng cho va chạm)
 PLAYER_HEIGHT = 40  # Chiều cao nhân vật
 
 # Giới hạn FPS (frames per second) - thiết lập rất cao (10000) có thể để test hoặc debug
-FPS = 10000000
+FPS = 1000000000000
 
 # Tốc độ di chuyển cơ bản của nhân vật (pixel/frame)
 PLAYER_SPEED = 3.0
@@ -40,5 +40,5 @@ RUN_SPEED = 6.0 # Tốc độ chạy (nhanh hơn đi bộ)
 MAP_IMAGE_PATH = "assets/map/MAP002.png"
 
 # Chế độ debug: in ra thông tin, hiển thị hitbox, v.v.
-#DEBUG_MODE = False 
-DEBUG_MODE = True 
+DEBUG_MODE = False 
+#DEBUG_MODE = True 
