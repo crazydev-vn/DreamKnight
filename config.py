@@ -2,15 +2,11 @@
 
 # Kích thước cửa sổ hiển thị chính của game (tính bằng pixel)
 
-SCREEN_WIDTH = 1220 #1420 #1920  # Độ rộng cửa sổ game 800
-SCREEN_HEIGHT = 540 #640 #1040  # Độ cao cửa sổ game 520
+#SCREEN_WIDTH = 1220  #1920  # Độ rộng cửa sổ game 800
+#SCREEN_HEIGHT = 540  #1040  # Độ cao cửa sổ game 520
 
-SCREEN_WIDTH = 1520 # Độ rộng cửa sổ game -100 cho đến khi phù hợp
-SCREEN_HEIGHT  = 740 # Độ cao cửa sổ game -100 cho đến khi phù hợp
-
-
-SCREEN_WIDTH = 1220 #1420 #1920  # Độ rộng cửa sổ game 800
-SCREEN_HEIGHT = 540 #640 #1040  # Độ cao cửa sổ game 520
+SCREEN_WIDTH = 1920 # Độ rộng cửa sổ game -100 cho đến khi phù hợp
+SCREEN_HEIGHT  = 1040 # Độ cao cửa sổ game -100 cho đến khi phù hợp
 
 
 # Kích thước vùng nhìn của camera (vùng thế giới game được hiển thị trong game_surface)
@@ -44,5 +40,5 @@ RUN_SPEED = 6.0 # Tốc độ chạy (nhanh hơn đi bộ)
 MAP_IMAGE_PATH = "assets/map/MAP002.png"
 
 # Chế độ debug: in ra thông tin, hiển thị hitbox, v.v.
-DEBUG_MODE = False 
-#DEBUG_MODE = True 
+#DEBUG_MODE = False 
+DEBUG_MODE = True 

@@ -373,8 +373,11 @@ class Player1(pygame.sprite.Sprite):
     def create_attack_hitbox(self):
         # ===== CÁC THAM SỐ DỄ ĐIỀU CHỈNH =====
         # Kích thước hitbox
-        hitbox_width = 60      # Độ rộng hitbox (cho hướng trái/phải)
-        hitbox_height = 60     # Chiều cao hitbox (cho hướng lên/xuống)
+        hitbox_width_vertical = 80   # Độ rộng hitbox (cho hướng trái/phải)
+        hitbox_height_vertical = 30     # Chiều cao hitbox (cho hướng lên/xuống)
+
+        hitbox_width_horizontal = 30   # Độ rộng hitbox (cho hướng trái/phải)
+        hitbox_height_horizontal = 80    # Chiều cao hitbox (cho hướng lên/xuống)
         
         # Điều chỉnh vị trí cho từng hướng (đơn vị: pixels)
         # Giá trị dương = dịch sang phải/xuống dưới, âm = dịch sang trái/lên trên
@@ -382,26 +385,26 @@ class Player1(pygame.sprite.Sprite):
             "up": {
                 "offset_x": 0,      # Dịch ngang (so với tâm)
                 "offset_y": -25,    # Dịch dọc (âm = lên trên, dương = xuống dưới)
-                "width": self.attack_range,        # Độ rộng hitbox khi đánh lên
-                "height": self.attack_range        # Chiều cao hitbox khi đánh lên
+                "width": hitbox_width_vertical,
+                "height": hitbox_height_vertical
             },
             "down": {
                 "offset_x": 0,
                 "offset_y": 45,     # Dịch xuống dưới
-                "width": self.attack_range,
-                "height": self.attack_range
+                "width": hitbox_width_vertical,
+                "height": hitbox_height_vertical
             },
             "left": {
                 "offset_x": -35,    # Dịch sang trái
-                "offset_y": 0,
-                "width": self.attack_range,
-                "height": self.attack_range
+                "offset_y": 5,
+                "width": hitbox_width_horizontal,
+                "height": hitbox_height_horizontal
             },
             "right": {
                 "offset_x": 40,     # Dịch sang phải
-                "offset_y": 0,
-                "width": self.attack_range,
-                "height": self.attack_range
+                "offset_y": 5,
+                "width": hitbox_width_horizontal,
+                "height": hitbox_height_horizontal
             }
         }
         
