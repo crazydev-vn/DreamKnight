@@ -9,6 +9,10 @@ SCREEN_WIDTH = 1520 # Độ rộng cửa sổ game -100 cho đến khi phù hợ
 SCREEN_HEIGHT  = 740 # Độ cao cửa sổ game -100 cho đến khi phù hợp
 
 
+SCREEN_WIDTH = 1220 #1420 #1920  # Độ rộng cửa sổ game 800
+SCREEN_HEIGHT = 540 #640 #1040  # Độ cao cửa sổ game 520
+
+
 # Kích thước vùng nhìn của camera (vùng thế giới game được hiển thị trong game_surface)
 #VIEW_WIDTH = 760    # Độ rộng vùng nhìn (camera viewport width) 600
 #VIEW_HEIGHT = 370   # Độ cao vùng nhìn (camera viewport height)  400

@@ -43,8 +43,7 @@ class Plant1(pygame.sprite.Sprite):
         self.dx    = 0.0
         self.dy    = 0.0
 
-        self.home_chase_radius = 250
-        self.home_leave_radius = 450
+
         self.walk_duration     = 1200   # ms trước khi chuyển sang run
         self.attack_range      = 45
         self.attack_duration   = 600    # ms cho animation tấn công
@@ -55,9 +54,9 @@ class Plant1(pygame.sprite.Sprite):
         self.attack_sound_index   = 0
 
         # Máu
-        self.health     = 300
-        self.contact_damage = 10
-        self.max_health = 300
+        self.health     = 250
+        self.contact_damage = 13
+        self.max_health = 250
 
         # Thời gian trạng thái
         self.hit_start_time       = 0
@@ -196,17 +195,14 @@ class Plant1(pygame.sprite.Sprite):
         self._update_direction(px, py)
 
         # Kích hoạt tấn công
-        if dist_to_player <= self.attack_range and self.state not in ("attack", "return_home"):
+        if dist_to_player <= self.attack_range and self.state != "attack":
             self._start_attack(current_time)
             return
 
         # Cập nhật trạng thái AI theo vùng
         self._update_state_by_zone(dist_player_to_home, current_time)
 
-        # Xử lý về nhà
-        if self.state == "return_home":
-            self._handle_return_home(home_cx, home_cy)
-        elif self.state in ("walk", "run"):
+        if self.state in ("walk", "run"):
             self._handle_chase(px, py)
         elif self.state == "idle":
             self.dx = self.dy = 0
@@ -244,44 +240,15 @@ class Plant1(pygame.sprite.Sprite):
             self.direction = "up"
 
     def _update_state_by_zone(self, dist_player_to_home, current_time):
-        if dist_player_to_home <= self.home_chase_radius:
-            if self.state == "idle":
-                self.state          = "walk"
-                self.walk_start_time = current_time
-                self.is_running     = False
-                print("[Plant1] Phát hiện player — bắt đầu đuổi")
-            elif self.state == "walk":
-                if current_time - self.walk_start_time >= self.walk_duration:
-                    self.state      = "run"
-                    self.is_running = True
-                    print("[Plant1] Chuyển sang chạy!")
-            elif self.state == "return_home":
-                self.state          = "walk"
-                self.walk_start_time = current_time
-                self.is_running     = False
-        elif dist_player_to_home > self.home_leave_radius:
-            if self.state not in ("return_home", "idle", "attack"):
-                self.state      = "return_home"
-                self.is_running = False
-                print("[Plant1] Player ra khỏi vùng — quay về nhà")
-
-    def _handle_return_home(self, home_cx, home_cy):
-        dx = home_cx - (self.x + self.width  // 2)
-        dy = home_cy - (self.y + self.height // 2)
-        dist = math.hypot(dx, dy)
-
-        if dist < 10:
-            self.state = "idle"
-            self.dx = self.dy = 0
-            self.x, self.y    = self.home_x, self.home_y
-            self.rect.x, self.rect.y = self.x, self.y
-            print("[Plant1] Đã về nhà!")
-        else:
-            speed    = PLAYER_SPEED * 0.5
-            self.dx  = (dx / dist) * speed
-            self.dy  = (dy / dist) * speed
-            self.direction = ("right" if dx > 0 else "left") if abs(dx) > abs(dy) \
-                             else ("down" if dy > 0 else "up")
+    # Bỏ return_home — quái luôn chase player đến khi chết
+        if self.state == "idle":
+            self.state           = "walk"
+            self.walk_start_time = current_time
+            self.is_running      = False
+        elif self.state == "walk":
+            if current_time - self.walk_start_time >= self.walk_duration:
+                self.state       = "run"
+                self.is_running  = True
 
     def _handle_chase(self, target_x, target_y):
         dx = target_x - (self.x + self.width  // 2)
@@ -366,7 +333,6 @@ class Plant1(pygame.sprite.Sprite):
             "attack":      self.attack_anims,
             "hit":         self.hit_anims,
             "death":       self.death_anims,
-            "return_home": self.walk_anims,
         }
         anim_dict = anim_map.get(self.state, self.idle_anims)
         anim      = anim_dict.get(self.direction) \
