@@ -7,7 +7,6 @@ _sfx_volume   = 0.5
 def register_sound(sound):
     _sfx_sounds.append(sound)
     sound.set_volume(_sfx_volume)
-    print(f"[SoundManager] Đăng ký sound #{len(_sfx_sounds)}, volume={_sfx_volume}, id={id(sound)}")
 
 def set_music_volume(volume):
     global _music_volume
@@ -17,7 +16,6 @@ def set_music_volume(volume):
 def set_sfx_volume(volume):
     global _sfx_volume
     _sfx_volume = max(0.0, min(1.0, volume))
-    print(f"[SoundManager] set_sfx_volume={_sfx_volume}, tổng sound={len(_sfx_sounds)}")
     for sound in _sfx_sounds:
         try:
             sound.set_volume(_sfx_volume)
