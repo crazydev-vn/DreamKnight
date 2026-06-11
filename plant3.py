@@ -263,7 +263,7 @@ class Plant3(pygame.sprite.Sprite):
                 self.state = "walk"
             return
 
-        speed   = RUN_SPEED * 0.6 if self.state == "run" else PLAYER_SPEED * 0.4
+        speed   = RUN_SPEED * 0.4 if self.state == "run" else PLAYER_SPEED * 0.3
         self.dx = (dx / dist) * speed
         self.dy = (dy / dist) * speed
 
