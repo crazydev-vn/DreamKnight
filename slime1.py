@@ -44,8 +44,8 @@ class Slime1(pygame.sprite.Sprite):
 
         
         self.walk_duration     = 1200   # ms trước khi chuyển sang run
-        self.attack_range      = 45
-        self.attack_duration   = 600    # ms cho animation tấn công
+        self.attack_range      = 60     #sát thương
+        self.attack_duration   = 550    # ms cho animation tấn công
 
         self.walk_start_time      = 0
         self.is_running           = False
@@ -54,7 +54,7 @@ class Slime1(pygame.sprite.Sprite):
 
         # Máu
         self.health     = 150
-        self.contact_damage = 5         # Sát thương khi chạm vào player
+        self.contact_damage = 20         # Sát thương khi chạm vào player
         self.max_health = 100
 
         # Thời gian trạng thái
@@ -84,8 +84,8 @@ class Slime1(pygame.sprite.Sprite):
         self.body_radius = 20
         
         # Debug
-        #self.debug = True
-        self.debug = False
+        self.debug = True
+        #self.debug = False
 
         # Âm thanh
         self.attack_sounds = []
@@ -387,12 +387,12 @@ class Slime1(pygame.sprite.Sprite):
         pygame.draw.circle(screen, (128, 0, 128), (cx, cy), self.body_radius, 2)
         pygame.draw.circle(screen, (255, 165, 0),  (cx, cy), self.attack_range, 2)
 
-        hcx = int(self.home_x + self.width  // 2 - camera.x)
-        hcy = int(self.home_y + self.height // 2 - camera.y)
-        pygame.draw.circle(screen, (255, 255, 0), (hcx, hcy), self.home_chase_radius, 2)
-        pygame.draw.circle(screen, (255, 0,   0), (hcx, hcy), self.home_leave_radius, 2)
-        pygame.draw.rect(screen,   (255, 255, 255), (hcx - 5, hcy - 5, 10, 10), 2)
-        pygame.draw.line(screen,   (200, 200, 200), (cx, cy), (hcx, hcy), 1)
+        #hcx = int(self.home_x + self.width  // 2 - camera.x)
+        #hcy = int(self.home_y + self.height // 2 - camera.y)
+        #pygame.draw.circle(screen, (255, 255, 0), (hcx, hcy), self.home_chase_radius, 2)
+        #pygame.draw.circle(screen, (255, 0,   0), (hcx, hcy), self.home_leave_radius, 2)
+        #pygame.draw.rect(screen,   (255, 255, 255), (hcx - 5, hcy - 5, 10, 10), 2)
+        #pygame.draw.line(screen,   (200, 200, 200), (cx, cy), (hcx, hcy), 1)
 
         font = pygame.font.Font(None, 20)
         dist_home = math.hypot(

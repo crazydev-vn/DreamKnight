@@ -170,15 +170,15 @@ class Player1(pygame.sprite.Sprite):
         self.attack_hitbox = None 
 
         # HỆ THỐNG SÁT THƯƠNG =====
-        #PMD-Bất tử khi HP <= 30% với hiệu ứng mờ dần
+        #PMD-Bất tử khi HP <= 20% với hiệu ứng mờ dần
         self.health = 100
         self.max_health = 100
         self.gold = 0
         self.is_dead = False
-        # GHOST MODE: khi HP <= 30% thì mờ và bất tử 2 giây
+        # GHOST MODE: khi HP <= 20% thì mờ và bất tử 2 giây
         self.ghost_mode = False
         self.ghost_start_time = 0
-        self.ghost_duration = 2000
+        self.ghost_duration = 1500
         self.ghost_used = False     # Chỉ dùng 1 lần duy nhất     # 2 giây bất tử
         self.ghost_alpha = 80           # độ mờ (0=trong suốt, 255=bình thường)
         #PMD
@@ -190,7 +190,7 @@ class Player1(pygame.sprite.Sprite):
         self.dash_upgrade_level = 0       # Cấp độ nâng cấp dash 
         self.range_upgrade_level = 0      # Cấp độ nâng cấp tầm đánh
         self.has_dealt_damage = False     # Đã gây sát thương trong đòn tấn công này chưa
-        self.damage_cooldown = 200          # Thời gian delay giữa các lần gây sát thương (ms)
+        self.damage_cooldown = 400          # Thời gian delay giữa các lần gây sát thương (ms)
         self.last_damage_time = 0           # Thời điểm gây sát thương lần cuối
         self.enemies = None                 # Danh sách kẻ địch (sẽ được gán từ game chính)
         # HIT EFFECT MANAGER
@@ -544,7 +544,7 @@ class Player1(pygame.sprite.Sprite):
     # ===== HÀM MỚI: Gán danh sách enemy từ game chính =====
     def set_enemies(self, enemies):
         self.enemies = enemies
-#PMD-Bất tử khi HP <= 30% với hiệu ứng mờ dần
+#PMD-Bất tử khi HP <= 20% với hiệu ứng mờ dần
     def take_damage(self, damage):
         if self.is_dead:
             return
@@ -563,8 +563,8 @@ class Player1(pygame.sprite.Sprite):
             self.is_dead = True
             print("Player đã chết!")
             return
-        # Kích hoạt ghost mode nếu HP <= 30% và chưa từng dùng
-        if self.health <= self.max_health * 0.3 and not self.ghost_used:
+        # Kích hoạt ghost mode nếu HP <= 20% và chưa từng dùng
+        if self.health <= self.max_health * 0.2 and not self.ghost_used:
             self.ghost_mode = True
             self.ghost_used = True
             self.ghost_start_time = pygame.time.get_ticks()

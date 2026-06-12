@@ -264,12 +264,13 @@ class Game:
             # 1. Luôn luân chuyển lấy sự kiện từ bàn phím/chuột ở mọi frame đầu tiên
             events = self.handle_events()
 
+            dt = self.clock.get_time()
             # Nếu đang chết hoặc đang ở Pause Menu thì dừng toàn bộ logic cập nhật game
             if self.game_over or self.pause_menu.visible:
                 return
 
             # 2. Cập nhật hệ thống tương tác và quét khoảng cách NPC (Bắt buộc truyền thêm "self")
-            self.npc_manager.update(self.player, self)
+            self.npc_manager.update(self.player, self, dt)
 
             # 3. KHÓA CHÂN LUỒNG GAME: Chỉ cập nhật di chuyển và AI quái vật khi KHÔNG xem chữ hội thoại và KHÔNG mở shop
             if not self.npc_manager.is_showing_dialogue and not self.npc_manager.is_showing_shop:

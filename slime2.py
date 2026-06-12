@@ -55,7 +55,7 @@ class Slime2(pygame.sprite.Sprite):
 
         # Máu
         self.health     = 250
-        self.contact_damage = 8         # Sát thương khi chạm vào player
+        self.contact_damage = 40        # Sát thương khi chạm vào player
         self.max_health = 150
 
         # Thời gian trạng thái

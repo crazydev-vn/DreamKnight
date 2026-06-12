@@ -2,6 +2,10 @@ import pygame
 import math
 import os
 from config import SCREEN_WIDTH, SCREEN_HEIGHT
+import sound_manager
+
+# Thêm import pygame.mixer để phát nhạc
+pygame.mixer.init()
 
 #================================================================================================
 # CLASS NPCSYSTEM - Hệ thống NPC, hội thoại và cửa hàng
@@ -25,15 +29,25 @@ class NPCSystem:
 
         # Cache icon
         self.shop_icons = {}
+        
+        # Hệ thống audio cho dialogue
+        self.current_voice = None
+        self.voice_timer = 0
+        self.is_playing_voice = False
 
-        # Kịch bản hội thoại NPC
+        # Kịch bản hội thoại NPC (có thêm đường dẫn file voice)
         self.npc_data = {
             1: {
-                "name": "Lilith (Thuong Nhan Toc Quy) Xin Chao Hanh Gia!",
+                "name": "Sample",
                 "dialogues": {
-                    0: "Lilith: Su dung cam cua nguoi lam ta thay rat thu vi day, chang hanh gia tre...",
-                    1: "Lilith: Lu Slime ngoai kia dang khao khat linh hon cua nguoi. Nguoi khong the di tay khong.",
-                    2: "Lilith: Hay doi trac voi ta! Nguoi muon on dinh sinh menh bang Vat Pham, hay muon hoc Ky Nang?" 
+                    0: "Chao Knight, nguoi trong co ve can su giup do...",
+                    1: "Ta co nhung mon do co the giup do nguoi.",
+                    2: "Hay dua cho ta tien tu nhung con quai bi ha va lay thu nguoi can!" 
+                },
+                "voices": {  # Thêm đường dẫn file voice cho từng câu thoại
+                    0: "03_sounds/sample_sound/IseldaShopOpen.mp3",
+                    1: "03_sounds/sample_sound/IseldaShopTalk01.mp3",
+                    2: "03_sounds/sample_sound/IseldaShopTalk02.mp3",
                 }
             },
             2: {
@@ -42,7 +56,7 @@ class NPCSystem:
                     0: "Kaelen: Ta giu trong trach quan ly Guild Hall de dan dat cac hiep si tre tuoi nhu nguoi.",
                     1: "Kaelen: Hay chuan bi day du trang bi tu Lilith truoc khi buoc vao vung dat cua lu Slime.",
                     2: "Kaelen: Tieu diet lu quai vat se giup nguoi co vang de giao dich. Chuc may man!"
-                }
+                },
             }
         }
 
@@ -50,14 +64,63 @@ class NPCSystem:
         self.shop_goods = {
             "vat pham": [
                 {"name": "Minor Health Potion", "desc": "+20 HP", "price": 15, "type": "heal", "value": 20, "quantity": 1, "icon": "fc266.png"},
-                {"name": "Health Potion", "desc": "+50 HP", "price": 39, "type": "heal", "value": 50, "quantity": 1, "icon": "fc268.png"},
-                {"name": "Greater Health Potion", "desc": "+MAX HP", "price": 81, "type": "heal", "value": 100, "quantity": 1, "icon": "fc272.png"}
+                {"name": "Health Potion", "desc": "+40 HP", "price": 30, "type": "heal", "value": 40, "quantity": 1, "icon": "fc268.png"},
+                {"name": "Greater Health Potion", "desc": "+MAX HP", "price": 60, "type": "heal", "value": 100, "quantity": 1, "icon": "fc272.png"}
             ],
             "ky nang": [
-                {"name": "Upgrade sword", "desc": "Tang Sat Thuong Kiem (+15)", "price": 150, "type": "damage", "value": 15, "quantity": 1, "icon": "fc730.png"},
-                {"name": "Dashmaster", "desc": "Giam Cooldown Dash (-0.2s)", "price": 200, "type": "dash_cd", "value": 0.2, "quantity": 1, "icon": "fc790.png"},
+                {"name": "Upgrade sword", "desc": "Tang Sat Thuong Kiem (+15)", "price": 100, "type": "damage", "value": 15, "quantity": 1, "icon": "fc730.png"},
+                {"name": "Dashmaster", "desc": "Giam Cooldown Dash (-0.2s)", "price": 150, "type": "dash_cd", "value": 0.2, "quantity": 1, "icon": "fc790.png"},
             ]
         }
+
+    # ------------------------------------------------------------------
+    # HỆ THỐNG AUDIO CHO DIALOGUE
+    # ------------------------------------------------------------------
+    def play_dialogue_voice(self, npc_id, step):
+        """Phát file voice cho câu thoại hiện tại"""
+        # Dừng voice đang phát nếu có
+        if self.current_voice:
+            self.current_voice.stop()
+            
+        # Kiểm tra xem NPC có voice cho step này không
+        if npc_id in self.npc_data:
+            voices = self.npc_data[npc_id].get("voices", {})
+            voice_file = voices.get(step)
+            
+            if voice_file and os.path.exists(voice_file):
+                try:
+                    self.current_voice = pygame.mixer.Sound(voice_file)
+                    # Đăng ký với sound_manager để control volume
+                    sound_manager.register_npc_voice(self.current_voice)
+                    # Phát âm thanh
+                    self.current_voice.play()
+                    self.is_playing_voice = True
+                    self.voice_timer = int(self.current_voice.get_length() * 1000)
+                    print(f"✅ Đang phát: {voice_file}")
+                    print(f"📊 Volume hiện tại: {sound_manager.get_sfx_volume()}")
+                except Exception as e:
+                    print(f"❌ Lỗi: {e}")
+                    self.is_playing_voice = False
+            else:
+                if voice_file:
+                    print(f"❌ Không tìm thấy file: {voice_file}")
+                self.is_playing_voice = False
+        
+    def stop_current_voice(self):
+        """Dừng voice đang phát"""
+        if self.current_voice:
+            self.current_voice.stop()
+            self.current_voice = None
+        self.is_playing_voice = False
+        self.voice_timer = 0
+    
+    def update_voice(self, dt):
+        """Cập nhật timer cho voice (gọi trong game loop)"""
+        if self.is_playing_voice:
+            self.voice_timer -= dt
+            if self.voice_timer <= 0:
+                self.is_playing_voice = False
+                self.voice_timer = 0
 
     # ------------------------------------------------------------------
     # LOAD ICON
@@ -80,7 +143,10 @@ class NPCSystem:
     # ------------------------------------------------------------------
     # CẬP NHẬT
     # ------------------------------------------------------------------
-    def update(self, player, game_instance):
+    def update(self, player, game_instance, dt=0):
+        # Cập nhật voice timer
+        self.update_voice(dt)
+        
         if self.is_showing_dialogue or self.is_showing_shop:
             if self.shop_message_timer > 0:
                 self.shop_message_timer -= 1
@@ -175,6 +241,8 @@ class NPCSystem:
                 self.is_showing_dialogue = True
                 self.current_step = 0
                 self.selected_option = 0
+                # Phát voice cho câu thoại đầu tiên
+                self.play_dialogue_voice(self.active_npc_id, 0)
             return
 
         if self.is_showing_dialogue and self.active_npc_id:
@@ -188,6 +256,8 @@ class NPCSystem:
                     self.is_showing_dialogue = False 
                     self.is_showing_shop = True     
                     self.shop_type = "vat pham" if self.selected_option == 0 else "ky nang"
+                    # Dừng voice khi đóng dialogue
+                    self.stop_current_voice()
                 return
 
             if key == pygame.K_f:
@@ -195,6 +265,11 @@ class NPCSystem:
                 if self.current_step >= total_dialogues:
                     self.is_showing_dialogue = False
                     self.active_npc_id = None
+                    # Dừng voice khi kết thúc dialogue
+                    self.stop_current_voice()
+                else:
+                    # Phát voice cho câu thoại tiếp theo
+                    self.play_dialogue_voice(self.active_npc_id, self.current_step)
 
     # ------------------------------------------------------------------
     # VẼ GIAO DIỆN
@@ -232,6 +307,11 @@ class NPCSystem:
             msg = npc["dialogues"].get(self.current_step, "")
             msg_surf = font_small.render(msg, True, (255, 255, 255))
             surface.blit(msg_surf, (70, SCREEN_HEIGHT - 110))
+            
+            # Hiển thị icon đang phát voice (nếu có)
+            if self.is_playing_voice:
+                voice_icon = font_small.render("🔊", True, (100, 255, 100))
+                surface.blit(voice_icon, (SCREEN_WIDTH - 60, SCREEN_HEIGHT - 150))
             
             total_dialogues = len(npc["dialogues"])
             if self.active_npc_id == 1 and self.current_step == total_dialogues - 1:
