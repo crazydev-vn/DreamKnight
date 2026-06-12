@@ -183,7 +183,7 @@ class Player1(pygame.sprite.Sprite):
         self.ghost_alpha = 80           # độ mờ (0=trong suốt, 255=bình thường)
         #PMD
 
-        self.damage = 50                  # Sát thương mỗi đòn đánh
+        self.damage = 15                  # Sát thương mỗi đòn đánh
         self.attack_range = 60            # Tầm đánh cơ bản của kiếm
         self.attack_damage_level = 0      # Cấp độ nâng cấp sát thương
         self.attack_speed_level = 0       # Cấp độ nâng cấp tốc độ đánh

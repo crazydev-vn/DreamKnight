@@ -19,10 +19,12 @@ class UI:
         # Load ảnh dash
         self.dash_frames = []  # Mảng chứa 5 khung hình animation của dash
         self.load_dash_frames()
-
-
         
-        # ===== BIẾN ANIMATION =====
+        # Load ảnh HP animation (thay thế hoàn toàn thanh máu vẽ bằng code)
+        self.hp_frames = []  # Mảng chứa 5 khung hình animation của HP (0% → 100%)
+        self.load_hp_frames()
+        
+        # ===== BIẾN ANIMATION DASH =====
         self.dash_animation_progress = 0.0   # Tiến độ animation (0.0 → 1.0)
         self.is_dashing_anim = False        # Cờ báo hiệu đang chạy animation dash
         self.dash_animation_speed = 0.04    # Tốc độ chạy animation (mỗi frame tăng 0.04)
@@ -37,6 +39,7 @@ class UI:
             img = pygame.image.load(f"assets/gold/gold01/gold{i}.png").convert_alpha()
             img = pygame.transform.scale(img, (img.get_width() * 2, img.get_height() * 2))
             self.gold_frames.append(img)
+    
     def load_dash_frames(self):
         """Load 5 ảnh dash từ thư mục assets/dash_UI/ và scale gấp đôi kích thước"""
         for i in range(5):  # Duyệt từ 0 đến 4 tương ứng dashUI00.png → dashUI04.png
@@ -50,11 +53,26 @@ class UI:
                 pygame.quit()
                 exit()
     
+    def load_hp_frames(self):
+        """Load 5 ảnh HP từ thư mục assets/HP_UI/ (0% → 100% máu) và scale gấp đôi"""
+        for i in range(5):  # hp_UI0.png (0% máu) → hp_UI4.png (100% máu)
+            try:
+                frame = pygame.image.load(f"assets/HP_UI/hp_UI{i}.png").convert_alpha()
+                w, h = frame.get_width(), frame.get_height()
+                frame = pygame.transform.scale(frame, (w * 2, h * 2))
+                self.hp_frames.append(frame)
+            except Exception as e:
+                print(f"LỖI: Không load được HP_UI{i}.png - {e}")
+                # Tạo frame giả nếu lỗi
+                dummy = pygame.Surface((100, 30), pygame.SRCALPHA)
+                dummy.fill((100, 0, 0))
+                self.hp_frames.append(dummy)
+    
     def start_dash_animation(self):
         """Bắt đầu animation dash (chỉ gọi 1 lần mỗi lần dash)"""
         self.is_dashing_anim = True
         self.dash_animation_progress = 0.0
-        self.has_played_dash_anim = True  # Đánh dấu đã chạy animation cho lần dash này
+        self.has_played_dash_anim = True
     
     def reset_dash_animation_flag(self):
         """Reset flag khi dash kết thúc, cho phép lần dash sau có thể chạy animation lại"""
@@ -65,78 +83,29 @@ class UI:
         if self.is_dashing_anim:
             self.dash_animation_progress += self.dash_animation_speed
             if self.dash_animation_progress >= 1.0:
-                self.is_dashing_anim = False  # Kết thúc animation
+                self.is_dashing_anim = False
                 self.dash_animation_progress = 0.0
-                self.reset_dash_animation_flag()  # Reset flag để lần dash sau có thể chạy lại
-
-    def draw_rounded_rect(self, surface, color, rect, radius=8):
-        """Vẽ hình chữ nhật bo góc (tay thủ công vì pygame không có sẵn hàm vẽ bo góc)
-        
-        Args:
-            surface: Surface để vẽ lên
-            color: Màu sắc (tuple RGB)
-            rect: Tuple (x, y, width, height)
-            radius: Bán kính bo góc
-        """
-        x, y, w, h = rect
-        # Vẽ phần thân (hình chữ nhật không có góc)
-        pygame.draw.rect(surface, color, (x + radius, y, w - 2*radius, h))
-        pygame.draw.rect(surface, color, (x, y + radius, w, h - 2*radius))
-        # Vẽ 4 góc tròn
-        pygame.draw.circle(surface, color, (x + radius, y + radius), radius)
-        pygame.draw.circle(surface, color, (x + w - radius, y + radius), radius)
-        pygame.draw.circle(surface, color, (x + radius, y + h - radius), radius)
-        pygame.draw.circle(surface, color, (x + w - radius, y + h - radius), radius)
+                self.reset_dash_animation_flag()
 
     def draw_health_bar(self, surface, player):
-        """Vẽ thanh máu với hiệu ứng đổi màu theo % máu và nhấp nháy khi máu thấp"""
-        self.tick += 1  # Tăng biến đếm frame để tạo hiệu ứng nhấp nháy
+        """Vẽ thanh máu HOÀN TOÀN bằng SPRITE (không còn vẽ bằng code nữa)"""
+        self.tick += 1
+        
         health_percent = max(0, player.health / player.max_health)  # Tính % máu (0.0 → 1.0)
-
-        # Thông số thanh máu: vị trí và kích thước
-        PAD    = 14      # Khoảng cách từ mép màn hình
-        BW     = 220     # Chiều rộng thanh (Bar Width)
-        BH     = 22      # Chiều cao thanh (Bar Height)
+        
+        # Chọn frame dựa trên % máu (0% → frame 0, 100% → frame 4)
+        # 5 frame tương ứng: 0%, 25%, 50%, 75%, 100%
+        frame_index = int(health_percent * 4)  # 0.0 → 0, 1.0 → 4
+        frame_index = max(0, min(frame_index, len(self.hp_frames) - 1))
+        
+        # Vị trí thanh máu
+        PAD    = 14
         BAR_X  = PAD
         BAR_Y  = PAD
-
-        # Vẽ nền thanh máu (màu đỏ)
-        self.draw_rounded_rect(surface, (255, 0, 0), (BAR_X, BAR_Y, BW, BH), radius=6)
-
-        # Tính chiều rộng phần máu còn lại
-        fill_w = max(0, int(BW * health_percent))
-        if fill_w > 8:  # Chỉ vẽ nếu còn đủ rộng (tránh lỗi khi fill_w quá nhỏ)
-            # Chọn màu dựa trên % máu
-            if health_percent > 0.5:
-                # Máu > 50%: Màu đỏ cam sáng
-                bar_color = (210, 55, 55)
-                shine     = (255, 100, 100)  # Màu ánh sáng phản chiếu
-            elif health_percent > 0.25:
-                # Máu 25-50%: Màu cam
-                bar_color = (210, 130, 30)
-                shine     = (255, 190, 60)
-            else:
-                # Máu < 25%: Màu đỏ nhấp nháy
-                pulse = int(abs(math.sin(self.tick * 0.06)) * 40)  # Tạo dao động từ 0-40
-                bar_color = (200 + pulse, 30, 30)  # Màu đỏ dao động
-                shine     = (255, 80 + pulse, 80)
-
-            # Vẽ phần máu còn lại
-            self.draw_rounded_rect(surface, bar_color, (BAR_X, BAR_Y, fill_w, BH), radius=6)
-            
-            # Vẽ hiệu ứng ánh sáng (phản chiếu ở nửa trên thanh máu)
-            shine_surf = pygame.Surface((fill_w, BH // 2), pygame.SRCALPHA)
-            shine_surf.fill((*shine, 60))  # Màu với độ trong suốt 60/255
-            surface.blit(shine_surf, (BAR_X, BAR_Y))
-
-        # Vẽ viền thanh máu (màu vàng)
-        pygame.draw.rect(surface, (255, 210, 100), (BAR_X, BAR_Y, BW, BH), 2, border_radius=6)
         
-        # Vẽ text hiển thị số máu (vd: "75 / 100")
-        hp_text = self.font.render(f"{player.health} / {player.max_health}", True, (255, 255, 255))
-        tx = BAR_X + (BW - hp_text.get_width()) // 2  # Căn giữa theo chiều ngang
-        ty = BAR_Y + (BH - hp_text.get_height()) // 2  # Căn giữa theo chiều dọc
-        surface.blit(hp_text, (tx, ty))
+        # Vẽ sprite thanh máu
+        hp_frame = self.hp_frames[frame_index]
+        surface.blit(hp_frame, (BAR_X, BAR_Y))
 
     def draw_dash_cooldown(self, surface, player):
         """Vẽ thanh dash - chỉ chạy animation 1 lần mỗi lần dash"""
@@ -247,13 +216,13 @@ class UI:
         gold = getattr(player, 'gold', 0)
         gold_text = self.font.render(f"{gold}", True, (255, 230, 80))
         
-        text_x = PAD + gold_icon.get_width() + 1   # Cách icon 5px (chỉnh + để xa hơn, - để gần hơn)
-        text_y = GOLD_Y + 22       # Cách icon x(px) (chỉnh + để xuống, - để lên)
+        text_x = PAD + gold_icon.get_width() + 1
+        text_y = GOLD_Y + 22
         surface.blit(gold_text, (text_x, text_y))
 
     def draw(self, surface, player, screen_width, screen_height):
         """Vẽ toàn bộ UI (hàm chính gọi từ game loop)"""
-        # Vẽ thanh máu
+        # Vẽ thanh máu (bằng SPRITE)
         self.draw_health_bar(surface, player)
         
         # Vẽ thanh cooldown dash
@@ -265,6 +234,7 @@ class UI:
         # Nếu player đã chết, vẽ màn hình Game Over
         if hasattr(player, 'is_dead') and player.is_dead:
             self.draw_game_over(surface, screen_width, screen_height)
+
 
 class PauseMenu:
     def __init__(self):

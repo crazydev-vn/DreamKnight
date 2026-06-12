@@ -53,7 +53,7 @@ class Slime1(pygame.sprite.Sprite):
         self.attack_sound_index   = 0
 
         # Máu
-        self.health     = 100
+        self.health     = 150
         self.contact_damage = 5         # Sát thương khi chạm vào player
         self.max_health = 100
 
@@ -98,7 +98,7 @@ class Slime1(pygame.sprite.Sprite):
     # ------------------------------------------------------------------
 
     def _load_sounds(self):
-        sound_path = os.path.join("03_sounds", "slime3")
+        sound_path = os.path.join("03_sounds", "slime1")
         try:
             for i in range(1, 3):
                 path = os.path.join(sound_path, f"Attack{i}.mp3")

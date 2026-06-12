@@ -35,7 +35,7 @@ FPS = 1000000000000
 PLAYER_SPEED = 3.0
 
 # Tốc độ khi chạy (bằng nửa PLAYER_SPEED? thực tế là 6 > 3 nên nhanh gấp đôi)
-RUN_SPEED = 6.0 # Tốc độ chạy (nhanh hơn đi bộ)
+RUN_SPEED = 5.0 # Tốc độ chạy (nhanh hơn đi bộ)
 
 # ==================== ĐƯỜNG DẪN ẢNH ====================
 
