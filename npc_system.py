@@ -51,12 +51,19 @@ class NPCSystem:
                 }
             },
             2: {
-                "name": "Kaelen (Truong Lao Guild Hall) Xin Chao Hanh Gia!",
+                "name": "The Hunter",
                 "dialogues": {
-                    0: "Kaelen: Ta giu trong trach quan ly Guild Hall de dan dat cac hiep si tre tuoi nhu nguoi.",
-                    1: "Kaelen: Hay chuan bi day du trang bi tu Lilith truoc khi buoc vao vung dat cua lu Slime.",
-                    2: "Kaelen: Tieu diet lu quai vat se giup nguoi co vang de giao dich. Chuc may man!"
+                    0: "Tiny squib... You approach fearless. Are you a hunter like me?.",
+                    1: "Do you feel the urge inside, to stalk, to kill, to understand?",
+                    2: "Then take it! My journal. It will aid you. At first the text may seem difficult to discern, but a learned hunter will come to understand its words.",
+                    3: "Venture the depths of this land and slay its beasts. Prove yourself worthy to bear the mark of Hunter.",
                 },
+                "voices": {  # Thêm đường dẫn file voice cho từng câu thoại
+                    0: "03_sounds/TheHunter/HunterTalk01.mp3",
+                    1: "03_sounds/TheHunter/HunterTalk02.mp3",
+                    2: "03_sounds/TheHunter/HunterTalk03.mp3",
+                    3: "03_sounds/TheHunter/HunterTalk04.mp3",
+                }
             }
         }
 

@@ -46,7 +46,7 @@ class UI:
             try:
                 frame = pygame.image.load(f"assets/dash_UI/dashUI0{i}.png").convert_alpha()
                 w, h = frame.get_width(), frame.get_height()
-                frame = pygame.transform.scale(frame, (w * 2, h * 2))  # Scale gấp đôi để rõ nét hơn
+                frame = pygame.transform.scale(frame, (w * 3, h * 3))  # Scale gấp đôi để rõ nét hơn
                 self.dash_frames.append(frame)
             except Exception as e:
                 print(f"LỖI: Không load được dashUI0{i}.png - {e}")
@@ -59,7 +59,7 @@ class UI:
             try:
                 frame = pygame.image.load(f"assets/HP_UI/hp_UI{i}.png").convert_alpha()
                 w, h = frame.get_width(), frame.get_height()
-                frame = pygame.transform.scale(frame, (w * 2, h * 2))
+                frame = pygame.transform.scale(frame, (w * 3, h * 3))
                 self.hp_frames.append(frame)
             except Exception as e:
                 print(f"LỖI: Không load được HP_UI{i}.png - {e}")
@@ -99,7 +99,7 @@ class UI:
         frame_index = max(0, min(frame_index, len(self.hp_frames) - 1))
         
         # Vị trí thanh máu
-        PAD    = 14
+        PAD    = 20
         BAR_X  = PAD
         BAR_Y  = PAD
         
@@ -124,7 +124,7 @@ class UI:
         ready_pct = max(0.0, min(1.0, ready_pct))
 
         # Vị trí thanh dash (ngay dưới thanh máu)
-        PAD   = 14
+        PAD   = 20
         BAR_X = PAD
         BAR_Y = PAD + 28
 

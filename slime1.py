@@ -84,8 +84,8 @@ class Slime1(pygame.sprite.Sprite):
         self.body_radius = 20
         
         # Debug
-        self.debug = True
-        #self.debug = False
+        #self.debug = True
+        self.debug = False
 
         # Âm thanh
         self.attack_sounds = []
